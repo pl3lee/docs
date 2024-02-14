@@ -1,3 +1,4 @@
 {
-    "gitlabcicd": "GitLab CI/CD"
+    "gitlabcicd": "GitLab CI/CD",
+    "docker-dockercompose": "Docker & Docker Compose"
 }

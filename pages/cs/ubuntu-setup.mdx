@@ -1,0 +1,76 @@
+# Ubuntu Setup
+This is a script that automates the setup of a new Ubuntu installation. It installs the following:
+- VSCode
+- Git
+- Node 16
+- Yarn
+- Docker with Docker Compose
+- Go
+- Latex with ttf-mscorefonts-installer
+- Python with pip
+- Jupyter Lab
+
+## Usage
+Copy and paste the code below into a file, then change its permissions to make it executable by running `chmod +x <filename>`. Finally, run the script with `./<filename>`.
+
+```bash
+#!/bin/bash
+
+sudo apt update
+sudo apt upgrade
+
+# Installs VSCode
+wget -O code-latest.deb 'https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64'
+sudo apt install ./code-latest.deb
+rm code-latest.deb
+
+# Installs Git
+sudo add-apt-repository ppa:git-core/ppa
+sudo apt update
+sudo apt install git
+git config --global user.name "pl3lee"
+git config --global user.email "billy.pl.lee@gmail.com"
+git config --global init.defaultBranch main
+git config --global pull.rebase false
+ssh-keygen -t ed25519 -C "billy.pl.lee@gmail.com"
+
+# Installs Node
+sudo apt install curl
+sudo apt update && sudo apt upgrade
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# Installs version 16.20.2. change to --lts if necessary
+nvm install 16.20.2
+npm install -g yarn
+
+# Installs Docker
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
+
+# Installs Go
+sudo add-apt-repository ppa:longsleep/golang-backports
+sudo apt update
+sudo apt install golang-go
+
+# Installs Latex
+sudo apt install texlive-full
+sudo apt-get install ttf-mscorefonts-installer
+
+# Installs pip
+sudo apt install python3-pip
+pip install jupyterlab
+```
