@@ -1,15 +1,13 @@
 {
   "index": "Introduction",
-  "another": "Another Page",
   "webdev": "Web Development",
-  "about": {
-    "title": "About",
-    "type": "page"
-  },
-  "contact": {
-    "title": "Contact ↗",
+  "devops": "DevOps",
+  "mathematics": "Mathematics",
+  "cs": "Computer Science",
+  "personalWebsite": {
+    "title": "Personal Website ↗",
     "type": "page",
-    "href": "https://twitter.com/shuding_",
+    "href": "https://billylee.me",
     "newWindow": true
   }
 }

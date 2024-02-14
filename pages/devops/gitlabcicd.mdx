@@ -1,0 +1,209 @@
+# GitLab CI/CD
+GitLab CI/CD can be used for automating the process of testing, building, and deploying our application.
+
+Video: https://www.youtube.com/watch?v=qP8kir2GUgo&list=WL&index=46
+## Pipeline Configuration File
+The configuration file is stored in the application's git repository. It must be named ```.gitlab-ci.yml```.
+
+In the following, we will have the following sections
+- Run tests
+- Build image
+- Deploy
+
+Each step is called a job. Jobs are the most fundamental building block of a ```.gitlab-ci.yml``` file. You can define arbitrary names for your jobs, however the following keywords cannot be used as job names:
+- image
+- services
+- stages
+- types
+- before_script
+- after_script
+- variables
+- cache
+- include
+- true
+- false
+- nil
+
+We will write each job configuration in the same ```.gitlab-ci.yml``` file.
+## Running Tests
+Each job must contain at least the ```script``` clause. ```script``` specify the commands to execute. In the ```script``` clause, we will have our command for running tests. For it to successfully run, we must have to have a package manager (npm or yarn), and Node installed on the machine where the job is executed.
+```yml
+run_tests:
+  script: 
+    - yarn test
+```
+The script is executed by an executor. The executor determine the environment each job runs in.
+
+The shell is the simplest executor. The commands are directly executed on the operating system, on the shell of the server where GitLab Runner is installed.
+
+Another common executor is a Docker container. Advantages of this include
+- Only Docker itself needs to be installed.
+- Each job runs in a separate and isolated container.
+
+However, which Docker Image is used for the containers? Containers run based on a certain Docker Image. Depending on the image we specify, we have different tools available inside the container. By default, GitLab's managed Runners use a Ruby image to start the container. For our purposes, we will use the NodeJS 16 image. We can specify this in our  ```.gitlab-ci.yml```.
+```yml
+run_tests:
+  image: node:16
+  script: 
+    - yarn test
+```
+Now, what if we need do execute some commands before we run our script? For example, we need to install the packages we need from our ```package.json``` file. We can specify them in the ```before_script``` tag, and for commands we run after our script, we specify them in ```after_script``` tag.
+```yml
+run_tests:
+  image: node:16
+  before_script:
+    - apt-get update && apt-get install
+    - yarn install
+  script: 
+    - yarn test
+```
+
+## Building and Pushing Docker Image
+This job will build the Docker image and push it to a private DockerHub repository (or to the GitLab Container Registry). In this tutorial we use DockerHub.
+
+To push images to private Docker repositories, the GitLab runner needs the Docker repository credentials, so that it can push and pull images to and from it. For Dockerhub, this is usually the username and password of our DockerHub account. However, do NOT hard code any credentials in our ```.gitlab-ci.yml``` file. Instead, we will create secret variables on GitLab. In our GitLab repository, we go to 
+
+Settings -> CI/CD -> Variables
+
+This is where we can create Project Variables.
+- They are stored outside the git repository (not in ```.gitlab-ci.yml```)
+- They are ideal for tokens and passwords, which should not be included in the repository for security reasons.
+
+In the Variable section, we click on Add variable, then specify the key-value pairs. One example might be
+```
+key: REGISTRY_USER
+value: pl3lee
+```
+```
+key: REGISTRY_PASSWORD
+value: strongpassword123
+```
+Remember to check Mask variable. This masks the variable in job logs, so that we avoid the risk of exposing the value of the variable.
+
+Now we can continue writing our configuration file. What do we want to do now? We want to build the image using a Dockerfile stored in the root.
+```yml
+run_tests:
+  image: node:16
+  before_script:
+    - apt-get update && apt-get install
+    - yarn install
+  script: 
+    - yarn test
+
+build_image:
+  image: docker:20.10.16 # use docker image for docker-in-docker
+  services:
+    - docker:20.10.16-dind # need this for docker daemon
+  # defining variables here so that we dont have to keep typing the same thing
+  # these variables are defined on a job level. Otherwise, we can extract them and make them available in a pipeline level by putting them on top before our jobs.
+  variables: 
+    IMAGE_NAME: <repository name>
+    IMAGE_TAG: example-app-1.0
+    DOCKER_TLS_CERTDIR: "/certs" # need this so that the service container and the job container can share the cert
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG . # -t adds a version tag to our image, so that we can push/pull to DockerHub
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS <optional registry if not pushing to DockerHub> # equivalently we can put this in before_script
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+```
+A service is an additional container that starts at the same time as the job container. The job container can then use that service during build time.
+- Most common case is to run a database container
+- The service attribute makes sure that the containers are linked together on the same network so that they can talk to each other
+
+Now, we should actually see the docker image in our DockerHub repository. However, what we currently have does not really work, since all our jobs will execute in parallel. We want to define in which order the jobs should run
+- Only if the tests are successful, we want to build the Docker image.
+- Only if the build and push was successful, we want to deploy that new image.
+
+### Stages
+We can do this using stages. We can group multiple jobs into stages that run in defined order. Multiple jobs in the same stage are executed in parallel. For example, all tests can run in parallel (lint, unit tests, E2E tests). We can define the stages attribute
+```yml
+stages:
+- test
+- build
+
+run_tests:
+  stage: test
+  image: node:16
+  before_script:
+    - apt-get update && apt-get install
+    - yarn install
+  script: 
+    - yarn test
+
+build_image:
+  stage: build
+  image: docker:20.10.16 # use docker image for docker-in-docker
+  services:
+    - docker:20.10.16-dind # need this for docker daemon
+  # defining variables here so that we dont have to keep typing the same thing
+  # these variables are defined on a job level. Otherwise, we can extract them and make them available in a pipeline level by putting them on top before our jobs.
+  variables: 
+    IMAGE_NAME: <repository name>
+    IMAGE_TAG: example-app-1.0
+    DOCKER_TLS_CERTDIR: "/certs" # need this so that the service container and the job container can share the cert
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG . # -t adds a version tag to our image, so that we can push/pull to DockerHub
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS <optional registry if not pushing to DockerHub> # equivalently we can put this in before_script
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+```
+## Deployment
+To deploy our app to our deployment server, GitLab Runner needs to SSH into it. We can create a new SSH key on our local machine, then use that SSH key for GitLab Runner.
+1. Generate our SSH key
+2. Copy public key ```.pub``` into deployment server
+3. Copy private key (without ```.pub``` extension) until and including the ```----END PRIVATE KEY----``` line
+4. Add new secret variable to GitLab CICD settings
+```
+key: SSH_KEY
+value: <private SSH key>
+```
+5. Remember to add a newline after the ```----END PRIVATE KEY----``` line
+6. Select Type = file
+
+Now let's add the deploy stage
+```yml
+stages:
+- test
+- build
+- deploy
+
+run_tests:
+  stage: test
+  image: node:16
+  before_script:
+    - apt-get update && apt-get install
+    - yarn install
+  script: 
+    - yarn test
+
+build_image:
+  stage: build
+  image: docker:20.10.16 # use docker image for docker-in-docker
+  services:
+    - docker:20.10.16-dind # need this for docker daemon
+  # defining variables here so that we dont have to keep typing the same thing
+  # these variables are defined on a job level. Otherwise, we can extract them and make them available in a pipeline level by putting them on top before our jobs.
+  variables: 
+    IMAGE_NAME: <repository name>
+    IMAGE_TAG: example-app-1.0
+    DOCKER_TLS_CERTDIR: "/certs" # need this so that the service container and the job container can share the cert
+  script:
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG . # -t adds a version tag to our image, so that we can push/pull to DockerHub
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS <optional registry if not pushing to DockerHub> # equivalently we can put this in before_script
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+
+deploy:
+  stage: deploy
+  before_script:
+    # required step since there will be permission errors if we do not set the permissions correctly.
+    - chmod 400 $SSH_KEY
+  script:
+    # StrictHostKeyChecking=no disables the confirmation for SSH
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY <username>@<server address> "
+        docker login -u $REGISTRY_USER -p $REGISTRY_PASS <optional registry if not pushing to DockerHub> &&
+        ## -aq means to list all container IDs
+        ## this stops all the docker containers, you might have different configuration (only stopping frontend container for example)
+        docker ps -aq | xargs docker stop | xargs docker rm &&
+        docker run -d -p 3000:3000 $IMAGE_NAME:$IMAGE_TAG
+    "
+```
+
+
