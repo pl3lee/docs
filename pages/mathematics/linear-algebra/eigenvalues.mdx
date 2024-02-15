@@ -1,0 +1,101 @@
+# Eigenvalues and Eigenvectors
+Suppose that we have a solution to the following problem:
+$$
+\begin{align*}
+    Av = \lambda v 
+\end{align*}
+$$
+where $A$ is a square matrix, $v$ is a vector, and $\lambda$ is a scalar. Then, $v$ is called an eigenvector of $A$ and $\lambda$ is called an eigenvalue of $A$.
+
+## How to Find Eigenvalues
+To find the eigenvalues of a matrix, we need to solve the following equation:
+$$
+\begin{align*}
+    \det(A - \lambda I) = 0
+\end{align*}
+$$
+As an example, suppose we have the following matrix:
+$$
+\begin{align*}
+    A = \begin{bmatrix}
+        2 & 1 \\
+        1 & 2
+    \end{bmatrix}
+\end{align*}
+$$
+We solve the following to find its eigenvalues:
+$$
+\begin{align*}
+    \det(A - \lambda I) &= 0 \\
+    \det\begin{bmatrix}
+        2 - \lambda & 1 \\
+        1 & 2 - \lambda
+    \end{bmatrix} &= 0 \\
+    (2 - \lambda)(2 - \lambda) - 1 &= 0 \\
+    4 - 4\lambda + \lambda^2 - 1 &= 0 \\
+    \lambda^2 - 4\lambda + 3 &= 0 \\
+    (\lambda - 3)(\lambda - 1) &= 0 \\
+    \lambda &= 3, 1
+\end{align*}
+$$
+So, the eigenvalues of $A$ are $\lambda = 3, 1$.
+
+## How to Find Eigenvectors
+We find eigenvectors associated with each eigenvalue by solving the following equation:
+$$
+\begin{align*}
+    (A - \lambda I)v = 0
+\end{align*}
+$$
+Using the example from above, we first find the eigenvector associated with $\lambda = 3$:
+$$
+\begin{align*}
+    (A - 3I)v &= 0 \\
+    \begin{bmatrix}
+        2 - 3 & 1 \\
+        1 & 2 - 3
+    \end{bmatrix}v &= 0 \\
+    \begin{bmatrix}
+        -1 & 1 \\
+        1 & -1
+    \end{bmatrix}v &= 0 \\
+    \begin{bmatrix}
+        -1 & 1 \\
+        0 & 0
+    \end{bmatrix}v &= 0 \\
+    -v_1 + v_2 &= 0 \\
+    v_1 &= v_2
+\end{align*}
+$$
+So an eigenvector is $\begin{bmatrix} 1 \\ 1 \end{bmatrix}$. Next, we find the eigenvector associated with $\lambda = 1$:
+$$
+\begin{align*}
+    (A - I)v &= 0 \\
+    \begin{bmatrix}
+        2 - 1 & 1 \\
+        1 & 2 - 1
+    \end{bmatrix}v &= 0 \\
+    \begin{bmatrix}
+        1 & 1 \\
+        1 & 1
+    \end{bmatrix}v &= 0 \\
+    \begin{bmatrix}
+        1 & 1 \\
+        0 & 0
+    \end{bmatrix}v &= 0 \\
+    v_1 + v_2 &= 0 \\
+    v_1 &= -v_2
+\end{align*}
+$$
+So an eigenvector is $\begin{bmatrix} 1 \\ -1 \end{bmatrix}$. Indeed, we can check that
+$$
+\begin{align*}
+    A\begin{bmatrix} 1 \\ 1 \end{bmatrix} &= \begin{bmatrix}
+        2 & 1 \\
+        1 & 2
+    \end{bmatrix} \begin{bmatrix} 1 \\ 1 \end{bmatrix} = \begin{bmatrix} 3 \\ 3 \end{bmatrix} = 3\begin{bmatrix} 1 \\ 1 \end{bmatrix} \\
+    A\begin{bmatrix} 1 \\ -1 \end{bmatrix} &= \begin{bmatrix}
+        2 & 1 \\
+        1 & 2
+    \end{bmatrix} \begin{bmatrix} 1 \\ -1 \end{bmatrix} = \begin{bmatrix} 1 \\ -1 \end{bmatrix} = 1\begin{bmatrix} 1 \\ -1 \end{bmatrix}
+\end{align*}
