@@ -11,7 +11,7 @@ const config: DocsThemeConfig = {
   // },
   // docsRepositoryBase: 'https://github.com/shuding/nextra-docs-template',
   footer: {
-    text: 'Documentation',
+    text: `@ ${new Date().getFullYear()} Billy Lee. All rights reserved.`
   },
 }
 
