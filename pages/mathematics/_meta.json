@@ -1,6 +1,6 @@
 {
-    "fourier-transform": "Fourier Transform",
     "linear-algebra": "Linear Algebra",
+    "fourier-transform": "Fourier Transform",
     "combinatorics": "Combinatorics",
     "optimization": "Optimization"
 }

@@ -24,7 +24,7 @@
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
-			"extensions": ["streetsidesoftware.code-spell-checker", "eamodio.gitlens", "unifiedjs.vscode-mdx", "rvest.vs-code-prettier-eslint", "bradlc.vscode-tailwindcss"]
+			"extensions": ["streetsidesoftware.code-spell-checker", "eamodio.gitlens", "unifiedjs.vscode-mdx", "rvest.vs-code-prettier-eslint", "bradlc.vscode-tailwindcss", "github.copilot", "github.copilot-chat"]
 		}
 	},
 
