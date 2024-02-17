@@ -1,1 +1,47 @@
 # Docker and Docker Compose
+Docker is a platform to containerize applications and services. This enables developers to package an application with all of its dependencies into a standardized unit for software development. Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration.
+
+## Installation
+On Ubuntu, the following commands can be used to install Docker and Docker Compose:
+```bash
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+```
+On Windows and Mac, install [Docker Desktop](https://docs.docker.com/desktop/).
+
+## Docker
+As an example, we can run the command `docker run --interactive --tty debian` to run a Debian container. Containers are isolated from each other and from the host system, so their file systems are separate.
+
+### Containers and Images
+A container is a runtime instance of an image. An image is a read-only template with instructions for creating a Docker container. Often, an image is based on another image, with some additional customization. For example, you may build an image which is based on the ubuntu image, but installs the Apache web server and your application, as well as the configuration details needed to make your application run.
+
+### Docker Architecture
+![Docker Architecture](/images/devops/docker-dockercompose/architecture.png)
+
+The Docker daemon is a service application that runs on the host operating system. It is responsible for managing containers and images. To make the daemon do all these stuff, we need the Docker CLI, which can execute commands such as `docker run`, `docker pull` and `docker build`. The `docker build` builds a new container image. The `docker pull` pulls an image from a registry. The `docker run` runs a container from an image.
+
+The container registry is like a big cloud storage where developers can upload their images. One such example is [Docker Hub](https://hub.docker.com/).
+
+### Docker Hub
+On Docker Hub, we can look up images of different applications. For example, there are Ubuntu, Debian, etc. The Alpine Linux image is a very small image, which is often used as a base image to build other images. When we click on the Ubuntu image for example, we can see that there are different tags (versions) of the image. By default, `docker pull ubuntu` pulls the latest version of the image. This downloads the image onto the host system, and we can run the image using `docker run ubuntu`. If we want to pull a specific version, we can use `docker pull ubuntu:20.04`. On the host machine, we can see the images using `docker images`. To remove an image, we can use `docker rmi <image_id>`.
+
+### Docker Commands
+- `docker ps -a`: List all containers, including stopped ones.
+- `docker start <container_id>`: Start a stopped container.
+- `docker run <image>`: Create a new container from the image (different from docker start).
+- `docker stop <container_id>`: Stop a running container.
+- `docker rm <container_id>`: Remove a container.
+- `docker rmi <image_id>`: Remove an image.
+- `docker restart <container_id>`: Restart a running container.
