@@ -203,6 +203,9 @@ services:
             - db
         links: # Adds a host entry for the db service, so in webserver, we can use the url db to connect to the db service
             - db 
+        networks: # Can connect to more than 1 network
+            - network1
+            - network2
     db:
         image: mysql:latest
         restart: always
@@ -210,4 +213,13 @@ services:
             MYSQL_ROOT_PASSWORD: password # should use .env file
         volumes:
             - /path/to/local:/var/lib/mysql
+        networks:
+            - network1
+networks: 
+    network1:
+        name: my-pre-existing-network
+        external: true
+    network2:
+        name: my-pre-existing-network2
+        external: true
 ```
