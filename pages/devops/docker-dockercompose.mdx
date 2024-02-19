@@ -37,8 +37,8 @@ The container registry is like a big cloud storage where developers can upload t
 ### Docker Hub
 On Docker Hub, we can look up images of different applications. For example, there are Ubuntu, Debian, etc. The Alpine Linux image is a very small image, which is often used as a base image to build other images. When we click on the Ubuntu image for example, we can see that there are different tags (versions) of the image. By default, `docker pull ubuntu` pulls the latest version of the image. This downloads the image onto the host system, and we can run the image using `docker run ubuntu`. If we want to pull a specific version, we can use `docker pull ubuntu:20.04`. On the host machine, we can see the images using `docker images`. To remove an image, we can use `docker rmi <image_id>`.
 
-## Docker Commands
-### Running Containers
+### Docker Commands
+#### Running Containers
 
 | COMMAND | DESCRIPTION |
 | --- | --- |
@@ -53,7 +53,7 @@ On Docker Hub, we can look up images of different applications. For example, the
 | `docker unpause <container>` | Resume a container |
 | `docker rm <container>` | Destroy a container |
 
-### Docker run flags
+#### Docker run flags
 | FLAG | DESCRIPTION |
 | --- | --- |
 | `-d` | Run the container in the background |
@@ -61,7 +61,7 @@ On Docker Hub, we can look up images of different applications. For example, the
 | `-v <host_volume>:<container_volume>` | Bind mount a volume |
 | `--name <name>` | Assign a name to the container |
 
-### Container Bulk Management
+#### Container Bulk Management
 
 | COMMAND | DESCRIPTION |
 | --- | --- |
@@ -83,7 +83,7 @@ On Docker Hub, we can look up images of different applications. For example, the
 | `docker system prune -a` | To delete all used and unused images |
 | `docker system prune --volumes` | To delete all docker volumes |
 
-### Inspect Containers
+#### Inspect Containers
 
 | COMMAND | DESCRIPTION |
 | --- | --- |
@@ -95,7 +95,7 @@ On Docker Hub, we can look up images of different applications. For example, the
 `docker diff` | Show the differences with the image (modified files)
 `docker inspect` | Show information of a container (json formatted)
 
-### Executing Commands
+#### Executing Commands
 
 | COMMAND | DESCRIPTION |
 | --- | --- |
@@ -107,7 +107,7 @@ On Docker Hub, we can look up images of different applications. For example, the
 | `docker exec -it <container> /bin/bash` | Open an interactive shell inside a container (there is no bash in some  |images, use /bin/sh)
 | `docker wait <container>` | Wait until the container terminates and return the exit code |
 
-### Images
+#### Images
 
 | COMMAND | DESCRIPTION |
 | --- | --- |
@@ -125,8 +125,9 @@ On Docker Hub, we can look up images of different applications. For example, the
 | `docker logout` | Logout from a registry |
 | `docker save <user>/<repository>:<tag>` | Export an image/repo as a tarball |
 | `docker load` | Load images from a tarball |
+| `docker build -t <image> .` | Build an image from a Dockerfile located in current directory |
 
-### Volumes
+#### Volumes
 
 | COMMAND | DESCRIPTION |
 | --- | --- |
@@ -136,3 +137,77 @@ On Docker Hub, we can look up images of different applications. For example, the
 | `docker volume rm <volume>` | Destroy a volume |
 | `docker volume ls --filter="dangling=true"` | List all dangling volumes (not referenced by any container) |
 | `docker volume prune` | Delete all volumes (not referenced by any container) |
+
+### Building Docker Images
+
+#### Why do we Build Docker Images?
+We can add containerize our own apps, services, and other code such as Python, NodeJS, and Go, etc. Furthermore, we can apply security updates ourselves, configure settings, and install our own packages. For example, we can install LaTeX on an Ubuntu image.
+
+#### How to Build Docker Images
+To build a Docker image, we need to create a `Dockerfile`. This file contains the instructions to build the image. The first line of the `Dockerfile` is the `FROM` instruction, which specifies the base image. Then we have the `RUN` instruction, which runs a command in the container. For example, we could have `RUN apt-get update && apt-get install -y python3`. After we have created our Dockerfile, we run `docker build -t <image_name> .` to build the image. The `-t` flag is used to tag the image with a name. The `.` specifies the build context, which is the directory where the Dockerfile is located. The build context is sent to the Docker daemon, which uses it to build the image.
+```Dockerfile
+FROM debian:latest
+RUN apt-get update && apt-get install -y python3
+```
+
+#### Understanding Docker Image Layers
+When we build a Docker image, each instruction in the Dockerfile creates a new layer. The first layer is always the base image layer, created from the `FROM` statement. This is the foundation for any container image, containing the operating system and the basic tools. 
+
+The next layers are the instruction layers. Each line in the Dockerfile creates a new layer, they are then stacked on top of the base image layer. The instruction layers are created from the `RUN`, `COPY`, `ADD`, and `CMD` statements. The difference between the `RUN` and `CMD` statements is that the `RUN` instruction executes a command at the time when the container is being built. The `CMD` instruction specifies the command to run when the container is started. For example, we can have `CMD ["yarn", "start"]` to start a NodeJS application. The `COPY` instruction copies a file or folder from the source directory into the container file system.
+
+The last layer is the writable container layer.
+
+Each layer is cached by Docker, so if we change a line in the Dockerfile, only the layers after the change will be rebuilt. This is why it is important to put the instructions that change the most at the bottom of the Dockerfile.
+
+Here is an example of a Dockerfile
+```Dockerfile
+FROM node:16
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["npm", "run", "dev"]
+```
+#### Dockerfile Instructions
+| INSTRUCTION | DESCRIPTION |
+| --- | --- |
+| `FROM image:tag` | Specifies the base image |
+| `RUN command` | Runs a command in the container |
+| `COPY source destination` | Copies files from the build context into the container |
+| `WORKDIR path` | Sets the working directory for the container |
+| `ADD source destination` | Copies files from the build context into the container |
+| `CMD ["command", "param1", ...]` | Specifies the command to run when the container is started |
+| `ENTRYPOINT ["command", "param1", ...]` | Specifies the command to run when the container is started |
+| `EXPOSE port/protocol` | Exposes a port from the container |
+| `ENV key=value` | Sets an environment variable |
+| `ARG name=defaultvalue` | Defines a build-time variable |
+| `USER username:group` | Sets the user for the container |
+
+## Docker Compose
+Docker Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application's services. Then, with a single command, you create and start all the services from your configuration. The YAML file is most commonly named `docker-compose.yml` or `docker-compose.yaml`, but can be named anything. For example, if the file is named `docker-compose.production.yml`, we can use `docker-compose -f docker-compose.production.yml up` to start the services. Then we can use `docker-compose -f docker-compose.production.yml down` to take down the containers, or `docker-compose -f docker-compose.production.yml stop` to stop the containers (containers can be restarted with `docker-compose -f docker-compose.production.yml start`).
+
+### Docker Compose File
+The first line of the `docker-compose.yml` file is the version of the Compose file format. We can just use `version: "3"`. Then, we define the containers and their services. 
+
+```yaml
+version: "3"
+services:
+    webserver:
+        image: nginx:latest
+        restart: always # Other options, no, on-failure, always, unless-stopped
+        ports: # Expose ports, host:container
+            - "80:80"
+            - "443:443"
+        volumes: # Bind mount volumes
+            - /path/to/local:/path/to/container
+        depends_on: # Will only start after the db service has started
+            - db
+        links: # Adds a host entry for the db service, so in webserver, we can use the url db to connect to the db service
+            - db 
+    db:
+        image: mysql:latest
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: password # should use .env file
+        volumes:
+            - /path/to/local:/var/lib/mysql
+```
