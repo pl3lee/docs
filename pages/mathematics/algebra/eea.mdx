@@ -1,0 +1,228 @@
+# Euclidean Algorithm and Extended Euclidean Algorithm
+## Euclidean Algorithm
+The Euclidean Algorithm finds the greatest common divisor $\gcd$ for two integers $a, b$. Before we start, let's establish some properties for the $\gcd$ operator.
+### Properties of $\gcd$
+1. $\gcd(a, b) = |a|$ if and only if $a \mid b$.
+2. $\gcd(a, a) = \gcd(a, 0) = |a|$ and $\gcd(a, 1) = 1$
+3. $\gcd(a, b) = \gcd(b, a)$ (Commutativity)
+4. $\gcd(a, \gcd(b,c)) = \gcd(\gcd(a,b), c)$ (Associativity)
+5. $\gcd(c \cdot a, c \cdot b) = c \cdot \gcd(a, b)$
+6. $|a| = |b|$ implies that $\gcd(a, c) = \gcd(b, c)$
+### Algorithm
+There is an iterative and a recursive version of the algorithm, and there is an integer version and a polynomial version. Let's start with the integer version
+```python
+def normalizedInteger(n):
+    """
+    Normalizes the integer n by returning its absolute value
+    """
+    return abs(n)
+
+def gcdIntegerIterative(a, b):
+    """
+    Performs the Euclidean algorithm to find the greatest common divisor of two integers.
+    Args:
+        a, b: integers
+    Returns:
+        gcd(a, b): the normalized greatest common divisor of a and b
+    Usage:
+        a = 126
+        b = 35
+        gcd = gcdIntegerIterative(a, b)
+    """
+
+    r = [a, b]
+    i = 1
+    while r[i] != 0:
+        remainder = abs(r[i-1]) % abs(r[i])
+        r.append(remainder)
+        i += 1
+    return normalizedInteger(r[i-1])
+
+def gcdIntegerRecursive(a, b):
+    """
+    Performs the Euclidean algorithm to find the greatest common divisor of two integers
+    Args:
+        a, b: integers
+    Returns:
+        gcd(a, b): the normalized greatest common divisor of a and b
+    Usage:
+        a = 126
+        b = 35
+        gcd = gcdIntegerRecursive(a, b)
+    """
+
+    m = abs(a)
+    n = abs(b)
+    if m < n:
+        return gcdIntegerRecursive(b, a)
+    if b == 0:
+        return normalizedInteger(a)
+    else:
+        r = m % n
+        return gcdIntegerRecursive(b, r)
+```
+Then, for the polynomial version
+```python
+def normalizedPolynomial(n):
+    """
+    Normalizes the polynomial n by dividing all coefficients by the first coefficient.
+    """
+    
+    return n / n[0]
+
+def gcdPolynomialIterative(a, b):
+    """
+    Performs the Euclidean algorithm to find the greatest common divisor of two polynomials.
+    Args:
+        a, b: polynomials
+    Returns:
+        gcd(a, b): the normalized greatest common divisor of a and b
+    Usage:
+        R = QQ['x']
+        x = R.gen()
+        f = 18*x^3 - 42*x^2 + 30*x - 6
+        g = -12*x^2 + 10*x - 2
+        gcd = gcdPolynomialRecursive(f, g)
+    """
+
+    r = [a, b]
+    i = 1
+    while r[i] != 0:
+        (_, remainder) = r[i-1].quo_rem(r[i])
+        r.append(remainder)
+        i += 1
+    return normalizedPolynomial(r[i-1])
+
+def gcdPolynomialRecursive(a, b):
+    """
+    Performs the Euclidean algorithm to find the greatest common divisor of two polynomials.
+    Args:
+        a, b: polynomials
+    Returns:
+        gcd(a, b): the normalized greatest common divisor of a and b
+    Usage:
+        R = QQ['x']
+        x = R.gen()
+        f = 18*x^3 - 42*x^2 + 30*x - 6
+        g = -12*x^2 + 10*x - 2
+        gcd = gcdPolynomialRecursive(f, g)
+    """
+
+    m = a.degree()
+    n = b.degree()
+    if m < n:
+        return gcdPolynomialRecursive(b, a)
+    if b == 0:
+        return normalizedPolynomial(a)
+    else:
+        (_, r) = a.quo_rem(b)
+        return gcdPolynomialRecursive(b, r)
+```
+
+## Extended Euclidean Algorithm
+The Extended Euclidean Algorithm finds the greatest common divisor $\gcd$ for two integers $a, b$ and also finds the coefficients $s, t$ such that $a \cdot s + b \cdot t = \gcd(a, b)$. Let's first use a table to illustrate the algorithm.
+
+### Example
+Suppose that $f = 126 \in \mathbb Z, g = 35 \in \mathbb Z$. Then our table is
+| $i$ | $q_i$ | $r_i$ | $s_i$ | $t_i$ |
+| --- | ----- | ----- | ----- | ----- |
+| 0   |       | 126   | 1     | 0     |
+| 1   | 3     | 35    | 0     | 1     |
+| 2   | 1     | 21    | 1     | -3    |
+| 3   | 1     | 14    | -1    | 4     |
+| 4   | 2     | 7     | 2     | -7    |
+| 5   | 2     | 0     | -5    | 18    |
+
+Then, we can read off the second last row to get 
+$$
+\begin{align*}
+\gcd(126, 35) = 7 = 2 \cdot 126 + (-7) \cdot 35
+\end{align*}
+$$
+Let's also illustrate on 
+$$
+\begin{align*}
+f = 18x^3 - 42x^2 + 30x - 6, \quad g = -12x^2 + 10x - 2, \quad f, g \in \mathbb Q[x]
+\end{align*}
+$$
+| $i$ | $q_i$ | $r_i$ | $s_i$ | $t_i$ |
+| --- | ----- | ----- | ----- | ----- |
+| 0   |       | $18x^3 - 42x^2 + 30x - 6$ | 1 | 0 |
+| 1   | $-\frac{3}{2}x + \frac{9}{4}$ | $-12x^2 + 10x - 2$ | 0 | 1 |
+| 2   | $-\frac{8}{3}x + \frac{4}{3}$ | $-\frac{9}{2}x - \frac{3}{2}$ | 1 | $\frac{3}{2}x - \frac{9}{4}$ |
+| 3   |  | $0$ | $\frac{8}{3}x - \frac{4}{3}$ | $4x^2 - 8x + 4$ |
+
+Then, we can read off the second last row to get 
+$$
+\begin{align*}
+\gcd(f, g) = \frac{9}{2}x - \frac{3}{2} = 1 \cdot f + \left(\frac{3}{2} - \frac{9}{4}\right) \cdot g
+\end{align*}
+$$
+
+If we want the normalized version, we can just multiply the equation by the inverse of the leading coefficient of the greatest common divisor, so that we get 
+$$
+\begin{align*}
+\gcd(f, g) = -3x + 1 = -\frac{2}{3} \cdot f + \left(x + \frac{3}{2}\right) \cdot g
+\end{align*}
+$$
+### Algorithm
+Again, we will give the integer and polynomial versions of the algorithm. 
+```python
+def ExtendedEuclideanAlgorithmInteger(a, b):
+    """
+    Finds s and t such that a * s + b * t = gcd(a, b)
+    Args:
+        a, b: integers
+    Returns:
+        Normalized (gcd(a, b), s, t)
+    Usage:
+        a = 126
+        b = 35
+        gcd, s, t = ExtendedEuclideanAlgorithmInteger(a, b)
+    """
+    
+    r = [a, b]
+    s = [1, 0]
+    t = [0, 1]
+    i = 1
+    q = [0]
+    while r[i] != 0:
+        quotient = r[i-1] // r[i]
+        q.append(quotient)
+        r.append(r[i-1] - q[i] * r[i])
+        s.append(s[i-1] - q[i] * s[i])
+        t.append(t[i-1] - q[i] * t[i])
+        i += 1
+    l = i - 1
+    return (r[l], s[l], t[l])
+
+def ExtendedEuclideanAlgorithmPolynomial(a, b):
+    """
+    Finds s and t such that a * s + b * t = gcd(a, b)
+    Args:
+        a, b: polynomials
+    Returns:
+        Normalized (gcd(a, b), s, t)
+    Usage:
+        R = QQ['x']
+        x = R.gen()
+        f = 18*x^3 - 42*x^2 + 30*x - 6
+        g = -12*x^2 + 10*x - 2
+        gcd, s, t = ExtendedEuclideanAlgorithmPolynomial(f, g)
+    """
+    
+    r = [a, b]
+    s = [1, 0]
+    t = [0, 1]
+    i = 1
+    q = [0]
+    while r[i] != 0:
+        (quotient, _) = r[i-1].quo_rem(r[i])
+        q.append(quotient)
+        r.append(r[i-1] - q[i] * r[i])
+        s.append(s[i-1] - q[i] * s[i])
+        t.append(t[i-1] - q[i] * t[i])
+        i += 1
+    l = i - 1
+    return (r[l] / r[l][0], s[l] / r[l][0], t[l] / r[l][0])
+```
