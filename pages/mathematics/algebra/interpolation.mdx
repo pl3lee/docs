@@ -1,0 +1,24 @@
+# Interpolation
+Suppose that we have a set of data points $(\alpha_0, y_0), (\alpha_1, y_1), \ldots, (\alpha_n, y_n)$ and we want to find a function $f(x)$ that passes through these points. This is called interpolation.
+
+## A Function's Value at Infinity
+Suppose that we have a function $F = f_0 + f_1x + f_2x^2$. What is $F(\infty)$? Turns out we have $F(\infty) = f_2$ because as $x \to \infty$, the term $f_2x^2$ dominates the value of $F$. The polynomial's value tends towards being proportional to $f_2x^2$. So, we use the convention that $F(\infty)$ is the leading coefficient of $F$. Note that this does not mean that $F$ literally equals $f_2$ at infinity, but rather that the leading term's coefficient $f_2$ is what's left when considering the polynomial's growth trend or dominant behavior as $x \to \infty$.
+## Lagrange Interpolation
+We can use the Lagrange interpolation formula to find the polynomial that passes through the given points. First we define the Lagrange polynomials as
+$$
+\begin{align*}
+L_i(x) = \prod_{j \neq i} \frac{x - \alpha_j}{\alpha_i - \alpha_j}
+\end{align*}
+$$
+Then we can construct $f(x)$ by
+$$
+\begin{align*}
+f(x) = \sum_{i=0}^n y_i L_i(x) = y_0 L_0(x) + y_1 L_1(x) + \cdots + y_n L_n(x)
+\end{align*}
+$$
+Now suppose that we have $\alpha_n = \infty$. Then one can impelement the Lagrange polynomial for interpolation for $\alpha_0,\alpha_1,\ldots,\alpha_{n-1}, \infty$ for a polynomial of degree $n$ by first finding $L_0, L_1, \ldots, L_{n-1}$ using the $n$ finite points $\alpha_0,\alpha_1,\ldots,\alpha_{n-1}$. The Lagrange polynomial for $\infty$ is then
+$$
+\begin{align*}
+L_n(x) = \prod_{j=0}^{n-1} (x - \alpha_j) = (x - \alpha_0)(x - \alpha_1)\cdots(x - \alpha_{n-1})
+\end{align*}
+$$

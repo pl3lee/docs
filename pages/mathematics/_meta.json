@@ -2,6 +2,5 @@
     "algebra": "Algebra",
     "linear-algebra": "Linear Algebra",
     "combinatorics": "Combinatorics",
-    "optimization": "Optimization",
-    "fourier-transform": "Fourier Transform"
+    "optimization": "Optimization"
 }

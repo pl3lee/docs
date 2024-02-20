@@ -1,3 +1,5 @@
 {
-    "eea": "Euclidean Algorithm & Extended Euclidean Algorithm"
+    "eea": "Euclidean Algorithm & Extended Euclidean Algorithm",
+    "fourier-transform": "Fourier Transform",
+    "interpolation": "Interpolation"
 }
