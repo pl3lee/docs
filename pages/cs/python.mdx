@@ -71,4 +71,393 @@ Here are some useful functions and methods:
 - `min(number1, number2)`: returns the smaller of the two numbers
 - `type(variable)`: returns the type of the variable
 
+## Containers
+A tuple is a collection of items which is ordered and unchangeable. Tuples are written with round brackets. For example,
+```python
+tuple1 = ("apple", 123, ('another tuple', 456))
+```
+Lists are similar to tuples, but they are changeable. Lists are written with square brackets. For example,
+```python
+list1 = ["apple", 123, ('another tuple', 456)]
+```
+The difference between a list and a tuple is that a list is mutable, while a tuple is immutable. This means that we can change the elements of a list, but we cannot change the elements of a tuple. We can also add and remove elements from a list, but we cannot do this with a tuple. We can use the `len()` function to get the length of a list or a tuple.
 
+A set is a collection of items which is unordered and unindexed. Sets are written with curly brackets, and every entry in the set is unique. For example,
+```python
+set1 = {"apple", 123, ('another tuple', 456), 123} # is equivalent to {"apple", 123, ('another tuple', 456)
+```
+Sets are extremely useful. For example, if we have a list of numbers and we want to remove all duplicates, we can convert the list to a set and then back to a list. 
+```python
+list1 = [1, 2, 3, 4, 5, 5, 5, 6, 7, 8, 9, 9, 9, 9]
+set1 = set(list1)
+list1 = list(set1) # list1 is now [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
+A dictionary is a collection of items which is unordered, changeable, and indexed. Dictionaries are written with curly brackets, and they have keys and values. For example,
+```python
+dict1 = {
+    "name": "John",
+    "age": 30,
+    "city": "New York"
+}
+```
+The `len()` function can be used to get the number of items in a dictionary. We can also use the `dict1['name']` notation to get the value of a key, and the `dict1['name'] = 'Jane'` notation to change the value of a key. We can also use the `dict1.pop('name')` method to remove a key-value pair from the dictionary.
+
+### Slicing
+We can use slicing to get a subset of a list or a tuple. The most basic form is `list1[start:stop]`, where `start` is the index of the first item we want to include, and `stop` is the index of the first item we do not want to include. That is, `[start:stop]` will include items from `start` to `stop - 1`. 
+```python
+list1 = [1, 2, 3, 4, 5]
+list2 = list1[1:3] # list2 is now [2, 3]
+```
+We can also add a step size to the slicing, for example `list1[start:stop:step]`. The step size is the number of items to skip. The default is 1 when we do not include it.
+```python
+list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+list2 = list1[1:8:2] # list2 is now [2, 4, 6, 8]
+```
+We can also use negative indices to start from the end of the list. For example, `list1[-1]` will return the last item in the list, and `list1[-2]` will return the second to last item in the list. In slicing, if we do not include a start or a stop, Python will assume the start is the beginning of the list and the stop is the end of the list. So `list1[:3]` will return the first three items in the list, and `list1[3:]` will return all items in the list from the fourth item to the end.
+```python
+list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+list2 = list1[:3] # list2 is now [1, 2, 3]
+list3 = list1[3:] # list3 is now [4, 5, 6, 7, 8, 9, 10]
+```
+If we use a negative step size, we can reverse the list. For example, `list1[::-1]` will return the list in reverse order.
+```python
+list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+list2 = list1[::-1] # list2 is now [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+```
+### Useful List Methods
+- `list1.append('new item')`: adds a new item to the end of the list
+- `list1.remove('item')`: removes the first instance of the item from the list
+- `list1.pop()`: removes the last item from the list
+- `list1.insert(1, 'new item')`: adds a new item at the specified index
+- `list1.sort()`: sorts the list
+- `list1.reverse()`: reverses the list
+- `list1.index('item')`: returns the index of the first instance of the item in the list
+- `list1.count('item')`: returns the number of times the item appears in the list
+- `list1.copy()`: returns a copy of the list
+- `list1.clear()`: removes all items from the list
+- `list1.extend(list2)`: adds all items from list2 to list1
+- `list1.pop(1)`: removes the item at the specified index from the list
+
+## Control Flow
+### If Statements
+```python
+if condition:
+    # do something
+    pass
+elif condition:
+    # do something else
+    pass
+else:
+    # do something else
+    pass
+```
+We can use the `and` and `or` operators to combine conditions. For example,
+```python
+if age > 18 and age < 65:
+    # do something
+```
+We can also use the `in` operator to check if an item is in a list, tuple, or dictionary. For example,
+```python
+if name in ["John", "Jane", "Jack"]:
+    # do something
+```
+### Loops
+#### For Loops
+```python
+list1 = ['apple', 'banana', 'cherry']
+for item in list1: 
+    print(item) # will print apple, banana, cherry
+```
+We can also use the `range()` function to loop through a range of numbers. For example,
+```python
+for i in range(5):
+    print(i) # will print 0, 1, 2, 3, 4
+```
+We can also use the `break` keyword to stop the loop, and the `continue` keyword to skip the current iteration.
+```python
+for i in range(5):
+    if i == 3:
+        break
+    print(i) # will print 0, 1, 2
+for i in range(5):
+    if i == 3:
+        continue
+    print(i) # will print 0, 1, 2, 4
+```
+We can use `enumerate()` to get the index of each item in a list. For example,
+```python
+list1 = ['apple', 'banana', 'cherry']
+for index, item in enumerate(list1):
+    print(index, item) # will print 0 apple, 1 banana, 2 cherry
+```
+We can also loop through the keys of a dictionary, or the keys and values of a dictionary. For example,
+```python
+dict1 = {
+    "name": "John",
+    "age": 30,
+    "city": "New York"
+}
+for key in dict1:
+    print(key) # will print name, age, city
+for key, value in dict1.items(): # can also use dict1.keys() or dict1.values()
+    print(key, value) # will print name John, age 30, city New York
+```
+#### While Loops
+```python
+i = 0
+while i < 5:
+    print(i) # will print 0, 1, 2, 3, 4
+    i += 1
+```
+### Truthy and Falsy
+In Python, the following are considered false:
+- `False`
+- `None`
+- `0`
+- `0.0`
+- `''`
+- `[]`
+- `()`
+- `{}`
+
+Everything else is considered truthy.
+
+## Functions and Tools
+### Functions
+We can define a function using the `def` keyword. For example,
+```python
+def greet(name): # name is a parameter
+    print(f"Hello, {name}")
+greet("John") # will print Hello, John
+```
+### f Strings
+We can use f strings to insert variables into strings. For example,
+```python
+name = "John"
+age = 30
+print(f"Hello, my name is {name} and I am {age} years old") # will print Hello, my name is John and I am 30 years old
+```
+This is a lot better than doing something like
+```python
+print("Hello, my name is " + name + " and I am " + str(age) + " years old")
+```
+### Single Line if Statements
+We can use single line if statements to make our code more concise. For example,
+```python
+age = 22
+message = "Eligible" if age >= 18 else "Not eligible"
+print(message) # will print Eligible
+```
+This fits nicely into f strings, for example
+```python
+age = 22
+print(f"Age is {age} and he is {'eligible' if age >= 18 else 'not eligible'}") # will print Age is 22 and he is eligible
+```
+### List Comprehensions
+List comprehensions are a concise way to create lists. We could create a list from 1 to 10 like this
+```python
+list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+```
+But we could also do it like this
+```python
+list1 = [i for i in range(1, 11)]
+```
+So, the basic syntax is `[expression for item in iterable]`, then whatever the expression is will be added to the list for each item in the iterable. We can also add a condition to the list comprehension. For example,
+```python
+list1 = [i * 2 for i in range(1, 11) if i % 2 == 0] # will return [4, 8, 12, 16, 20]
+```
+### Lambda Functions
+Lambda functions are small anonymous functions. They can take any number of arguments, but can only have one expression (one line). We can create a lambda function that doubles a number
+```python
+double_value = lambda x: x * 2
+print(double_value(5)) # will print 10
+```
+The most common usecase is when a function takes another function as an argument. For example the `sorted()` function. By default, `sorted()` will sort a list in ascending order
+```python
+list1 = [3, 1, 2, 5, 4]
+list1 = sorted(list1)
+print(list1) # will print [1, 2, 3, 4, 5]
+```
+Now, what if we have a list of tuples and we want to sort the list based on the second item in each tuple? We have to pass a function to the `key` parameter of the `sorted()` function. We could use a lambda function
+```python
+random_list = [('Anna', 25), ('Bob', 30), ('Charlie', 20)]
+random_list = sorted(random_list, key=lambda user_tuple: user_tuple[1])
+print(random_list) # will print [('Charlie', 20), ('Anna', 25), ('Bob', 30)]
+```
+## Classes
+Classes are a way to organize your code. Image you make a game with various characters, Mages, Monsters, Traders, etc. Each character has attributes and abilities. Mages have health, mana, weapons, cast magic method. Monsters have health and attack method. We could create a class for each character type, and then create instances of each class. Then we could call for example `mage.health` to get the health of the mage, or `monster.attack()` to make the monster attack. Attributes in a class just mean variables inside a class, and methods are functions inside a class.
+```python
+class TestClass:
+    def __init__(self, name, age): # constructor
+        self.name = name
+        self.age = age
+    def greet(self): # method, need to pass self as the first parameter
+        print(f"Hello, my name is {self.name} and I am {self.age} years old")
+
+test1 = TestClass("John", 30)
+test1.greet() # will print Hello, my name is John and I am 30 years old
+```
+### Dunder Methods
+Dunder methods are special methods that Python uses to perform certain operations. For example, the `__init__` method is called when we create an instance of a class. The `__str__` method is called when we print an instance of a class. We can also use the `__repr__` method to return a string representation of the instance. The `__len__` method gets called when the instance is passed into the `len` function.
+```python
+class Mage:
+    def __init__(self, health, mana):
+        self.health = health
+        self.mana = mana
+        print(f"Mage created with {self.health} health and {self.mana} mana")
+    
+    def __len__(self):
+        return self.health
+```
+#### List of Dunder Methods
+##### Initialization and Construction
+- `__new__`: To get called in an object’s instantiation.
+- `__init__`: To get called by the `__new__` method.
+- `__del__`: It is the destructor.
+##### Numeric magic methods
+- `__trunc__(self)`: Implements behavior for `math.trunc()`
+- `__ceil__(self)`: Implements behavior for `math.ceil()`
+- `__floor__(self)`: Implements behavior for `math.floor()`
+- `__round__(self,n)`: Implements behavior for the built-in `round()`
+- `__invert__(self)`: Implements behavior for inversion using the `~` operator.
+- `__abs__(self)`: Implements behavior for the built-in `abs()`
+- `__neg__(self)`: Implements behavior for negation
+- `__pos__(self)`: Implements behavior for unary positive
+##### Arithmetic operators
+- `__add__(self, other)`: Implements behavior for math.trunc()
+- `__sub__(self, other)`: Implements behavior for math.ceil()
+- `__mul__(self, other)`: Implements behavior for math.floor()
+- `__floordiv__(self, other)`: Implements behavior for the built-in round()
+- `__div__(self, other)`: Implements behavior for inversion using the ~ operator.
+- `__truediv__(self, other)`: Implements behavior for the built-in abs()
+- `__mod__(self, other)`: Implements behavior for negation
+- `__divmod__(self, other)`: Implements behavior for unary positive
+- `__pow__`: Implements behavior for exponents using the `**` operator.
+- `__lshift__(self, other)`: Implements left bitwise shift using the `<<` operator.
+- `__rshift__(self, other)`: Implements right bitwise shift using the `>>` operator.
+- `__and__(self, other)`: Implements bitwise and using the `&` operator.
+- `__or__(self, other)`: Implements bitwise or using the `|` operator.
+- `__xor__(self, other)`: Implements bitwise xor using the `^` operator.
+##### String Magic Methods
+- `__str__(self)`: Defines behavior for when `str()` is called on an instance of your class.
+- `__repr__(self)`: To get called by built-int `repr()` method to return a machine readable representation of a type.
+- `__unicode__(self)`: This method to return an unicode string of a type.
+- `__format__(self, formatstr)`: return a new style of string.
+- `__hash__(self)`: It has to return an integer, and its result is used for quick key comparison in dictionaries.
+- `__nonzero__(self)`: Defines behavior for when `bool()` is called on an instance of your class.
+- `__dir__(self)`: This method to return a list of attributes of a class.
+- `__sizeof__(self)`: It return the size of the object.
+##### Comparison magic methods
+- `__eq__(self, other)`: Defines behavior for the equality operator, `==`.
+- `__ne__(self, other)`: Defines behavior for the inequality operator, `!=`.
+- `__lt__(self, other)`: Defines behavior for the less-than operator, `<`.
+- `__gt__(self, other)`: Defines behavior for the greater-than operator, `>`.
+- `__le__(self, other)`: Defines behavior for the less-than-or-equal-to operator, `<=`.
+- `__ge__(self, other)`: Defines behavior for the greater-than-or-equal-to operator, `>=`.
+
+### Relationship between Classes
+Most of the time we want to create classes that influence other classes. 
+```python
+class Mage:
+    def __init__(self, health, mana):
+        self.health = health
+        self.mana = mana
+        print(f"Mage created with {self.health} health and {self.mana} mana")
+    
+    def attack(self, target):
+        target.health -= 10
+
+class Monster:
+    def __init__(self, health):
+        self.health = health
+        print(f"Monster created with {self.health} health")
+    
+    def attack(self, target):
+        target.health -= 5
+
+mage1 = Mage(100, 50)
+monster1 = Monster(100)
+print(monster1.health) # will print 100
+mage1.attack(monster1)
+print(monster1.health) # will print 90
+```
+### Inheritance
+With inheritance one class can get the methods and attributes of another class. A class can also inherit from multiple classes and you can have entire family trees.
+```python
+class Human: # parent class
+    def __init__(self, health):
+        self.health = health
+    
+    def attack(self, target): # pure virtual method, needs to be implemented in the child class
+        raise NotImplementedError("Subclass must implement this method")
+
+
+class Warrior(Human): # child class, inherits whatever class(es) is in the parentheses
+    def __init__(self, health, defense):
+        super().__init__(health) # calls the __init__ method of the parent class
+        self.defense = defense
+    
+    def attack(self, target): # overrides the attack method of the parent class
+        target.health -= 20
+
+class Barbarian(Human):
+    def __init__(self, health, damage):
+        super().__init__(health)
+        self.damage = damage
+    
+    def attack(self, target):
+        target.health -= 30
+```
+
+## Modules
+Modules can give you extra functionalities via the Python standard library, your own code via multiple files, and external libraries via pip.
+
+### Python Standard Library
+The Python standard library is a set of modules that give you commonly used tools. For example, it contains a `math` module for square root, sine, cos, tan, etc. It also contains a `random` module for random numbers, a `datetime` module for dates and times, and a `os` module for interacting with the operating system.
+
+### Importing Modules
+We can use the `import` keyword to import a module. For example,
+```python
+import math
+import random
+print(math.sqrt(16)) # will print 4.0
+print(random.randint(1, 10)) # will print a random number between 1 and 10
+```
+If we want to import only a specific function from a module, we can use the `from` keyword. For example,
+```python
+from math import sqrt
+# can also do from math import * to import everything
+print(sqrt(16)) # will print 4.0
+```
+We can also use the `as` keyword to give a module or a function a different name. For example,
+```python
+import math as m
+print(m.sqrt(16)) # will print 4.0
+```
+### Creating Modules
+We can create our own modules by creating a new file and writing some code in it. For example, we could create a file called `my_module.py` and write the following code in it
+```python
+# my_module.py
+def add_2_numbers(a, b):
+    return a + b
+
+class Test:
+    a = 123
+    def some_method(self):
+        print("some method")
+
+variable1 = "some variable"
+```
+Then we could import the module and use the function in another file
+```python
+# main.py
+import my_module
+
+test = my_module.Test()
+test.some_method()
+
+print(my_module.add_2_numbers(1, 2))
+print(my_module.variable1)
+```
+### External Libraries
+We can use the `pip` command to install external libraries. For example, we could use the `requests` library to make HTTP requests, the `beautifulsoup4` library to scrape web pages, the `pandas` library to work with data, and the `numpy` library to work with arrays and matrices. To install a library, we can do `pip install library_name`. 
