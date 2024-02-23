@@ -1,3 +1,5 @@
 {
-    "ubuntu-setup": "Ubuntu Setup"
+    "ubuntu-setup": "Ubuntu Setup",
+    "python": "Python",
+    "go": "Golang"
 }

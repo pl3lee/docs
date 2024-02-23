@@ -5,6 +5,5 @@
     "react-query": "React Query",
     "typescript": "TypeScript",
     "css": "CSS",
-    "go": "Go",
     "django": "Django"
 }

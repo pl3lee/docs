@@ -1,0 +1,74 @@
+# Python
+Notes are taken from Net Ninja's [Python Crash Course](https://www.youtube.com/watch?v=wdp7smAtqZI&list=PL4cUxeGkcC9goeb7U1FXFdNszWetCmhfB) on Youtube.
+
+## Basics
+### Datatypes
+- Strings
+- Numbers
+- Floats
+- Lists
+- Tuples
+- Dictionaries
+- Booleans
+- Sets
+
+### Operations
+- Addition: `+`
+- Subtraction: `-`
+- Multiplication: `*`
+- Division: `/`
+- Floor Division: `//`
+- Exponent: `**`, for example `2 ** 3` will return `8`
+
+Note that whenever we use the division operator, the result will always be a float. If we want to get an integer, we can use the floor division operator `//`.
+
+The multiplication operator can be used to repeat a string. For example, `"hello" * 3` will return `"hellohellohello"`.
+
+Python follows the order of operations (multiplication/division before addition/subtraction), but we can use parentheses to change the order, so `(2 + 3) * 10` will return `50`.
+
+### Variables
+When we declare variables, we do not need to declare the type like in C, or use `var` like in JavaScript. We can simply assign a value to a variable and Python will figure out the type. There are several rules for declaring variables:
+- They cannot start with a number
+- They cannot contain spaces
+- They can only use letters A-Z, a-z, numbers 0-9, and underscores
+- They are case sensitive
+- They should not use Python keywords, e.g. `if`, `else`, `for`, `while`, etc.
+
+If we want to reassign a variable after an operation, we can use the shorthand notation `+=`, `-=`, `*=`, and `/=`. For example these two are equivalent
+```python
+x = 10
+x = x + 5
+```
+```python
+x = 10
+x += 5
+```
+
+### Input
+We can use the `input()` function to get input from the user. This function always returns a string, so if we want to get a number, we need to convert it to an integer or a float.
+```python
+age = input("Enter your age: ")
+age = int(age)
+```
+
+## Methods and Functions
+Functions and methods provide useful tools. For strings, we could capitalize every letter or get the number of letters. For numbers, we could create a random number or find the absolute value. `input()` is also a function. 
+
+Functions take in arguments, and (sometimes) return a value. Methods are functions of datatypes. For example, `string1.replace('e', '3')` is a method that replaces all instances of the letter 'e' with the number 3 in the variable `string1`.
+
+Here are some useful functions and methods:
+- `len(string1)`: returns the length of a string, can also be used for lists
+- `string1.upper()`: returns the string in all uppercase
+- `string1.lower()`: returns the string in all lowercase
+- `string1.title()`: returns the string with the first letter of each word capitalized
+- `string1.count('e')`: returns the number of times the letter 'e' appears in the string
+- `string1.find('e')`: returns the index of the first instance of the letter 'e' in the string
+- `string1.replace('e', '3')`: replaces all instances of the letter 'e' with the number 3 in the string
+- `string1.split(' ')`: splits the string into a list of words, using the space as a delimiter
+- `string1.strip()`: removes any whitespace from the beginning and end of the string
+- `abs(number)`: returns the absolute value of a number
+- `max(number1, number2)`: returns the larger of the two numbers
+- `min(number1, number2)`: returns the smaller of the two numbers
+- `type(variable)`: returns the type of the variable
+
+
