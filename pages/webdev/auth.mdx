@@ -1,0 +1,143 @@
+# Authentication and Authorization
+Notes taken from [this](https://www.youtube.com/watch?v=mL8EuL7jSbg&list=WL&index=43) video.
+
+## Authentication vs Authorization
+Authentication is the step of proving you are who you say you are. This is the login step of a website.
+
+Authorization is about the permissions you have. For example, there are admin users and regular users. Admin users have more permissions than regular users. A regular user cannot delete a post, and if they try to, the server stops them.
+
+Therefore, once a user is authenticated by the server, it is then authorized to do certain things.
+
+## How Authentication Works
+The whole idea behind authentication is that it happens on the server. This is because the client cannot be trusted (they can change the code anytime). The client communicates with the server with requests.
+
+The client sends a request with a username and password. The server then checks if the username and password are correct. If they are, the server sends back some user information in a response, and creates a **session**. The session is just a unique ID specifically associated with the user, let's say John. The server then sends back the session ID to the client via an HTTP only cookie.
+
+Whenever John makes a future request that requires authorization, the cookie containing John's session ID will be sent along with the request, so that the server knows the request is coming from John.
+
+## How Authorization Works
+Again, the client John makes a request to the server. Let's say that the request is to delete a Youtube video. John's request contains the cookie containing the session ID. The server then checks if John has the permission to delete the specific Youtube video. If he does, the server will delete the video and send back a response indicating that the operation is successful. If he doesn't, the server will send back a response containing an error saying that John is not authorized to delete the video.
+
+## Server vs Client Validation
+Note that everything about authentication and authorization happens on the server. However, it is okay to conditionally render certain components on the client based on the user's permissions. This is because even if the client somehow changes the code and renders a component that it shouldn't, the server will still stop the client from doing anything that it shouldn't.
+
+## Code Example
+### Client
+Suppose that we have a website with a login page
+```jsx
+export const Login = () => {
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const handleLogin = () => {
+        // send a request to the server with the username and password
+        fetch("/login", {
+            credential: "include", // IMPORTANT: this is what allows the server to send back a cookie
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
+            throw new Error("Invalid username or password");
+        }).then((data) => {
+            console.log(data);
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+    return (
+        <input type="text" placeholder="username" onChange={(e) => setUsername(e.target.value)} value={username}/>
+        <input type="password" placeholder="password" onChange={(e) => setPassword(e.target.value)} value={password}/>
+        <button onClick={handleLogin}>Login</button>
+    )
+}
+```
+And we have a component that fetches some admin data.
+```jsx
+export const AdminData = () => {
+    const [data, setData] = useState([]);
+    const fetchAdminData = () => {
+        fetch("/adminData", {
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        }).then((res) => {
+            if (res.ok) {
+                return res.json();
+            }
+            throw new Error("You are not authorized to view this data");
+        }).then((data) => {
+            setData(data);
+        }).catch((error) => {
+            console.log(error);
+        })
+    }
+    return (
+        <button onClick={fetchAdminData}>Fetch Admin Data</button>
+    )
+}
+```
+### Server
+We will use express for the server.
+```javascript
+const express = require("express")
+const cors = require("cors")
+const cookieParser = require("cookie-parser")
+
+const app = express()
+app.use(cors({origin: "http://localhost:3000", credentials: true})); // IMPORTANT: this is what allows the server to send back a cookie
+app.use(cookieParser())
+
+const USERS = new MAP() // acts as like a database
+// password should be hashed in a real application
+USERS.set("John", {id: 1, username: "John", password: "password", role: "admin"});
+USERS.set("Jane", {id: 2, username: "Jane", password: "password", role: "user"});
+
+const SESSIONS = new MAP() // stores session IDs
+
+app.post("/login", (req, res) => {
+    // checks if user exists in USERS database
+    const user = USERS.get(req.body.username)
+    if (user == null) {
+        res.sendStatus(401) // unauthenticated status code
+        return
+    }
+
+    const sessionId = crypto.randomUUID() // creates a session ID
+    // stores the session ID in the SESSIONS database
+    SESSIONS.set(sessionId, user)
+
+    res.cookie("sessionId", sessionId, {
+        secure: true, // IMPORTANT: this is what makes the cookie only accessible via HTTPS
+        httpOnly: true, // IMPORTANT: this is what makes the cookie only accessible via HTTP requests, no JavaScript
+        sameSite: "none", // if the server is on a different domain from the client. strict if on the same domain
+    }).send(`Authed as ${req.body.username}`)
+})
+
+app.get("/adminData", (req, res) => {
+    // checks if the user is authenticated
+    const user = SESSIONS.get(req.cookies.sessionId)
+    if (user == null) {
+        res.sendStatus(401) // unauthenticated status code
+        return
+    }
+
+    if (user.role !== "admin") {
+        res.sendStatus(403) // unauthorized status code
+        return
+    }
+
+    res.send("This is the admin stuff")
+})
+
+app.listen(3000)
+```
+
+### Notes
+- The `credentials: "include"` option in the fetch request is what allows the server to send back a cookie. This is important because the server needs to send back a cookie containing the session ID to the client so that the client can send the session ID back to the server in future requests.
+- When a user that does not have `role: "admin"` tries to fetch the admin data, the server sends back a 403 status code, which means unauthorized. This is different from a 401 status code, which means unauthenticated.
+- It is important to periodically remove inactive sessions from the `SESSIONS` database so that even if a user leaks their session ID, the session would have expired so that another user cannot use it.
+- When a server logs someone out, it just removes the session from the `SESSIONS` database. The client does not need to do anything. The server will just stop accepting requests with the session ID that was removed from the `SESSIONS` database.
+- Normally, all of the stuff about sessions, cookies are handled by a library, for example `express-session` for express.
