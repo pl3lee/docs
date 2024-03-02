@@ -1,0 +1,23 @@
+# Flex
+- `display: flex` to make an element a flex-container.
+- All its direct children become flex-items.\
+- Add `flex` to a flex-item to make it grow and shrink.
+- `flex` is a shorthand for `flex-grow`, `flex-shrink`, and `flex-basis`.
+- `flex: 1` is a shorthand for `flex: 1 1 0`.
+
+## flex-grow
+`flex-grow` is a flex-item's growth factor. It is a number that determines how much of the remaining space in the flex-container the flex-item will take up. For example, if there are two flex-items in a flex-container, and one of them has `flex-grow: 1` and the other has `flex-grow: 2`, then the second flex-item will take up twice as much space as the first one.
+## flex-shrink
+`flex-shrink` is a flex-item's shrink factor. It only ends up being applied if the size of all flex items is larger than their parent container, hence it only applies only when items shrink. A higher value means the element shrinks more relative to the others. `flex-shrink: 0` means that the flex-item will not shrink. 
+## flex-basis
+`flex-basis` is a flex-item's initial size. Using `flex-basis: 0` ignores the item's width. Using `flex-basis: auto` tells the item to check for a width declaration.
+
+## flex-wrap
+`flex-wrap` is used to tell flex-items to wrap or not. `flex-wrap: wrap` tells the flex-items to wrap if they don't fit in the flex-container. `flex-wrap: nowrap` tells the flex-items to not wrap. `flex-wrap: wrap-reverse` tells the flex-items to wrap in reverse order.
+# Alignment
+## justify-content
+`justify-content` is used to align flex-items along the main axis. 
+## align-items
+`align-items` is used to align flex-items along the cross axis.
+## gap
+`gap` is used to set the gap between flex-items. 

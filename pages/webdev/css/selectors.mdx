@@ -1,0 +1,85 @@
+# Selectors
+## Universal Selector
+The universal selector (`*`) selects all elements in the document. 
+## Type Selector
+The type selector (`<element name>`) selects all elements of the specified type. For example, `p` will select all `p` elements.
+## Class Selector
+The class selector (`.<class name>`) selects all elements with the specified class. For example, `.red` will select all elements with the class `red`.
+## ID Selector
+The ID selector (`#<id name>`) selects the element with the specified ID. For example, `#main` will select the element with the ID `main`.
+## Grouping Selector
+The grouping selector (`<selector 1>, <selector 2>, ...`) selects all elements that match any of the specified selectors. For example, `p, .red` will select all `p` elements and all elements with the class `red`.
+## Chaining Selector
+The chaining selector (`<selector 1><selector 2>`) selects all elements that match both of the specified selectors. For example, `p.red` will select all `p` elements with the class `red`.
+## Descendant Combinator
+The descendant combinator (`<selector 1> <selector 2>`) selects all elements that match the second selector and are descendants of elements that match the first selector. For example, `div p` will select all `p` elements that are descendants of `div` elements.
+## Child Combinator
+The child combinator (`>`) selects only the direct children of an element. For example, `div > p` will select all `p` elements that are direct children of a `div` element.
+## Adjacent Sibling Combinator
+The adjacent sibling combinator (`+`) selects only the element that is immediately after another element. For example, suppose we have the following HTML:
+```html
+<main class="parent">
+  <div class="child group1">
+    <div class="grand-child group1"></div>
+  </div>
+  <div class="child group2">
+    <div class="grand-child group2"></div>
+  </div>
+  <div class="child group3">
+    <div class="grand-child group3"></div>
+  </div>
+</main>
+```
+Then, `.group1 + div` will only select the div with the class `child group2`.
+
+`group1 + div + div` will only select the div with the class `child group3`.
+## General Sibling Combinator
+The general sibling combinator (`~`) selects all elements that are siblings of another element. For example, `.group1 ~ div` from the previous example will select all divs with the class `child group2` and `child group3`.
+## Pseudo Classes
+- `:focus` selects an element that is currently focused.
+- `:hover` selects an element that is currently being hovered over.
+- `:active` selects an element that is currently being clicked on.
+- `:link` selects an element that is a link and has not been visited.
+- `:visited` selects an element that is a link and has been visited.
+- `:root` selects the root element (either `:root` or `html`).
+- `:first-child` and `:last-child` select the first and last child of an element, respectively.
+- `:empty` selects an element that has no children.
+- `:only-child` selects an element that is the only child of its parent.
+- `:nth-child(<n>)` selects the nth child of an element. For example, `:nth-child(2)` selects the second child of an element.
+## Pseudo Elements
+- `::before` inserts content before the selected element.
+- `::after` inserts content after the selected element.
+- `::marker` allows you to customize the styling of `<li>` elements' bullets or numbers.
+- `::first-letter` and `::first-line` allow you to customize the styling of the first letter and first line of an element, respectively.
+- `::selection` allows you to customize the styling of selected text.
+## Attribute Selector
+- `[<attribute name>]` selects all elements that have the specified attribute. For example, `[href]` will select all elements that have an `href` attribute.
+- `<selector>[<attribute name]` selects all elements that match the specified selector and have the specified attribute. For example, `a[href]` will select all `a` elements that have an `href` attribute.
+- `[<attribute name>="<attribute value>"]` selects all elements that have the specified attribute with the specified value. For example, `[href="https://www.google.com"]` will select all elements that have an `href` attribute with the value `https://www.google.com`.
+- regex:
+```css
+[class^='aus'] {
+  /* Classes are attributes too!
+    This will target any class that begins with 'aus':
+    class='austria'
+    class='australia'
+  */
+}
+
+[src$='.jpg'] {
+  /* This will target any src attribute that ends in '.jpg':
+  src='puppy.jpg'
+  src='kitten.jpg'
+  */
+}
+
+[for*='ill'] {
+  /* This will target any for attribute that has 'ill' anywhere inside it:
+  for="bill"
+  for="jill"
+  for="silly"
+  for="ill"
+  */
+}
+```
+  

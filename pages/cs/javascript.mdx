@@ -1,0 +1,129 @@
+# JavaScript
+## Spread Operator
+### Adding elemnts of an existing array into a new array
+```javascript
+let arr1 = [1, 2, 3, 4];
+let arr2 = [5, 6, ...arr1, 7, 8]; // [5, 6, 1, 2, 3, 4, 7, 8]
+```
+### Pass elements of an array as arguments to a function
+```javascript
+function add(a, b, c) {
+  return a + b + c;
+}
+let args = [1, 2, 3];
+const result = add(...args) // 6
+```
+### Copy arrays
+```javascript
+let arr3 = [1, 2, 3, 4];
+let arr4 = [...arr3];
+arr4.push(5);
+console.log(arr3); // [1, 2, 3, 4]
+console.log(arr4); // [1, 2, 3, 4, 5]
+```
+### Concatenate arrays
+```javascript
+let arr5 = [1, 2, 3];
+let arr6 = [4, 5, 6, 7];
+let arr7 = [...arr5, 1000, 2000, 3000, ...arr6, 5000];
+console.log(arr7); // [1, 2, 3, 1000, 2000, 3000, 4, 5, 6, 7, 5000]
+```
+### Adding fields to an object
+```javascript
+let obj1 = { name: 'John', age: 25 };
+let obj2 = { ...obj1, gender: "M"};
+// obj2 is now { name: 'John', age: 25, gender: "M" }
+```
+### Replacing fields in an object
+```javascript
+let obj3 = { name: 'John', age: 25 };
+let obj4 = { ...obj3, age: 30};
+// obj4 is now { name: 'John', age: 30 }
+```
+
+## Asynchronous
+### Promise
+Resolve is a function that you call when you want the promise to succeed.
+
+Reject is a function that you call when you want some sort of error
+```javascript
+const example = new Promise((resolve, reject) => {
+  let name = "Bill";
+  if (name === "Billy") {
+    // can pass or not pass arguments in the resolve function
+    resolve(name);
+  } else {
+    reject(name);
+  }
+});
+```
+Then, when you call the promise, you can use the `.then()` method to handle the resolve and the `.catch()` method to handle the reject. Essentially, the function inside the `.then()` method will be called when the API request is done. Or, if there are any errors, we can do something with the `.catch()` method. The `.finally()` method will be called no matter what.
+```javascript
+example
+  .then((name) => {
+    console.log("Name is " + name);
+  })
+  .catch((name) => {
+    console.log("Name is not BIlly, it is " + name);
+  })
+  .finally(() => {
+    console.log("Promise finished");
+  });
+```
+#### Example of Using Promises with Axios
+Axios is just a library to fetch data from an API.
+```javascript
+const axios = require("axios");
+
+const data = axios.get("https://cat-fact.herokuapp.com/facts");
+// <--- console logging data here will return a pending promise, not good
+// What we need to do is we need to resolve the promise
+// Most of the time an API call passes their data to the resolve function
+data
+  .then((response) => {
+    console.log(response);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+```
+### Async and Await
+Async and await are just syntactic sugar for promises. It makes the code look cleaner and easier to read. The `async` keyword is used to declare an asynchronous function. The `await` keyword is used to pause the execution of the function until the promise is resolved.
+```javascript
+// First, we need a function with the async keyword
+const fetchData = async () => {
+  try {
+    // Need to add the await keyword here
+    // This corresponds to .then in promises
+    const data = await axios.get("https://cat-fact.herokuapp.com/facts");
+    console.log(data);
+    // If we don't put the await keyword there, then console logging data will just
+    //  console log a pending promise, not good
+  } catch (error) {
+    // This catch block corresponds to .catch in promises
+    console.log(error);
+  } finally {
+    // finally in promises
+    console.log("finally");
+  }
+};
+
+// Remember to actually call the async function
+fetchData();
+```
+Note that using the `await` keyword means that we are placing every line of code below the `await` keyword in the `.then()` method of the promise. That is, the following are equivalent:
+```javascript
+const fetchData = async () => {
+  const data = await axios.get("https://cat-fact.herokuapp.com/facts");
+  doSomethingWithData(data);
+  doAnotherThingWithData(data);
+};
+```
+```javascript
+const fetchData = () => {
+  axios.get("https://cat-fact.herokuapp.com/facts").then((data) => {
+    doSomethingWithData(data);
+    doAnotherThingWithData(data);
+  });
+};
+```

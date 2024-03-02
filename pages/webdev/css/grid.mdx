@@ -1,0 +1,41 @@
+# Grid
+- `display: grid` to make an element a grid-container.
+- `grid-template-columns` to set the number of columns and their sizes.
+- `grid-template-rows` to set the number of rows and their sizes.
+- `gap` to set the gap between grid-items.
+- `gap` is a shorthand for `column-gap` and `row-gap`.
+- Grid lines are created implicitly. The lines are numbered from left to right and top to bottom starting at 1.
+- `grid-column-start`, `grid-column-end`, `grid-row-start`, `grid-row-end` can be added to grid items to specify which grid lines they start and end at.
+- 
+
+## grid-template-columns and grid-template-rows
+`grid-template-columns` and `grid-template-rows` are used to set the number of columns and rows and their sizes. 
+
+For example, `grid-template-columns` can be set to `1fr 1fr 1fr` to create a grid with three columns of equal size. `grid-template-columns` can also be set to `repeat(3, 1fr)` to create the same grid.
+
+## Dynamically Sizing Grid Boxes
+We can dynamically size grid boxes:
+```css
+.grid-container {
+  grid-template-rows: repeat(2, min(200px, 50%));
+  grid-template-columns: repeat(5, max(120px, 15%));
+}
+```
+`minmax()` specifies the minimum and maximum grid box sizes.
+```css
+.grid-container {
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(5, minmax(150px, 200px));
+}
+```
+`clamp(minimum-size, preferred-size, maximum-size)` specifies the minimum, preferred, and maximum grid box sizes.
+## auto-fit and auto-fill
+`auto-fit` and `auto-fill` are used to create a grid with a dynamic number of columns. Both of these will return the largest positive integer without the grid items overflowing their container.
+```css
+.grid-container {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+```
+With `minmax()`, we tell our grid that we want to have as many columns as possible without overflowing our grid.
+
+The difference between `auto-fit` and `auto-fill` is that `auto-fit` will collapse the empty columns, while `auto-fill` will not.

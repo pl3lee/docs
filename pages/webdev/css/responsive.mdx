@@ -1,0 +1,75 @@
+# Responsive Design
+- Refers to the ability of a website to adapt to the screen size of the device it is being viewed on.
+- Lower bound is usually 320px width.
+- For ultra-wide monitors, just set a max-width on the content and center it.
+- Add `<meta name="viewport" content="width=device-width, initial-scale=1">` to the head of the HTML document in every project so that it sets the initial width of the webpage to the size of the actual screen.
+- Avoid fixed width and height
+- Using `max-width` on an element will make it not exceed that width, but it will shrink if the screen is too small to accommodate it. Likewise for 
+- Using `min-height` on an element will make it not shrink below that height, but it will grow if the screen is large enough to accommodate it.
+- Just avoid using `height` all together (except for headers and footers).
+- Avoid using percentages with `width`, a better solution would be to use margins to control the width of the element
+
+# Responsive Images
+Do not use both `width` and `height` attributes on images because they will change the aspect ratio of the image when the screen size changes. Just define one of them and let the other one be calculated automatically.
+
+## background
+`background-position` and `background-size` are properties that work on elements with background image, and do not work on `img` tags.
+
+`background-position: center` will make sure the image is always centered in it's container.
+
+`background-size: cover` will resize the image so that it always completely fills it's container while cropping as little as possible.
+
+## img
+`object-fit: fill` stretches the image to fit the dimensions.
+
+`object-fit: cover` will resize the image so that it always completely fills it's container while cropping as little as possible.
+
+`object-fit: contain` will resize the image so that it always completely fits inside it's container while leaving empty space if necessary.
+
+The `picture` tag is used to provide different versions of the same image for different screen sizes. The `source` tag is used to specify the image source and the `media` attribute is used to specify the screen size for which the image is intended. The `img` tag is used as a fallback for browsers that do not support the `picture` tag.
+```html
+<picture>
+  <source media="(max-width: 799px)" srcset="elva-480w-close-portrait.jpg" />
+  <source media="(min-width: 800px)" srcset="elva-800w.jpg" />
+  <img src="elva-800w.jpg" alt="Chris standing up holding his daughter Elva" />
+</picture>
+```
+# Media Query
+Used to apply different styles for different screen sizes. Here is a simple example:
+```css
+body {
+  margin: 24px;
+}
+
+@media (max-width: 600px) {
+  body {
+    margin: 8px;
+  }
+}
+```
+In this example, the margin is changed based on screen size. On all screens width below or equal `600px`, the margin will be `8px`, and on all screens above `600px`, the margin will be `24px`.
+
+We can have unlimited number of media queries in a single document.
+
+We can also put any number of style definitions inside a media query.
+
+## Breakpoints
+A term for the screen-size that triggers media queries. In general, mobile phones usually are under `500px`, tablets are between `500px` and `1000px`, and desktops are above `1000px`.
+## Zooming
+In most browsers, zooming in on a webpage will change the effective resolution on that page, and thus trigger media queries. 
+## Print styles
+We can use media queries to specify styles for printing. For example, we can hide the navigation bar and the footer when printing.
+
+By default, media queries have the `screen` keyword:
+```css
+@media screen and (max-width: 480px) {
+}
+```
+This is redundant as `screen` is the default.
+
+But, for styles used in printing, we can add the `print` keyword:
+```css
+@media print {
+  /* print styles go here! */
+}
+```

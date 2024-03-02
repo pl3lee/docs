@@ -1,0 +1,196 @@
+# Animation
+## Transforms
+- The transform property changes the appearance of elements without affecting the natural document flow
+- Almost all elements can be transformed, except `<col>, <colgroup>`, and non-replaced inline elements (such as `<span>, <b>, <em>`)
+- There are 2D and 3D transforms
+
+### 2D Transforms
+
+#### Rotate
+Rotates an element on a 2D plane
+```css
+.rotate-by-deg {
+  transform: rotate(45deg);
+}
+.rotate-by-rad {
+  transform: rotate(-1rad);
+}
+.rotate-by-turn {
+  transform: rotate(0.25turn);
+}
+```
+#### Scale
+Scales an element on a 2D plane
+```css
+.scaleX {
+  transform: scaleX(2);
+}
+.scaleY {
+  transform: scaleY(0.5);
+}
+.scaleXY {
+  transform: scale(2, 0.5);
+}
+```
+#### Skew
+Skew an element on a 2D plane (for example, turning a square into a parallelogram)
+```css
+.skewX {
+  transform: skewX(45deg);
+}
+.skewY {
+  transform: skewY(-0.5rad);
+}
+.skewXY {
+  transform: skew(45deg, -0.5rad);
+}
+.skew {
+  transform: skew(45deg);
+}
+```
+Note that `skew()` behaves the same way as `skewX()` if there is only a single value passed to it.
+#### Translate
+Moves an element on a 2D plane
+```css
+.translateX {
+  transform: translateX(100px);
+}
+.translateY {
+  transform: translateY(-33%);
+}
+.translateXY {
+  transform: translate(100px, -33%);
+}
+```
+Note that percentage values are relative to the element's width.
+### Chaining Transforms
+Transforms can be chained together by adding a space between each one.
+```css
+.rotate-and-scale {
+  transform: rotate(45deg) scale(2);
+}
+```
+Note that order matters (left to right).
+### 3D Transforms
+
+#### Perspective
+Sets the distance from the user to the z=0 plane (distance from the user to the screen)
+
+See [this](https://css-tricks.com/how-css-perspective-works/) for examples on how perspective works.
+#### Rotate
+Rotates an element on a 3D plane
+```css
+.element {
+  transform: rotateX();
+  transform: rotateY();
+  transform: rotateZ();
+  transform: rotate3d();
+}
+```
+See [this](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/rotate3d) on how rotate3d works.
+#### Scale
+Scales an element on a 3D plane
+```css
+.element {
+  transform: scaleZ();
+  transform: scale3d();
+}
+```
+[scaleZ](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/scaleZ) and [scale3d](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/scale3d) examples.
+#### Translate
+Moves an element on a 3D plane
+```css
+.element {
+  transform: perspective(100px) translateZ(30px);
+}
+```
+[translate3d](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function/translate3d)
+
+## Transitions
+- Transitions let you animate a change from an element's initial state to an end state.
+- `transition` is a shorthand property for `transition-property`, `transition-duration`, `transition-timing-function`, and `transition-delay`.
+- We add the `transition` properties and the initial state to the base class. Then we have a class that has properties for the end state. When we add the class with the end state properties, the transition will occur.
+- For the best performance, we should use `transform` and `opacity` for transitions.
+
+### transition-property
+Determines what CSS property will be transitioned.
+### transition-duration
+Determines the duration that the transition will occur over.
+### transition-timing-function
+Lets us change the speed of the transition over the course of its duration. For example, `ease-out` will start the transition quickly and slow down towards the end.
+### transition-delay
+Determines the delay at which the transition will start.
+
+### Shorthand property
+The shorthand property looks like
+```
+transition: <property> <duration> <timing-function> <delay>;
+```
+
+## Keyframes
+
+### Animations vs Transitions
+- Animations and transitions are similar in that they both change the appearance of an element over time.
+- Animations were designed with the purpose of looping
+- Transitions need a trigger, like `:hover`, or `:focus`, or adding/removing a class via Javascript. Animations do not need triggers.
+
+### Animation Properties
+Put these properties on the base class
+```css
+#ball {
+  <!-- other CSS properties -->
+  animation-duration: 1s;
+  animation-name: change-color;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+```
+#### animation-duration
+Determines how long the animation will take to complete one cycle.
+#### animation-name
+Defines the name of the animation so we can reference it in the `@keyframes` rule.
+#### animation-iteration-count
+Determines how many times the animation will play. The default is `1`, but we can set it to `infinite` to make it loop forever.
+#### animation-direction
+Determines the direction of the animation. The default is `normal` which resets to the start point and repeat itself, or `alternate` which plays the animation forwards, then backwards, then forwards, etc.
+
+### Keyframes
+Example:
+```css
+@keyframes change-color {
+  from {
+    background-color: red;
+  }
+
+  to {
+    background-color: yellow;
+  }
+}
+```
+Note that keyframes use a percentage to indicate the times for an animation to take place. So `from` and `to` are aliases for `0%` and `100%` respectively.
+
+### Shorthand
+We can also use shorthand `animation`
+```css
+#ball {
+  /* ... other CSS properties ... */
+  background-color: red;
+  animation: 2s change-color infinite alternate;
+}
+
+@keyframes change-color {
+  from {
+    background-color: red;
+  }
+  
+  50% {
+    width: 200px;
+    height: 200px;
+    background-color: blue;
+  }
+
+  to {
+    background-color: green;
+  }
+}
+```
