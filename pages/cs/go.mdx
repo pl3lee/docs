@@ -1,0 +1,142 @@
+import { FileTree } from 'nextra/components'
+
+# GO
+Notes taken from [this](https://youtu.be/8uiZC0l4Ajw?si=v7CxSfCoaZqs08Yu) video.
+## Six Main Points about GO
+- It is a statically typed language. This means that the type of a variable is either explicitly declared or inferred by the compiler. The type of a variable cannot change after it’s declared.
+- It is a strongly typed language. This means that an operation you can perform on a variable depends on its type. For example, you cannot add a string to an integer.
+- GO is compiled, so after compiling, it can output into a standalone executable file, for example `.exe` for Windows. This also results in a faster execution time.
+- GO has fast compile times.
+- GO has built in concurrency support. This is done with Goroutines.
+- Simplicity, its syntax is simple and it has garbage collection for memory management.
+
+## Introduction
+There are two concepts in GO, **packages** and **modules**.
+
+A package is just a folder that contains a collection of GO files. 
+
+A module is a collection of packages. So when we initialize a project, we are creating a module.
+
+When we initialize our project/module, we can use the command
+```bash
+go mod init <module_name>
+```
+Most commonly the module name is a link to the repository where the code is stored. This creates a `go.mod` file in the root of the project. We see that it contains the following:
+```go
+module github.com/username/repo_name
+
+go 1.20
+```
+So it contains the module name and the version of GO that we are using. Let's create a `cmd` directory, and inside it, a `tutorial_1` directory, and inside that, a `main.go` file. 
+
+<FileTree>
+    <FileTree.File name="go.mod"/>
+    <FileTree.Folder name="cmd">
+        <FileTree.Folder name="tutorial_1">
+            <FileTree.File name="main.go"/>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+Recall that every GO file is part of a package. We identify the package it belongs to by the first line of the file. For example, in `main.go` we have:
+```go
+package main
+```
+This is a special package name that tells the compiler to look for the entrypoint function here. The entrypoint function is `main()`, which is the first thing that gets executed when we run the program. To create a function, we use the `func` keyword, followed by the name of the function, and then the parameters in parentheses.
+```go
+package main
+
+func main() {
+    // code here
+}
+```
+Let's try to print to our console. We need the `fmt` package to do this. We can import it by using the `import` keyword, followed by the package name in double quotes.
+```go
+package main
+import "fmt"
+
+func main() {
+    // Println appends a newline character to the end of the string
+    fmt.Println("Hello, World!")
+}
+```
+To run the program, we use the command `go build cmd/tutorial_1/main.go`. This produces a binary file called `main` in the root directory, which we can run with `./main`. We can also use the `go run cmd/tutorial_1/main.go` command to compile and run the program in one step.
+
+## Constants, Variables, and Data Types
+To declare a variable, we use the `var` keyword, followed by the name of the variable, and then the type of the variable. 
+```go
+func main() {
+    var intNum int
+}
+```
+In addition to the `int` type, we have `int8, int16, int32, int64`. This is used to specify how many bits we use to store the integer. Note that `int` will default to 32 or 64 bits depending on your system architecture. We also have the `uint, uint8, uint16, uint32, uint64` which have the same bit sizes but only stores positive integers.
+
+Next, we have the `float32` and `float64` types for floating point numbers. 
+
+Note that in GO, we cannot perform operations on variables of different types. For example, we cannot add an `int` to a `float32`. To do this, we need to **cast** the variable to the desired type. We do this by using the type name in parentheses before the variable name.
+```go
+var intNum int = 5
+var floatNum float32 = 5.5
+var result float32 = float32(intNum) + floatNum
+```
+Like many programming languages, the division operation `/` on integers will return an integer, which is rounded down.
+
+We can store strings in GO using the `string` type. We can use double quotes or back quotes. Their difference is that double quotes does not allow for multi line, while back quotes do.
+```go
+var myString1 string = "Hello World!"
+var myString2 string = "Hello
+World!" // This will throw an error
+var myString3 string = `Hello
+World!` // This is fine
+var myString4 string = "Hello \n World!" //This is also fine
+```
+Concatenation works by using the `+` operator. We can also use the `+=` operator to append to a string.
+```go
+var myString5 string = "Hello" + " World!"
+myString5 += " I am here!" // myString5 is now "Hello World! I am here!"
+```
+The `len` function in GO works a little bit differently than other languages. Instead of the number of characters, it returns the number of bytes of a string.
+```go
+fmt.Println(len("a")) // prints 1
+fmt.Println(len("👋")) // prints 4
+```
+If we want the number of characters, we have to use the built-in package `unicode/utf8` and use the `RuneCountInString` function.
+```go
+fmt.Println(utf8.RuneCountInString("👋")) // prints 1
+```
+Runes are actually another datatype in GO that represents characters. We can use the `rune` keyword to declare a variable of type rune. We use the single quote to declare a rune.
+```go
+var myRune rune = 'a'
+```
+As usual, booleans are declared using the `bool` type. They can either be `true` or `false`.
+
+Variables in GO can be declared without initializing a value.
+```go
+var myInt int
+```
+In this case, GO sets a default value for the variable. For integer types, float types, and runes, the default value is 0. For strings, the default value is an empty string, and for booleans, the default value is `false`.
+
+We can also declare a variable but omit the type if we initialize it with a value. GO will infer the type of the variable from the value.
+```go
+var myVar = "text"
+```
+We can go a step further and drop the `var` keyword as well by using the `:=` operator. This is called a short declaration.
+```go
+myVar := "text"
+```
+We can also declare multiple variables at once.
+```go
+var myVar1, myVar2, myVar3 int = 1, 2, 3
+var myVar4, myVar5, myVar6 = 1, 2, 3
+myVar7, myVar8, myVar9 := 1, 2, 3
+```
+Note that we should always add the type if it is not immediately obvious. For example, if we have a function that returns a value, we should add the type to the variable.
+```go
+var myVar string = foo()
+```
+We can also declare constants in GO using the `const` keyword. Constants are immutable, and their value cannot be changed after they are initialized. Constants cannot be declared but not initialized.
+```go
+const myConst int = 5
+const myConst2 string // This will throw an error
+```
+
+## Functions and Control Structures
