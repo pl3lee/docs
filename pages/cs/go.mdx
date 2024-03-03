@@ -140,3 +140,177 @@ const myConst2 string // This will throw an error
 ```
 
 ## Functions and Control Structures
+A function in GO is defined as follows:
+```go
+func myFunction(param1 type1, param2 type2) returnType {
+    // code here
+}
+```
+So for example
+```go
+func intDivision(numerator int, denominator int) int {
+    var result int = numerator / denominator
+    return result
+}
+```
+A function can return multiple values by using parentheses.
+```go
+func intDivision(numerator int, denominator int) (int, int) {
+    var result int = numerator / denominator
+    var remainder int = numerator % denominator
+    return result, remainder
+}
+```
+We can use the `Printf` function from the `fmt` package to print to the console with formatting. We use the `%` symbol to indicate where we want to insert a value, and then we list the values at the end of the function call.
+```go
+fmt.Printf("The result is %d and the remainder is %d", result, remainder)
+```
+Now what if we pass 0 as a denominator to our division function? There will be a divide by zero error. A design pattern in GO is that if your function can encounter errors, your function should also return a value of type `error` along with the other return values. The `error` type is a built-in type in GO. When we declare an `error` variable, the default value is `nil`.
+```go
+import (
+    "errors",
+    "fmt"
+)
+
+func intDivision(numerator int, denominator int) (int, int, error) {
+    var err error
+    if denominator == 0 {
+        err = errors.New("Cannot divide by zero")
+        return 0, 0, err
+    }
+    var result int = numerator / denominator
+    var remainder int = numerator % denominator
+    return result, remainder, err // err is nil here
+}
+
+// Then we perform error checking
+func main() {
+    var result, remainder, err = intDivision(11, 0)
+    if err != nil {
+        fmt.Printf(err.Error())
+    } else if remainder == 0 {
+        fmt.Printf("The result is %v", result)
+    } else {
+        fmt.Printf("The result is %v and the remainder is %v", result, remainder)
+    }
+}
+```
+## Arrays, Slices, Maps, and Loops
+### Arrays
+Arrays are a collection of data with fixed length, same type, indexable, and stored in contiguous memory. The following declares an array of 3 integers.
+```go
+func main() {
+    var intArr [3]int32
+    intArr[1] = 123
+    fmt.Println(intArr[0]) // gets the first element, 0
+    fmt.Println(intArr[1:3]) // gets the second and third element, [123 0]
+}
+```
+Note that the length of the array cannot be changed afterwards. We can print out the memory location of the array using the `&` operator.
+```go
+fmt.Println(&intArr) // prints the memory location of the first element
+fmt.Println(&intArr[1]) // prints the memory location of the second element
+```
+We could also immediately initialize the array using the following syntax:
+```go
+var intArr1 [3]int32 = [3]int32{1, 2, 3}
+var intArr2 := [3]int32{1, 2, 3}
+// We could even omit the length of the array by using the ... syntax
+var intArr3 := [...]int32{1, 2, 3}
+```
+### Slices
+Slice are a more flexible version of arrays. Slices wrap arrays to give a more general, powerful, and convenient interface to sequences of data. By omitting the length of the array, we create a slice.
+```go
+var intSlice []int32 = []int32{1, 2, 3}
+intAlice = append(intSlice, 7)
+```
+A slice has a `length` and a `capacity`. The length is the number of elements in the slice, and the capacity is the number of elements in the underlying array, starting from the first element of the slice. When we append an element to a slice, GO checks if the capacity is enough to store the new element. If it is not, GO creates a new array with double the capacity, copies the old array into the new array, and then appends the new element. 
+```go
+var intSlice []int32 = []int32{4, 5, 6}
+fmt.Printf("The length is %v with capacity %v", len(intSlice), cap(intSlice)) //prints 3, 3
+intAlice = append(intSlice, 7)
+fmt.Printf("The length is %v with capacity %v", len(intSlice), cap(intSlice)) //prints 4, 6
+```
+We can append multiple elements to a slice by using the `...` syntax.
+```go
+var intSlice2 []int32 = []int32{1, 2, 3}
+var intSlice3 []int32 = []int32{4, 5, 6}
+intSlice2 = append(intSlice2, intSlice3...)
+fmt.Println(intSlice2) // prints [1 2 3 4 5 6]
+```
+Another way to create a slice is to use the `make` function. We specify the length of the slice along with (optionally) the capacity of the slice. If you roughly know how many elements you will be appending to the slice, it is a good idea to specify the capacity to avoid unnecessary reallocation of arrays.
+```go
+var intSlice3 []int32 = make([]int32, 3, 8) // creates a slice of length 3 and capacity 8
+```
+### Maps
+A map is a set of key-value pairs where you can lookup a value by its key. We can create a map using the `make` function.
+```go
+var myMap map[string]uint8 = make(map[string]uint8) // creates an empty map of key type string and value type uint8
+
+var myMap2 = map[string]uint8{
+    "one": 1,
+    "two": 2,
+    "three": 3,
+}
+```
+If we try to access a value using a key that does not exist in that map, we get the default value of the value type.
+```go
+fmt.Println(myMap2["four"]) // prints 0
+```
+Luckily, GO returns two values when we access a value from a map. The first value is the value of the key, and the second value is a boolean that tells us if the key exists in the map.
+```go
+var value, exists = myMap2["four"]
+if exists {
+    fmt.Println(value)
+} else {
+    fmt.Println("The key does not exist")
+}
+```
+We can also delete a key-value pair from a map using the `delete` function. No return value is given.
+```go
+delete(myMap2, "one")
+```
+### Loops
+If we want to loop over arrays, slices, or maps, we can use the `range` keyword in a `for` loop.
+```go
+// loops over the keys of the map
+for number := range myMap2 {
+    fmt.Printf("%v\n", number)
+}
+```
+Note that when we loop over a map, the ordering of the keys is not guaranteed, so we might get different orders each time we run the program. If we also want to loop over the values, we can do it like this:
+```go
+// loops over the keys and values of the map
+for key, value := range myMap2 {
+    fmt.Printf("%v: %v\n", key, value)
+}
+```
+Similarly, we can loop over arrays and slices.
+```go
+for index, value := range intSlice2 {
+    fmt.Printf("Index: %v, Value: %v\n", index, value)
+}
+```
+GO does not have `while` loops, but we can achieve the same thing using the `for` keyword.
+```go
+var i int = 0
+for i < 10 {
+    fmt.Println(i)
+    i = i + 1
+}
+// can also omit the condition
+for {
+    if i >= 10 {
+        break
+    }
+    fmt.Println(i)
+    i = i + 1
+}
+```
+Another way to define a loop is using the syntax similar to C.
+```go
+for i:= 0; i < 10; i++ {
+    fmt.Println(i)
+}
+```
+## Strings, Runes, and Bytes
