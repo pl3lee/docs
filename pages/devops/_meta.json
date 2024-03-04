@@ -1,4 +1,5 @@
 {
     "gitlabcicd": "GitLab CI/CD",
-    "docker-dockercompose": "Docker & Docker Compose"
+    "docker-dockercompose": "Docker & Docker Compose",
+    "dockerize-nextjs": "Dockerizing Next.js App"
 }

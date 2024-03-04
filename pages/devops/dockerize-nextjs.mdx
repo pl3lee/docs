@@ -1,0 +1,41 @@
+# Dockerizing Next.js App
+We want the Docker image size to be as small as possible. We will leverage multi-stage builds and standalone output of Next.js to achieve this.
+
+## Standalone Output
+First, edit the `next.config.js` so that it contains `output: "standalone"`.
+```javascript
+module.exports = {
+  output: 'standalone',
+}
+```
+## dockerignore
+Before we create our `Dockerfile`, let's create a `.dockerignore` file to exclude unnecessary files and directories from the Docker build context.
+```
+node_modules
+.next
+.gitignore
+README.md
+.dockerignore
+.git
+```
+
+## Dockerfile
+Now we can create a `Dockerfile` in the root of the project that uses multi-stage builds to build the Next.js app and then copy the output to a smaller image.
+```Dockerfile
+FROM node:21 as builder
+COPY . /app
+WORKDIR /app
+RUN npm run install
+RUN npm run build
+
+FROM node:21-alpine as runner
+WORKDIR /app
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/package-lock.json .
+COPY --from=builder /app/next.config.js .
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+CMD ["node", "server.js"]
+```
