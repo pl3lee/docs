@@ -384,3 +384,438 @@ func main() {
 }
 ```
 What is happening here is that an array is allocated internally and values are appended when calling the `WriteString` method. Only at the end when we call the `String` method is the array converted to a string. This is much more efficient than using the `+` operator.
+
+## Structs and Interfaces
+We can think of `structs` as defining our own type. We can create a struct using the `type` and `struct` keyword. `structs` can hold mixed types in the form of fields, which we define my name. When we declare a struct variable, the field's default values are its data type's default values.
+```go
+package main
+
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+}
+
+func main() {
+    var myEngine gasEngine // mpg is 0, gallons is 0
+}
+```
+If we want to initialize the struct with values, we can do so using the following syntax.
+```go
+// we can include the field names
+var myEngine gasEngine = gasEngine{mpg: 25, gallons: 15}
+// or we can omit the field names, following the order of the fields
+var myEngine gasEngine = gasEngine{25, 15}
+// or we can set the values directly
+myEngine.mpg = 20
+```
+Fields can be anything we want, including other `structs`.
+```go
+package main
+
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+    ownerInfo owner
+}
+
+type owner struct {
+    name string
+}
+
+func main() {
+    var myEngine gasEngine = gasEngine{mpg: 25, gallons: 15, owner{"Alex"}}
+    // myEngine is now { mpg: 25, gallons: 15, ownerInfo: { name: "Alex"}}
+    fmt.Println(myEngine.mpg, myEngine.hallons, myEngine.ownerInfo.name) // prints 25, 15, Alex
+}
+```
+If we want, we can even omit the struct name when declaring a field of type another struct.
+```go
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+    owner
+}
+```
+This directly injects the `name` field of the `owner` struct into the `gasEngine` struct. 
+```go
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+    owner
+}
+
+var myEngine gasEngine = gasEngine{25, 15, owner{"Alex"}}
+// myEngine is now { mpg: 25, gallons: 15, name: "Alex" }
+```
+We can also define anonymous structs, which are structs without a name. To create an anonymous struct, we have to define it and initialize it at the same time.
+```go
+var myEngine = struct {
+    mpg uint8
+    gallons uint8
+}{25, 15}
+```
+However, this is not reusable, so it is not recommended to use anonymous structs.
+### Struct Methods
+Struct methods are functions that are directly tied to the struct and have access to the struct instance itself. A method is just like a function, except we have to specify the type of the struct that the method is tied to. 
+```go
+package main
+
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+}
+
+// method tied to the gasEngine struct
+func (e gasEngine) milesLeft() uint8 {
+    return e.gallons * e.mpg
+}
+
+func main() {
+    var myEngine gasEngine = gasEngine{25, 15}
+    fmt.Printf("Total miles left in tank: %v", myEngine.milesLeft())
+}
+```
+We can also pass in a struct as an argument to a function.
+```go
+package main
+
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+}
+
+// method tied to the gasEngine struct
+func (e gasEngine) milesLeft() uint8 {
+    return e.gallons * e.mpg
+}
+
+func canMakeIt(e gasEngine, miles uint8) bool {
+    return e.milesLeft() >= miles
+}
+
+func main() {
+    var myEngine gasEngine = gasEngine{25, 15}
+    fmt.Printf("Total miles left in tank: %v", myEngine.milesLeft())
+}
+```
+Now suppose that we also have an `electricEngine` type that has different fields from a `gasEngine`. It also has a similar `milesLeft` method
+```go
+package main
+
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+}
+
+type electricEngine struct {
+    mpkwh uint8
+    kwh uint8
+}
+
+// method tied to the gasEngine struct
+func (e gasEngine) milesLeft() uint8 {
+    return e.gallons * e.mpg
+}
+
+// method tied to the electricEngine struct
+func (e electricEngine) milesLeft() uint8 {
+    return e.kwh * e.mpkwh
+}
+
+func canMakeIt(e gasEngine, miles uint8) bool {
+    return e.milesLeft() >= miles
+}
+
+func main() {
+    var myEngine gasEngine = gasEngine{25, 15}
+    fmt.Printf("Total miles left in tank: %v", myEngine.milesLeft())
+}
+```
+Currently, our `canMakeIt` function only takes in a `gasEngine` as an argument. We can make it more flexible by using an interface. In our `canMakeIt` function, we see that it only really needs the `milesLeft` method that takes no parameters and returns an `uint8`. This is called the **method signature**. We specify it in the interface like this.
+```go
+package main
+
+type gasEngine struct {
+    mpg uint8
+    gallons uint8
+}
+
+type electricEngine struct {
+    mpkwh uint8
+    kwh uint8
+}
+
+// method tied to the gasEngine struct
+func (e gasEngine) milesLeft() uint8 {
+    return e.gallons * e.mpg
+}
+
+// method tied to the electricEngine struct
+func (e electricEngine) milesLeft() uint8 {
+    return e.kwh * e.mpkwh
+}
+
+// interface here
+type engine interface {
+    milesLeft() uint8
+}
+
+
+// replace gasEngine with interface engine
+func canMakeIt(e engine, miles uint8) bool {
+    return e.milesLeft() >= miles
+}
+
+func main() {
+    var myEngine gasEngine = gasEngine{25, 15}
+    fmt.Printf("Can make it: %v", canMakeIt(myEngine, 50))
+}
+```
+The `canMakeIt` function can now take in any parameter with the only requirement that the parameter has a `milesLeft` method with the signature `() uint8`. 
+
+## Pointers
+Pointers are a special type that stores memory locations rather than values. We can declare a pointer using the `*` operator. 
+```go
+package main
+
+func main() {
+    var p *int32
+    var i int32
+}
+```
+This indicates that the variable `p` will hold the memory address of an `int32` value. The default value for pointers are `nil`. To create a new `int32` value and store its memory address in `p`, we use the `new` function.
+```go
+var p *int32 = new(int32)
+var i int32
+```
+We can then get the value stored at the memory location pointed to by `p` using the `*` (dereferncing) operator.
+```go
+var p *int32 = new(int32)
+var i int32
+fmt.Printf("The value p points to is: %v", *p)
+```
+To change the value of the memory location pointed to by `p`, we can use the `*` operator to dereference the pointer and then assign a new value to it.
+```go
+var p *int32 = new(int32)
+var i int32
+*p = 10
+```
+We can also have a pointer point to an existing variable.
+```go
+var p *int32 = new(int32)
+var i int32
+p = &i
+
+// OR
+var p *int32 = &i
+```
+So if we change the value of `*p`, the value of `i` will also change.
+```go
+var p *int32 = &i
+*p = 10
+fmt.Printf("The value of i is: %v", i) // prints 10
+```
+Slices uses pointers in the underlying array.
+```go
+var slice = []int32{1, 2, 3}
+var sliceCopy = slice
+sliceCopy[2] = 4
+fmt.Printf("The value of slice is: %v", slice) // prints [1 2 4]
+```
+We can pass pointers to functions. This is useful when we want to modify the value of a variable in a function.
+```go
+package main
+import "fmt"
+
+func square(thing2 *[5]float64) [5]float64 {
+    for i := range thing2 {
+        thing2[i] = thing2[i] * thing2[i]
+    }
+    return thing2
+}
+
+func main() {
+    var thing1 = [5]float64{1, 2, 3, 4, 5}
+    var result [5]float64 = square(thing1)
+    fmt.Printf("The result is: %v", result) // prints [1 4 9 16 25]
+    fmt.Printf("The original thing1 is: %v", thing1) // prints [1 4 9 16 25]
+}
+```
+Pointers are really useful when we pass in large data structures to functions, as we can avoid copying the entire data structure.
+## Goroutines
+Goroutines are a way to launch multiple functions and execute them concurrently. Note that concurrency is not equal to parallel execution. Concurrency is mainly for 1 CPU core, the CPU switches between different tasks very quickly, giving the illusion of parallel execution. Parallel execution is when multiple tasks are executed at the same time on different CPU cores. Let's see how we can create a goroutine. First we simulate a database call using the `time` package.
+```go
+package main
+import (
+    "fmt"
+    "math/rand"
+    "time"
+)
+
+var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
+
+func dbCall(i int) {
+    // Simulate DB call delay
+    var delay float32 = rand.Float32() * 2000
+    time.sleep(time.Duration(delay) * time.Millisecond)
+    fmt.Println("The result from the database is:", dbData[i])
+}
+
+func main() {
+    for i := 0; i < len(dbData); i++ {
+        dbCall(i)
+    }
+}
+```
+This will take a long time to execute, as each call to `dbCall` is called sequentially. We can use a goroutine to make the calls concurrently by using the `go` keyword.
+```go
+package main
+import (
+    "fmt"
+    "math/rand"
+    "time"
+)
+
+var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
+
+func dbCall(i int) {
+    // Simulate DB call delay
+    var delay float32 = rand.Float32() * 2000
+    time.sleep(time.Duration(delay) * time.Millisecond)
+    fmt.Println("The result from the database is:", dbData[i])
+}
+
+func main() {
+    for i := 0; i < len(dbData); i++ {
+        go dbCall(i)
+    }
+}
+```
+However, this program spawns these processes, does not wait for them to complete, then ends the program. So we need the program to wait for the goroutines to complete. We can use the `sync` package to do this. We can use the `WaitGroup` type to wait for a group of goroutines to complete. `WaitGroups` are basically counters. Whenever we spawn a new goroutine, we add 1 to the counter, and when a function is done executing, we subtract 1 from the counter. Then we can use the `Wait` method to block the program until the counter is 0.
+```go
+package main
+import (
+    "fmt"
+    "math/rand"
+    "time"
+    "sync"
+)
+
+// Create a WaitGroup
+var wg = sync.WaitGroup{} 
+var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
+
+func dbCall(i int) {
+    // Simulate DB call delay
+    var delay float32 = rand.Float32() * 2000
+    time.sleep(time.Duration(delay) * time.Millisecond)
+    fmt.Println("The result from the database is:", dbData[i])
+    wg.Done() // subtract 1 from the counter
+}
+
+func main() {
+    for i := 0; i < len(dbData); i++ {
+        wg.Add(1) // add 1 to the counter
+        go dbCall(i)
+    }
+    wg.Wait() // wait until all the goroutines are done, i.e. the counter is 0
+}
+```
+Now what if we have multiple goroutines that need to write to the same variable? For example, our `dbCall` function write the results to a slice `results`. This can cause unexpected results because multiple goroutines are trying to write to the same memory location. We use a `mutex` to lock the memory location while a goroutine is writing to it. We can use the `sync` package to create a `Mutex` type. The two main methods are the `Lock` and `Unlock` methods. We use the `Lock` method to lock the memory location, and the `Unlock` method to unlock it. We place them around the part of the code which accesses the shared memory location.
+```go
+package main
+import (
+    "fmt"
+    "math/rand"
+    "time"
+    "sync"
+)
+
+// Create a WaitGroup
+var wg = sync.WaitGroup{} 
+
+// Create a Mutex
+var m = sync.Mutex{}
+var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
+var results = []string{}
+
+func dbCall(i int) {
+    // Simulate DB call delay
+    var delay float32 = rand.Float32() * 2000
+    time.sleep(time.Duration(delay) * time.Millisecond)
+    fmt.Println("The result from the database is:", dbData[i])
+
+    // Lock the memory location
+    m.Lock()
+    results = append(results, dbData[i])
+    // After we are done, unlock the memory location
+    m.Unlock()
+    wg.Done() // subtract 1 from the counter
+}
+
+func main() {
+    for i := 0; i < len(dbData); i++ {
+        wg.Add(1) // add 1 to the counter
+        go dbCall(i)
+    }
+    wg.Wait() // wait until all the goroutines are done, i.e. the counter is 0
+}
+```
+When a goroutine reaches a `Lock` method, it will perform a check to see if a lock has already been set by another goroutine. If it has, it will wait until the lock is released. When the lock is released, the goroutine will set the lock and continue. After the goroutine is done, it will release the lock and allow other goroutines to access the memory location.
+
+Therefore, it really matters where we call the `Lock` methods. If we call it in the wrong location, it can destroy our concurrency.
+
+Now this type of `mutex` might not be what we wanted because it completely locks out other goroutines to accessing our `results` slice. GO provides another `mutex` called the `RWMutex` (Read-write Mutex). The `Lock` and `Unlock` methods work exactly the same, but we also get the `RLock` and `RUnlock` methods (read lock and read unlock).
+```go
+package main
+import (
+    "fmt"
+    "math/rand"
+    "time"
+    "sync"
+)
+
+// Create a WaitGroup
+var wg = sync.WaitGroup{} 
+
+// Create a Mutex
+var m = sync.RWMutex{}
+var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
+var results = []string{}
+
+func dbCall(i int) {
+    // Simulate DB call delay
+    var delay float32 = rand.Float32() * 2000
+    time.sleep(time.Duration(delay) * time.Millisecond)
+    save(dbData[i])
+    log()
+    wg.Done() // subtract 1 from the counter
+}
+
+// appends the result to the results slice
+func save(result string) {
+    // Lock the memory location
+    m.Lock()
+    results = append(results, result)
+    // After we are done, unlock the memory location
+    m.Unlock()
+}
+
+// reads the results slice and prints out the results
+func log() {
+    m.RLock()
+    fmt.Println("The results so far are:", results)
+    m.RUnlock()
+}
+
+func main() {
+    for i := 0; i < len(dbData); i++ {
+        wg.Add(1) // add 1 to the counter
+        go dbCall(i)
+    }
+    wg.Wait() // wait until all the goroutines are done, i.e. the counter is 0
+}
+```
+When a goroutine reaches the line `m.RLock()`, it checks if there is a full lock on the mutex. If there is, it will wait until the lock is released. This way we are not reading when another goroutine is writing. If no full lock exists, the goroutine will aquire a read lock and proceed with the rest of the code. When a goroutine executes the line `m.Lock()`, in order to proceed, all locks must be released (including full locks and read locks). This prevents the slice while other goroutines are writing to/reading from the slice.
+
+## Channels
