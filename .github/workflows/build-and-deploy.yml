@@ -12,11 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag docs:latest
+      run: docker build . --file Dockerfile --tag pl3lee/docs:latest
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
     - name: Push the Docker image to Docker Hub
-      run: docker push docs:latest
+      run: docker push pl3lee/docs:latest
       
   deploy:
     needs: build_and_push
