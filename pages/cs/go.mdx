@@ -314,3 +314,73 @@ for i:= 0; i < 10; i++ {
 }
 ```
 ## Strings, Runes, and Bytes
+### Strings and Runes
+Let's use the word `résumé` here since it has a bunch of weird characters (non ASCII). We can index a string using the same notation as an array. We use `%T` to print out a type of a variable in GO.
+```go
+var myString string = "résumé"
+var indexed = myString[0]
+fmt.Println(indexed) // prints 114
+fmt.Printf("%v, %T", indexed, indexed) // prints 114, uint8
+```
+This is weird, why is it not printing the character `r` like other languages? Let's try to use a for loop to print out its indices and values
+```go
+for index, value := range myString {
+    fmt.Println(index, value)
+    // Prints
+    // 0 114
+    // 1 233
+    // 3 115
+    // 4 117
+    // 5 109
+    // 6 233
+}
+```
+We can see that the index skips 2. This is because the string is encoded in UTF-8, which uses a variable number of bytes to encode characters. The `é` character is encoded using two bytes, and has a unicode point number of 233. The underlying array that stores `myString` is an array of bytes
+```go
+//   r         é                   s         u         m         é
+[01110010, 11000011, 10101001, 01110011, 01110101, 01101101, 11000011, 10101001]
+```
+When we index our string, we are actually indexing the underlying byte array. The key takeaway here is that in GO when you deal with strings, you are dealing with an array of bytes. This is also why when we use the `len` function on a string, we get the number of bytes, not the number of characters. An easier way to deal with strings is to cast it to a slice of runes.
+```go
+var myString = []rune("résumé")
+// myString is now [114 233 115 117 109 233]
+```
+Note that we can declare and initialize a `rune` using the single quote notation. 
+```go
+var myRune rune = 'a'
+```
+### String Building
+Recall that we can concatenate strings using the `+` operator.
+```go
+var strSlice = []string{"s", "u", "b", "s", "c", "r", "i", "b", "e"}
+var catStr = ""
+for i := range strSlice {
+    catStr += strSlice[i]
+}
+fmt.Printf("\n%v", catStr) // prints "subscribe"
+```
+But strings are immutable, so we cannot modify them once created.
+```go
+var myString = "subscribe"
+myString[0] = "S" // This will throw an error
+```
+So, when we do string concatenation, we are actually creating a new string every time, this is pretty inefficient. Instead, we can use the `strings` package to build strings.
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    var strSlice = []string{"s", "u", "b", "s", "c", "r", "i", "b", "e"}
+    var strBuilder strings.Builder
+    for i := range strSlice {
+        strBuilder.WriteString(strSlice[i])
+    }
+    var catStr = strBuilder.String()
+    fmt.Printf("\n%v", catStr) // prints "subscribe"
+}
+```
+What is happening here is that an array is allocated internally and values are appended when calling the `WriteString` method. Only at the end when we call the `String` method is the array converted to a string. This is much more efficient than using the `+` operator.
