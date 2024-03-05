@@ -32,7 +32,7 @@ jobs:
       
   deployment:
     needs: build_and_push
-    environment: production
+    environment: Production
     runs-on: ubuntu-latest
     steps:
     - name: Installing SSH key
