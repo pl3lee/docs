@@ -819,3 +819,645 @@ func main() {
 When a goroutine reaches the line `m.RLock()`, it checks if there is a full lock on the mutex. If there is, it will wait until the lock is released. This way we are not reading when another goroutine is writing. If no full lock exists, the goroutine will aquire a read lock and proceed with the rest of the code. When a goroutine executes the line `m.Lock()`, in order to proceed, all locks must be released (including full locks and read locks). This prevents the slice while other goroutines are writing to/reading from the slice.
 
 ## Channels
+At a high level, channels are a way to enable goroutines to pass around information. Channels
+1. Hold data, for example an integer, a slice etc.
+2. are thread safe, i.e. we avoid data races when we read and write from memory.
+3. listen for when data is added or removed from a channel, and can block code execution until one of these events happen.
+
+To make a channel, we use the `make` function, followed by the `chan` keyword and the type of data we want to pass around.
+```go
+var c = make(chan int)
+```
+This channel can only hold a single `int` value. They also have a special syntax for assigning values, `<-`.
+```go
+c <- 5 // sends the value 5 to the channel
+```
+We can think of channels as like a pipe. We can pop the data out of the channel using the `<-` operator.
+```go
+var i = <- c // pops the value out of the channel, now channel is empty
+```
+But actually the following code does not work
+```go
+var c = make(chan int)
+c <- 5 // sends the value 5 to the channel
+var i = <- c // pops the value out of the channel, now channel is empty
+```
+This is because when we write to a channel, the code will block until something else reads from it, so we'll be waiting at the line `c <- 5` forever. A proper way to use this is with a goroutine.
+```go
+func main() {
+    var c = make(chan int)
+    go process(c) // 1. start our go routine
+    fmt.Println(<-c) // 2. program moves to this line, where it wait for a value to be sent to the channel
+    // 4. main function notices a value has been set, print value gets called and the value gets printed
+}
+
+func process(c chan int) {
+    c <- 123 // 3. send the value 123 to the channel
+}
+```
+What if we have a `for` loop like this?
+```go
+func main() {
+    var c = make(chan int)
+    go process(c) // 1. start our go routine
+    for i := range c { // 2. wait at the top of the for loop for something to be added to the channel
+        fmt.Println(i) // 4. 0 is printed
+        // 6. 1 is printed, etc.
+    }
+}
+
+func process(c chan int) {
+    for i := 0; i < 5; i++ {
+        c <- i // 3. add 0 to the channel
+        // 5. add 1 to the channel
+    }
+}
+```
+Notice that when we run this, we will encounter the deadlock error, because after we print all of our values from 0 to 4, the main function will go back to wait at the top of the loop. Instead, what we have to do is to close the channel before exiting a process.
+```go
+func process(c chan int) {
+    for i := 0; i < 5; i++ {
+        c <- i 
+    }
+    close(c) // close the channel
+}
+```
+This notifies any other processes using this channel that we are done, and the main function will break out of the loop and exit. We can also use the `defer` keyword, that will execute a function when the current function is done executing.
+```go
+func process(c chan int) {
+    defer close(c) // close the channel when the function is done executing
+    for i := 0; i < 5; i++ {
+        c <- i 
+    }
+}
+```
+A channel that only stores 1 value is called an **unbuffered channel**. We can also create a channel that stores multiple values, called a **buffered channel**.
+```go
+func main() {
+    var c = make(chan int, 5) // creates buffered channel
+    go process(c) 
+    for i := range c { 
+        fmt.Println(i) 
+        time.Sleep(time.Second * 1) // does some work
+    }
+}
+
+func process(c chan int) {
+    defer close(c) // close the channel when the function is done executing
+    for i := 0; i < 5; i++ {
+        c <- i 
+    }
+    fmt.Println("Exiting process")
+}
+```
+This will print out `Exiting process`, then the main function will print out the values from 0 to 4. That is, the process function will add values to the channel without having to wait for the main function to make room for them by popping out a value from the channel. Let's see an example of a more useful application of channels.
+
+We have a program that mocks checking for sales on chicken fingers at Walmart, Costco, and Wholefoods. If it finds a sale, it will send a message, notifying the user of the sale.
+```go
+package main
+
+import (
+    "fmt"
+    "math/rand"
+    "time"
+)
+
+var MAX_CHICKEN_PRICE float32 = 5
+
+func main() {
+    var chickenChannel = make(chan string)
+    var websites = []string{"walmart.com", "costco.com", "wholefoods.com"}
+    for i := range websites {
+        go checkChickenPrices(websites[i], chickenChannel) // spawns 3 goroutines to check for sales
+    }
+    sendMessage(chickenChannel)
+}
+
+func checkChickenPrices(website string, chickenChannel chan string) {
+    for {
+        time.Sleep(time.Second * 1)
+        var chickenPrice = rand.Float32() * 20 // simulate chicken price
+        if chickenPrice <= MAX_CHICKEN_PRICE {
+            chickenChannel <- website
+            break
+        }
+    }
+}
+
+func sendMessage(chickenChannel chan string) {
+    fmt.Printf("\nFound a deal on chicken at %s", <-chickenChannel)
+}
+```
+The first goroutine to find a deal on chicken will send a message to the `chickenChannel`, and the `sendMessage` function will print out the message, then the program will exit.
+
+Suppose we want to check for tofu as well.
+```go
+package main
+
+import (
+    "fmt"
+    "math/rand"
+    "time"
+)
+
+var MAX_CHICKEN_PRICE float32 = 5
+var MAX_TOFU_PRICE float32 = 3
+
+func main() {
+    var chickenChannel = make(chan string)
+    var tofuChannel = make(chan string)
+    var websites = []string{"walmart.com", "costco.com", "wholefoods.com"}
+    for i := range websites {
+        go checkChickenPrices(websites[i], chickenChannel) 
+        go checkTofuPrices(websites[i], tofuChannel) 
+    }
+    sendMessage(chickenChannel)
+}
+
+func checkChickenPrices(website string, tofuChannel chan string) {
+    for {
+        time.Sleep(time.Second * 1)
+        var tofuPrice = rand.Float32() * 20 
+        if tofuPrice <= MAX_TOFU_PRICE {
+            tofuChannel <- website
+            break
+        }
+    }
+}
+
+func checkChickenPrices(website string, chickenChannel chan string) {
+    for {
+        time.Sleep(time.Second * 1)
+        var chickenPrice = rand.Float32() * 20 // simulate chicken price
+        if chickenPrice <= MAX_CHICKEN_PRICE {
+            chickenChannel <- website
+            break
+        }
+    }
+}
+
+func sendMessage(chickenChannel chan string, tofuChannel chan string) {
+    // If we get a sale on tofu, we send an email instead of a message
+    // we can use a select statement
+    select {
+        case website := <-chickenChannel:
+            fmt.Printf("\nText Sent: Found deal on chicken at %v", website)
+        case website := <-tofuChannel:
+            fmt.Printf("\nEmail Sent: Found deal on tofu at %v", website)
+    }
+}
+```
+The `select` statement is like an `if` statement for channels. What happens is if we receive a message from the `chickenChannel`, we set the variable website to the value of in the channel, and we sent a text. Otherwise, if we receive a message from the `tofuChannel`, we set the variable website to the value of in the channel, and we send an email. So the `select` statement will listen for a result, and once it gets one, it will execute one of the statements, and exit.
+
+## Generics
+Suppose we have a function that sums up the values of an integer slice. But then we also want a similar function for a float32 slice. We can use generics to handle this.
+```go
+package main
+
+import "fmt"
+
+func main() {
+    var intSlice = []int{1, 2, 3}
+    fmt.Println(sumSlice[int](intSlice))
+
+    var float32Slice = []float32{1.1, 2.2, 3.3}
+    fmt.Println(sumSlice[float32](float32Slice))
+}
+
+func sumSlice[T int | float32 | float64](slice []T) T {
+    var sum T
+    for _, v := range slice {
+        sum += v
+    }
+    return sum
+}
+```
+So the `sumSlice` function can take in a slice that is an `int`, `float32`, or `float64`. So when we pass in an integer slice by `sumSlice[int](intSlice)`, we can replace all instances of `T` with `int` in the function. We can also use the `any` type to specify that the type can be anything, however it does not work everywhere.
+```go
+// This does not work because not all types are compatible with the + operator
+func sumSlice[T any](slice []T) T {
+    var sum T
+    for _, v := range slice {
+        sum += v
+    }
+    return sum
+}
+```
+Instead, we can use the `any` type here
+```go
+func isEmpty[T any](slice []T) bool {
+    return len(slice) == 0
+}
+```
+Generics also works in structs
+```go
+package main
+
+import "fmt"
+
+type gasEngine struct {
+    gallons float32
+    mpg float32
+}
+
+type electricEngine struct {
+    kwh float32
+    mpkwh float32
+}
+
+type car [T gasEngine | electricEngine] struct {
+    carMake string
+    carModel string
+    engine T
+}
+
+func main() {
+    var gasCar = car[gasEngine]{
+        carMake: "Honda",
+        carModel: "Civic",
+        engine: gasEngine{
+            gallons: 12.4,
+            mpg: 40,
+        }
+    }
+
+    var electricCar = car[electricEngine]{
+        carMake: "Tesla",
+        carModel: "Model 3",
+        engine: electricEngine{
+            kwh: 57.5,
+            mpkwh: 4.17,
+        }
+    }
+}
+```
+
+## Example API Project
+First let's initialize our project
+```bash
+go mod init github.com/pl3lee/example-go-project
+```
+Many GO projects adhere to a standard layout. [Here](https://github.com/golang-standards/project-layout) is a GitHub repository of standard layouts for GO projects. Lets make an `api` folder, here we are going to have our specs such as parameters and response types for our endpoints. This is also where we put our `yaml` spec file.
+
+Then we create a `cmd/api` folder which will contain our `main.go` folder. We also have an `internal` folder that contains most of our code for our API. Let's also create an `api.go` file in our `api` folder.
+<FileTree>
+    <FileTree.Folder name="api">
+        <FileTree.File name="api.go" />
+    </FileTree.Folder>
+    <FileTree.Folder name="cmd">
+        <FileTree.Folder name="api">
+            <FileTree.File name="main.go" />
+        </FileTree.Folder>
+    </FileTree.Folder>
+    <FileTree.Folder name="internal" />
+</FileTree>
+
+```go
+// api/api.go
+package api
+
+import (
+    "encoding/json"
+    "net/http"
+)
+
+// Coin Balance Params: represents the parameters that our API endpoint will take. In this case we just require the username
+type CoinBalanceParams struct {
+    Username string
+}
+
+// Coin Balance Response: outlines a successful response from the server containing a status code and the account balance
+type CoinBalanceResponse struct {
+    Code int
+    Balance int64
+}
+
+// Error Response: outlines a failed response from the server containing a status code and an error message
+type ErrorResponse struct {
+    Code int
+    Message string
+}
+
+// This function is going to return an error response to the person who called the endpoint. We write the function here because we want to reuse this function in multiple places when we want to return an error
+func writeError(w http.ResponseWriter, message string, code int) {
+    resp := Error{
+        Code: code,
+        Message: message,
+    }
+
+    // set content type, i.e. we want to return a json
+    w.Header().Set("Content-Type", "application/json")
+    // write the error code
+    w.WriteHeader(code)
+
+    // json.NewEncoder(w) creates a new json encoder object that writes to the response writer
+    // .Encode(resp) writes the resp object (which is an error) into JSON
+    json.NewEncoder(w).Encode(resp)
+}
+
+// Now we create some wrappers for our error handling, because we want different types of error
+var (
+    // We use this when we want a specific error in our response, this guides the caller to fix his request
+    RequestErrorHandler = func(w http.ResponseWriter, err error) {
+        writeError(w, err.Error(), http.StatusBadRequest)
+    }
+    // We use this when we want to return a generic error message. For example, when we have a bug in our code, we don't want to return the error message to the caller, so we return a generic error message
+    InternalErrorHandler = func(w http.ResponseWriter) {
+        writeError(w, "An Unexpected Error Occured.", http.StatusInternalServerError)
+    }
+)
+```
+Now let's define our main package in `cmd/api/main.go`. When we import an external package, we can install it using `go mod tidy`. After running the command, we will see the packages listed in the `go.mod` file.
+```go
+// cmd/api/main.go
+package main
+
+import (
+    "fmt"
+    "net/http"
+
+    // the chi package is a flexible package for web development
+    "github.com/go-chi/chi"
+    // imports a package from our own module in the internal/handlers folder
+    "github.com/pl3lee/example-go-project/internal/handlers"
+    // used to log errors for debugging, aliased as just log
+    log "github.com/sirupsen/logrus"
+)
+
+func main() {
+    // when we print something out, we get the file and the line number
+    log.SetReportCaller(true)
+    // create a new chi Mux variable, which is just a struct that we use to setup our API
+    var r *chi.Mux = chi.NewRouter()
+    // pass in the chi Mux variable to the Handler function
+    handlers.Handler(r)
+
+    fmt.Println("Starting GO API service...")
+
+    // takes in the base location of the server and a handler which our mux type satisfies
+    err := http.ListenAndServe("localhost:8000", r)
+    if err != nil {
+        log.Error(err)
+    }
+}
+```
+Now let's create our `Handler` function which sets up our router in the `internal/handlers/api.go` file.
+```go
+// internal/handlers/api.go
+package handlers
+
+import (
+    "github.com/go-chi/chi"
+    // middleware is a function that gets called before the primary function gets called that handles the endpoint
+    chimiddle "github.com/go-chi/chi/middleware"
+    "github.com/pl3lee/example-go-project/internal/middleware"
+)
+
+// our function name starts with Uppercase, this tells the compiler that our function can be imported into other packages. Functions that start with lowercase are private to the package
+func Handler(r *chi.Mux) {
+    // global middleware
+    // what this does, it ignores the trailing slashes, for example, if we do http://localhost:8000/account/coins/ it will be the same as http://localhost:8000/account/coins
+    r.Use(chimiddle.StripSlashes)
+
+    // setup our route
+    r.Route("/account", func(router chi.Router) {
+        // Middleware for /account route, checks if user is authorized to access this account. This will be defined later in our middleware package
+        router.Use(middleware.Authorization)
+
+        // the GET method to /account/coins is handled by the GetCoinBalance function, will be defined later
+        router.Get("/coins", GetCoinBalance)
+    })
+}
+```
+Now let's define our `Authorization` middleware in the `internal/middleware/authorization.go` file.
+```go
+// internal/middleware/authorization.go
+package middleware
+
+import (
+    "errors"
+    "net/http"
+
+    "github.com/pl3lee/example-go-project/api"
+    "github.com/pl3lee/example-go-project/internal/tools"
+    log "github.com/sirupsen/logrus"
+)
+
+var UnAuthorizedError = errors.New("Invalid username or token.")
+
+// since we are using our Authorization function as middleware, this needs to follow a certain signature. It needs to take in a http.Handler and return a http.Handler
+func Authorization(next http.Handler) http.Handler {
+    // we return a http.HandlerFunc, which itself takes a function with the signature http.ResponseWriter and *http.Request
+    // the http.ResponseWriter is what we use to construct a response to the caller, for example we can write a status code, or write a response body
+    // the *http.Request is the request that the client made to the server which contains information such as the URL, the headers, and the body
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        var username string = r.URL.Query().Get("username")
+        var token = r.Header.Get("Authorization")
+        var err error
+
+        if username == "" || token == "" {
+            log.Error(UnAuthorizedError)
+            // Use the error handler we defined in the api package to return an error response
+            api.RequestErrorHandler(w, UnAuthorizedError)
+            return
+        }
+
+        // will be defined later
+        var database *tools.DatabaseInterface
+        database, err = tools.NewDatabase()
+        if err != nil {
+            api.InternalErrorHandler(w)
+            return
+        }
+
+        // gets login details from the database, and checks if the token is valid
+        var loginDetails *tools.LoginDetails
+        loginDetails = (*database).GetUserLoginDetails(username)
+
+        if (loginDetails == nil || (token != (*loginDetails).AuthToken)) {
+            log.Error(UnAuthorizedError)
+            api.RequestErrorHandler(w, UnAuthorizedError)
+            return
+        }
+
+        // This calls the next middleware in line or the handler function for the endpoint if there is no middlware left
+        next.ServeHTTP(w, r)
+    })
+}
+```
+Now we create our database functions in the `internal/tools/database.go` file.
+```go
+// internal/tools/database.go
+package tools
+
+import (
+    log "github.com/sirupsen/logrus"
+)
+
+type LoginDetails struct {
+    AuthToken string
+    Username string
+}
+
+type CoinDetails struct {
+    Coins int64
+    Username string
+}
+
+// this defines a few methods that are required for our API
+// we are using an interface here because this makes swapping our databases really easy, as long as we define the three methods below
+type DatabaseInterface interface {
+    GetUserLoginDetails(username string) *LoginDetails
+    GetUserCoins(username string) *CoinDetails
+    SetupDatabase() error
+}
+
+func NewDatabase() (*DatabaseInterface, error) {
+    // this is a struct that we are going to create that is going to implement our interface
+    var database DatabaseInterface = &mockDB{}
+
+    var err error = database.SetupDatabase()
+    if err != nil {
+        log.Error(err)
+        return nil, err
+    }
+
+    return &database, nil
+}
+```
+Now let's create a mock database in the `internal/tools/mockdb.go` file.
+```go
+// internal/tools/mockdb.go
+
+package tools
+
+import (
+    "time"
+)
+
+type mockDB struct {}
+
+var mockLoginDetails = map[string]LoginDetails {
+    "alex": {
+        AuthToken: "123ABC",
+        Username: "alex",
+    },
+    "jason": {
+        AuthToken: "456DEF",
+        Username: "jason",
+    },
+    "marie": {
+        AuthToken: "789GHI",
+        Username: "marie",
+    },
+}
+
+var mockCoinDetails = map[string]CoinDetails {
+    "alex": {
+        Coins: 100,
+        Username: "alex",
+    },
+    "jason": {
+        Coins: 200,
+        Username: "jason",
+    },
+    "marie": {
+        Coins: 300,
+        Username: "marie",
+    },
+}
+
+// we need to create these functions to conform to our DatabaseInterface
+func (d *mockDB) GetUserLoginDetails(username string) *LoginDetails {
+    // Simulate DB call
+    time.Sleep(time.Second * 1)
+
+    var clientData = LoginDetails{}
+    clientData, ok := mockLoginDetails[username]
+    if !ok {
+        return nil
+    }
+    return &clientData
+}
+
+func (d *mockDB) GetUserCoins(username string) *CoinDetails {
+    // Simulate DB call
+    time.Sleep(time.Second * 1)
+
+    var clientData = CoinDetails{}
+    clientData, ok := mockCoinDetails[username]
+    if !ok {
+        return nil
+    }
+    return &clientData
+}
+
+func (d *mockDB) SetupDatabase() error {
+    return nil
+}
+```
+Now we need to define our `GetCoinBalance` function in the `internal/handlers/get_coin_balance.go` file.
+```go
+// internal/handlers/get_coin_balance.go
+package handlers
+
+import (
+    "encoding/json"
+    "net/http"
+
+    "github.com/pl3lee/example-go-project/api"
+    "github.com/pl3lee/example-go-project/internal/tools"
+    log "github.com/sirupsen/logrus"
+    "github.com/gorilla/schema"
+)
+
+// here we are assuming that the authorization middleware has already been called, so we just need to grab the username from the request
+func GetCoinBalance(w http.ResponseWriter, r *http.Request) {
+    var params = api.CoinBalanceParams{}
+    var decoder *schema.Docoder = schema.NewDecoder()
+    var err error
+
+    // this line grabs the query parameters in the URL and set them to the values in the struct CoinBalanceParams. In this case it will just grab the username from the URL and put it in the username field in the struct
+    err = decoder.Decode(&params, r.URL.Query())
+
+    if err != nil {
+        log.Error(err)
+        api.InternalErrorHandler(w)
+        return
+    }
+
+    // instantiate a database interface
+    var database *tools.DatabaseInterface
+    database, err = tools.NewDatabase()
+    if err != nil {
+        api.InternalErrorHandler(w)
+        return
+    }
+
+    // call the GetUserCoins method
+    var tokenDetails *tools.CoinDetails
+    tokenDetails = (*database).GetUserCoins(params.Username)
+    if tokenDetails == nil {
+        log.Error(err)
+        api.InternalErrorHandler(w)
+        return
+    }
+
+    // set the value to our response struct
+    var response = api.CoinBalanceResponse {
+        Balance: (*tokenDetails).Coins,
+        Code: http.StatusOK,
+    }
+
+    // write it to the response writer
+    w.Header().Set("Content-Type", "application/json")
+    err = json.NewEncoder(w).Encode(response)
+    if err != nil {
+        log.Error(err)
+        api.InternalErrorHandler(w)
+        return
+    }
+}
+```
+Done!
+
