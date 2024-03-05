@@ -32,7 +32,9 @@ jobs:
       
   deployment:
     needs: build_and_push
-    environment: Production
+    environment: 
+      name: Production
+      url: https://docs.billylee.me
     runs-on: ubuntu-latest
     steps:
     - name: Installing SSH key
