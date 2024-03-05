@@ -223,3 +223,15 @@ networks:
         name: my-pre-existing-network2
         external: true
 ```
+## .dockerignore
+The `.dockerignore` file is a configuration file that describes files and directories that you want to exclude when building a docker image. We can use it to avoid inadvertently sending files or directories that are large or contain sensitive files to the docker daemon or avoid adding them to the image using the `ADD` or `COPY` instructions. The common files and directories to ignore are
+- `.git`
+- `.gitignore`
+- `.dockerignore`
+- `.env`
+- `node_modules`
+- `*.log`
+- `*.tmp`
+- `*.swp`
+- `.DS_Store`
+- `README.md`
