@@ -30,8 +30,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/docs:latest
       
-  deploy:
+  deployment:
     needs: build_and_push
+    environment: production
     runs-on: ubuntu-latest
     steps:
     - name: Installing SSH key
