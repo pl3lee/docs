@@ -1116,7 +1116,7 @@ export const { auth, signIn, signOut } = NextAuth({
 });
 ```
 ### Adding Credentials Provider
-Next, you will need to add the` providers` option for NextAuth.js. `providers` is an array where you list different login options such as Google or GitHub. For this course, we will focus on using the Credentials provider only, it allows users to log in with a username and a password.
+Next, you will need to add the `providers` option for NextAuth.js. `providers` is an array where you list different login options such as Google or GitHub. For this course, we will focus on using the Credentials provider only, it allows users to log in with a username and a password.
 ```tsx filename="/auth.ts"
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
