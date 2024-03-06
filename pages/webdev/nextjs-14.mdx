@@ -1,0 +1,195 @@
+# NextJS 14
+Notes taken from [this](dashboard-app/css-styling) course.
+## CSS Styling
+### Tailwind
+Tailwind is a CSS framework that allows you to quickly write utility classes directly in your TSX markup. For example, adding the `text-blue-500` class to a `div` will make the text color blue. 
+```tsx
+<div className="text-blue-500">Hello World</div>
+```
+### CSS Modules
+CSS Modules allow you to scope CSS to a component by automatically creating unique class names for each component. This is done by creating a CSS file with the `.module.css` extension. 
+```css
+/* component.module.css */
+.container {
+  background-color: red;
+}
+```
+Then we can import the CSS file and use the class names in our component.
+```tsx
+// component.tsx
+import styles from './component.module.css';
+<div className={styles.container}> Container </div>
+```
+### Toggling Class Names using clsx
+There are cases where you may need to conditionally style an element or conditionally apply classes based on state or some other condition. `clsx` is a library that lets you toggle class names easily. As an easy example:
+- Suppose that you want to create an `InvoiceStatus` component which accepts status. The status can be 'pending' or 'paid'.
+- If it's 'paid', you want the color to be green. If it's 'pending', you want the color to be gray.
+
+You can use `clsx` to conditionally apply classes based on the status.
+```tsx
+import clsx from 'clsx';
+ 
+export default function InvoiceStatus({ status }: { status: string }) {
+  return (
+    <span
+      className={clsx(
+        'inline-flex items-center rounded-full px-2 py-1 text-sm',
+        {
+          'bg-gray-100 text-gray-500': status === 'pending',
+          'bg-green-500 text-white': status === 'paid',
+        },
+      )}
+    >
+        {status}
+    </span>
+)}
+```
+### Other Styling Options
+Consider using Sass, which allows you to import `.scss` files and use variables, mixins, and other features.
+
+Or, CSS-in-JS libraries such as `styled-components` or `emotion` are also popular options. They allow you to write CSS directly in your TSX files and have the styles scoped to the component. But I don't really like CSS-in-JS.
+
+## Fonts and Images
+### Fonts
+Next.js automatically optimizes fonts in the application when you use the `next/font` module. It downloads font files at build time and hosts them with your other static assets. This means when a user visits your application, there are no additional network requests for fonts which would impact performance.
+
+TO add a custom font, we can create a `font.ts` file
+```ts
+// app/ui/font.ts
+import { Inter } from 'next/font/google';
+ 
+export const inter = Inter({ subsets: ['latin'] });
+``` 
+Then we can import the font in the `layout.tsx` file
+```tsx
+// layout.tsx
+import '@/app/ui/global.css';
+import { inter } from '@/app/ui/fonts';
+ 
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} antialiased`}>{children}</body>
+    </html>
+  );
+}
+```
+By adding `Inter` to the body element, the font will be applied throughout our application. The tailwind class `antialiased` just smooths out the font, but it is not necessary.
+
+We can also add a second font
+```ts
+// app/ui/font.ts
+import { Inter, Lusitana } from 'next/font/google';
+ 
+export const inter = Inter({ subsets: ['latin'] });
+ 
+export const lusitana = Lusitana({
+  weight: ['400', '700'],
+  subsets: ['latin'],
+});
+```
+Then we can use the second font in a component
+```tsx
+// app/page.tsx
+import AcmeLogo from '@/app/ui/acme-logo';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { lusitana } from '@/app/ui/fonts';
+ 
+export default function Page() {
+  return (
+    // ...
+    <p
+      className={`${lusitana.className} text-xl text-gray-800 md:text-3xl md:leading-normal`}
+    >
+      <strong>Welcome to Acme.</strong> This is the example for the{' '}
+      <a href="https://nextjs.org/learn/" className="text-blue-500">
+        Next.js Learn Course
+      </a>
+      , brought to you by Vercel.
+    </p>
+    // ...
+  );
+}
+```
+### Images
+Next.js can serve static assets, like images, under the top-level `/public` folder. Files inside `/public` can be referenced in your application. We can then use the images in regular HTML
+```html
+<img
+  src="/hero.png"
+  alt="Screenshots of the dashboard project showing desktop version"
+/>
+```
+However, this means that you have to manually
+- Ensure your image is responsive on different screen sizes.
+- Specify image sizes for different devices.
+- Prevent layout shift as the images load.
+- Lazy load images that are outside the user's viewport.
+
+We can use `next/image` to do all these for us. The `<Image>` component is an extension of the HTML `<img>` tag, and comes with automatic image optimization, such as
+- Preventing layout shift automatically when images are loading.
+- Resizing images to avoid shipping large images to devices with a smaller viewport.
+- Lazy loading images by default (images load as they enter the viewport).
+- Serving images in modern formats, like WebP and AVIF, when the browser supports it.
+
+Let's see it in action. Suppose we have `hero-desktop.png` and `hero-mobile.png` in the `/public` folder. We can use the `<Image>` component to display the images.
+```tsx
+import AcmeLogo from '@/app/ui/acme-logo';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { lusitana } from '@/app/ui/fonts';
+import Image from 'next/image';
+ 
+export default function Page() {
+  return (
+    // ...
+    <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
+      {/* Add Hero Images Here */}
+      <Image
+        src="/hero-desktop.png"
+        width={1000}
+        height={760}
+        className="hidden md:block"
+        alt="Screenshots of the dashboard project showing desktop version"
+      />
+      <Image
+        src="/hero-mobile.png"
+        width={560}
+        height={620}
+        className="block md:hidden"
+        alt="Screenshot of the dashboard project showing mobile version"
+      />
+    </div>
+    //...
+  );
+}
+```
+Here we are setting the `width` to `1000` pixels and the `height` to `760` pixels for the desktop image. It is good practice to set the `width` and `height` to the images to avoid layout shifts, but these should have identical aspect ratio to the source image. We also set the `className` to `hidden md:block` to hide the image on mobile devices and show it on desktop devices. We do the opposite for the mobile image.
+
+## Layouts and Pages
+
+## Navigating Between Pages
+
+## Fetching Data
+
+## Static and Dynamic Rendering
+
+## Streaming
+
+## Partial Prerendering
+
+## Search and Pagination
+
+## Mutating Data
+
+## Handling Errors
+
+## Improving Accessibility
+
+## Adding Authentication
+
+## Adding Metadata
