@@ -171,25 +171,1280 @@ export default function Page() {
 Here we are setting the `width` to `1000` pixels and the `height` to `760` pixels for the desktop image. It is good practice to set the `width` and `height` to the images to avoid layout shifts, but these should have identical aspect ratio to the source image. We also set the `className` to `hidden md:block` to hide the image on mobile devices and show it on desktop devices. We do the opposite for the mobile image.
 
 ## Layouts and Pages
+### Pages
+NextJS uses a file based routing system. This means that the file structure of your pages will determine the URL structure of your application. For example, if you have a file called `page.tsx` in the `app/about` directory, the URL will be `/about`. If you have a file called `page.tsx` in the `app/dashboard/users` directory, the URL will be `/dashboard/users`. Each corresponding page should have a
+- `page.tsx`
+- (Optional) `layout.tsx`
 
+Each `page.tsx` should have a default export that is a React component.
+```tsx
+export default function Page() {
+  return <p>Dashboard Page</p>;
+}
+```
+By having a `page.tsx` file, NextJS allows us to colocate UI components, test files, and other related code with our routes.
+### Layouts
+In NextJS, we can use a special `layout.tsx` file to create UI that is shared between multiple pages.
+```tsx
+import SideNav from '@/app/ui/dashboard/sidenav';
+ 
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
+      <div className="w-full flex-none md:w-64">
+        <SideNav />
+      </div>
+      <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
+    </div>
+  );
+}
+```
+The pages will then go to the `children` prop of the `Layout` component. One benefit is that the layout won't be re-rendered when the page changes, only the `children` will be re-rendered. 
+
+Note that there must exist a `layout.tsx` in the root of the `app` directory. This will be shared across **all** pages in the app. We can use the root layout to modify the `<html>` and `<body>` tags, and add metadata.
+
+Any nested layouts will be specific to the pages in that directory. For example, if we have a `layout.tsx` in the `app/dashboard` directory, it will be shared across all pages in the `app/dashboard` directory.
 ## Navigating Between Pages
-
+The `<Link/>` component allows us to navigate between pages in our NextJS application. 
+```tsx
+import {
+  UserGroupIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+ 
+// ...
+ 
+export default function NavLinks() {
+  return (
+    <>
+      {links.map((link) => {
+        const LinkIcon = link.icon;
+        return (
+          <Link
+            key={link.name}
+            href={link.href}
+            className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3"
+          >
+            <LinkIcon className="w-6" />
+            <p className="hidden md:block">{link.name}</p>
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+```
+### Showing Active Links
+A common UI pattern is to show an active link to indicate to the user what page they are currently on. To do this, we need to get the user's current path from the URL. Next.js provides a hook called `usePathname()` that we can use to check the path and implement this pattern. However, this means that we need to use the `use client` directive.
+```tsx
+'use client';
+ 
+import {
+  UserGroupIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import clsx from 'clsx';
+ 
+// ...
+ 
+export default function NavLinks() {
+  const pathname = usePathname();
+ 
+  return (
+    <>
+      {links.map((link) => {
+        const LinkIcon = link.icon;
+        return (
+          <Link
+            key={link.name}
+            href={link.href}
+            className={clsx(
+              'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
+              {
+                'bg-sky-100 text-blue-600': pathname === link.href,
+              },
+            )}
+          >
+            <LinkIcon className="w-6" />
+            <p className="hidden md:block">{link.name}</p>
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+```
 ## Fetching Data
+By default, Next.js applications use React Server Components. Fetching data with Server Components is a relatively new approach and there are a few benefits of using them:
 
+- Server Components support promises, providing a simpler solution for asynchronous tasks like data fetching. You can use `async/await` syntax without reaching out for `useEffect`, `useState` or data fetching libraries.
+- Server Components execute on the server, so you can keep expensive data fetches and logic on the server and only send the result to the client.
+- As mentioned before, since Server Components execute on the server, you can query the database directly without an additional API layer.
+```tsx
+import { Card } from '@/app/ui/dashboard/cards';
+import RevenueChart from '@/app/ui/dashboard/revenue-chart';
+import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
+import { lusitana } from '@/app/ui/fonts';
+import {
+  fetchRevenue,
+  fetchLatestInvoices,
+  fetchCardData,
+} from '@/app/lib/data';
+ 
+export default async function Page() {
+  const revenue = await fetchRevenue();
+  const latestInvoices = await fetchLatestInvoices();
+  const {
+    numberOfInvoices,
+    numberOfCustomers,
+    totalPaidInvoices,
+    totalPendingInvoices,
+  } = await fetchCardData();
+ 
+  return (
+    <main>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        Dashboard
+      </h1>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Card title="Collected" value={totalPaidInvoices} type="collected" />
+        <Card title="Pending" value={totalPendingInvoices} type="pending" />
+        <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
+        <Card
+          title="Total Customers"
+          value={numberOfCustomers}
+          type="customers"
+        />
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+        <RevenueChart revenue={revenue} />
+        <LatestInvoices latestInvoices={latestInvoices} />
+      </div>
+    </main>
+  );
+}
+```
+It is important that the `Page` component is an `async` function. This is because the `fetchRevenue`, `fetchLatestInvoices`, and `fetchCardData` functions are asynchronous. This means that the `Page` component will wait for the data to be fetched before rendering the UI.
+
+However, notice that we have created a request waterfall, where we are fetching data sequentially. This means that the `fetchRevenue` function will be called first, then the `fetchLatestInvoices` function, and finally the `fetchCardData` function. This is not ideal, as it can slow down the page load time. We can use `Promise.all` to fetch the data concurrently.
+```tsx
+// ...
+export default async function Page() {
+  const [revenue, latestInvoices, cardData] = await Promise.all([
+    fetchRevenue(),
+    fetchLatestInvoices(),
+    fetchCardData(),
+  ]);
+
+  // ...
+}
+```
 ## Static and Dynamic Rendering
+Static rendering makes data fetching and rendering happen at build time (when you deploy). This results in faster page loads, as the data is already available when the user visits the page. However, it is not suitable for pages that require data that always change.
 
+Dynamic rendering makes data fetching and rendering happen at request time (when the user visits the page). This is suitable for pages that require data that always change, but it can slow down the page load time.
+
+By default, data fetching in NextJS is static, so if you want it to be dynamic, you have to use the `unstable_nostore` API to opt out of fetching.
+```tsx
+// ...
+import { unstable_noStore as noStore } from 'next/cache';
+ 
+export async function fetchRevenue() {
+  // Add noStore() here to prevent the response from being cached.
+  // This is equivalent to in fetch(..., {cache: 'no-store'}).
+  noStore();
+ 
+  // ...
+}
+ 
+export async function fetchLatestInvoices() {
+  noStore();
+  // ...
+}
+ 
+export async function fetchCardData() {
+  noStore();
+  // ...
+}
+ 
+export async function fetchFilteredInvoices(
+  query: string,
+  currentPage: number,
+) {
+  noStore();
+  // ...
+}
+ 
+export async function fetchInvoicesPages(query: string) {
+  noStore();
+  // ...
+}
+ 
+export async function fetchFilteredCustomers(query: string) {
+  noStore();
+  // ...
+}
+ 
+export async function fetchInvoiceById(query: string) {
+  noStore();
+  // ...
+}
+```
+In the above section, we mentioned that we could do all data fetching together. However, what happens if one of the data fetching functions is slow? The entire page load time will be slow. With dynamic rendering, our application is only as fast as our slowest data fetch. This brings us to the next section.
 ## Streaming
+Streaming is a data transfer technique that allows you to break down a route into smaller "chunks" and progressively stream them from the server to the client as they become ready. By streaming, you can prevent slow data requests from blocking your whole page. This allows the user to see and interact with parts of the page without waiting for all the data to load before any UI can be shown to the user.
 
-## Partial Prerendering
+There are two ways you implement streaming in Next.js:
 
+- At the page level, with the `loading.tsx` file.
+- For specific components, with `<Suspense>`.
+### Page Level Streaming with `loading.tsx`
+Create a new file called `loading.tsx`
+```tsx
+export default function Loading() {
+  return <div>Loading...</div>;
+}
+```
+This allows you to create fallback UI to show as a replacement while page content loads. Note that this is affected by the `layout.tsx` file, so the layout is also included. A common approach is to have a loading skeleton 
+```tsx
+import DashboardSkeleton from '@/app/ui/skeletons';
+ 
+export default function Loading() {
+  return <DashboardSkeleton />;
+}
+```
+If this `layout.tsx` file is placed at the root, it will be shared across all pages. We can change this with **Route Groups**. We can create a new folder called `(route)` inside the root directory. Then we can move our `layout.tsx` and `page.tsx` files into this folder. 
+
+Route groups allow you to organize files into logical groups without affecting the URL path structure. When you create a new folder using parentheses `()`, the name won't be included in the URL path. So `/dashboard/(overview)/page.tsx` becomes `/dashboard`.
+
+Here, you're using a route group to ensure `loading.tsx` only applies to your dashboard overview page. However, you can also use route groups to separate your application into sections (e.g. `(marketing)` routes and `(shop)` routes) or by teams for larger applications.
+
+### Component Level Streaming with `<Suspense>`
+Suspense allows you to defer rendering parts of your application until some condition is met (e.g. data is loaded). You can wrap your dynamic components in Suspense. Then, pass it a fallback component to show while the dynamic component loads.
+```tsx filename="page.tsx"
+import { Card } from '@/app/ui/dashboard/cards';
+import RevenueChart from '@/app/ui/dashboard/revenue-chart';
+import LatestInvoices from '@/app/ui/dashboard/latest-invoices';
+import { lusitana } from '@/app/ui/fonts';
+import { fetchLatestInvoices, fetchCardData } from '@/app/lib/data';
+import { Suspense } from 'react';
+import { RevenueChartSkeleton } from '@/app/ui/skeletons';
+ 
+export default async function Page() {
+  const latestInvoices = await fetchLatestInvoices();
+  const {
+    numberOfInvoices,
+    numberOfCustomers,
+    totalPaidInvoices,
+    totalPendingInvoices,
+  } = await fetchCardData();
+ 
+  return (
+    <main>
+      <h1 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>
+        Dashboard
+      </h1>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <Card title="Collected" value={totalPaidInvoices} type="collected" />
+        <Card title="Pending" value={totalPendingInvoices} type="pending" />
+        <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
+        <Card
+          title="Total Customers"
+          value={numberOfCustomers}
+          type="customers"
+        />
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+        <Suspense fallback={<RevenueChartSkeleton />}>
+          <RevenueChart />
+        </Suspense>
+        <LatestInvoices latestInvoices={latestInvoices} />
+      </div>
+    </main>
+  );
+}
+```
+```tsx filename="revenue-chart.tsx"
+import { generateYAxis } from '@/app/lib/utils';
+import { CalendarIcon } from '@heroicons/react/24/outline';
+import { lusitana } from '@/app/ui/fonts';
+import { fetchRevenue } from '@/app/lib/data';
+ 
+// ...
+ 
+export default async function RevenueChart() { // Make component async, remove the props
+  const revenue = await fetchRevenue(); // Fetch data inside the component
+ 
+  const chartHeight = 350;
+  const { yAxisLabels, topLabel } = generateYAxis(revenue);
+ 
+  if (!revenue || revenue.length === 0) {
+    return <p className="mt-4 text-gray-400">No data available.</p>;
+  }
+ 
+  return (
+    // ...
+  );
+}
+ 
+ ```
 ## Search and Pagination
+When we have a list of data and wants to implement search, most of the time we do it with URL search params. There are a couple of benefits of implementing search with URL params:
 
+- Bookmarkable and Shareable URLs: Since the search parameters are in the URL, users can bookmark the current state of the application, including their search queries and filters, for future reference or sharing.
+- Server-Side Rendering and Initial Load: URL parameters can be directly consumed on the server to render the initial state, making it easier to handle server rendering.
+- Analytics and Tracking: Having search queries and filters directly in the URL makes it easier to track user behavior without requiring additional client-side logic.
+
+We use the following client hooks to implement search:
+
+- `useSearchParams`- Allows you to access the parameters of the current URL. For example, the search params for this URL `/dashboard/invoices?page=1&query=pending` would look like this: `{page: '1', query: 'pending'}`.
+- `usePathname` - Lets you read the current URL's pathname. For example, for the route `/dashboard/invoices`, usePathname would return `'/dashboard/invoices'`.
+- `useRouter` - Enables navigation between routes within client components programmatically. There are multiple methods you can use.
+
+Here is the implementation steps
+
+1. Capture the user's input.
+2. Update the URL with the search params.
+3. Keep the URL in sync with the input field.
+4. Update the table to reflect the search query.
+
+### Capture the User's Input
+```tsx filename="search.tsx"
+'use client';
+ 
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+ 
+export default function Search({ placeholder }: { placeholder: string }) {
+  function handleSearch(term: string) {
+    console.log(term);
+  }
+ 
+  return (
+    <div className="relative flex flex-1 flex-shrink-0">
+      <label htmlFor="search" className="sr-only">
+        Search
+      </label>
+      <input
+        className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+        placeholder={placeholder}
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
+      />
+      <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+    </div>
+  );
+}
+```
+### Update the URL with the Search Params
+```tsx filename="search.tsx"
+'use client';
+ 
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useSearchParams } from 'next/navigation';
+ 
+export default function Search() {
+  const searchParams = useSearchParams();
+ 
+  function handleSearch(term: string) {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+  }
+  // ...
+}
+```
+Then we can use the `useRouter` and `usePathname` hooks to update the URL
+```tsx filename="search.tsx"
+'use client';
+ 
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+ 
+export default function Search() {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+ 
+  function handleSearch(term: string) {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set('query', term);
+    } else {
+      params.delete('query');
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }
+}
+```
+### Keep the URL in Sync with the Input Field
+To ensure the input field is in sync with the URL and will be populated when sharing, you can pass a `defaultValue` to input by reading from searchParams:
+```tsx filename="search.tsx"
+<input
+  className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+  placeholder={placeholder}
+  onChange={(e) => {
+    handleSearch(e.target.value);
+  }}
+  defaultValue={searchParams.get('query')?.toString()}
+/>
+```
+### Update the Table to Reflect the Search Query
+```tsx filename="invoices/page.tsx"
+import Pagination from '@/app/ui/invoices/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/invoices/table';
+import { CreateInvoice } from '@/app/ui/invoices/buttons';
+import { lusitana } from '@/app/ui/fonts';
+import { Suspense } from 'react';
+import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+ 
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
+ 
+  return (
+    <div className="w-full">
+      <div className="flex w-full items-center justify-between">
+        <h1 className={`${lusitana.className} text-2xl`}>Invoices</h1>
+      </div>
+      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+        <Search placeholder="Search invoices..." />
+        <CreateInvoice />
+      </div>
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+        <Table query={query} currentPage={currentPage} />
+      </Suspense>
+      <div className="mt-5 flex w-full justify-center">
+        {/* <Pagination totalPages={totalPages} /> */}
+      </div>
+    </div>
+  );
+}
+```
+Notice the use of `useSearchParams()` and `searchParams` prop. Whether you use one or the other depends on whether you're working on the client or the server.
+- For client components, use `useSearchParams()`.
+- For server components, use the `searchParams` prop.
+### Best practice: Debouncing
+Debouncing is a programming practice that limits the rate at which a function can fire. In our case, you only want to query the database when the user has stopped typing. How it works:
+
+- Trigger Event: When an event that should be debounced (like a keystroke in the search box) occurs, a timer starts.
+- Wait: If a new event occurs before the timer expires, the timer is reset.
+- Execution: If the timer reaches the end of its countdown, the debounced function is executed.
+
+We can use the `use-debounce` library.
+```bash
+npm i use-debounce
+```
+```tsx filename="search.tsx"
+// ...
+import { useDebouncedCallback } from 'use-debounce';
+ 
+// Inside the Search Component...
+const handleSearch = useDebouncedCallback((term) => {
+  console.log(`Searching... ${term}`);
+ 
+  const params = new URLSearchParams(searchParams);
+  if (term) {
+    params.set('query', term);
+  } else {
+    params.delete('query');
+  }
+  replace(`${pathname}?${params.toString()}`);
+}, 300);
+```
+This function will wrap the contents of `handleSearch`, and only run the code after a specific time once the user has stopped typing (300ms).
+### Pagination
+Similarly, we can use the `useSearchParams` hook to read the current page number from the URL. We can then use this to fetch the correct page of data from the server.
+```tsx filename="page.tsx"
+// ...
+ 
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    query?: string;
+    page?: string;
+  };
+}) {
+  const query = searchParams?.query || '';
+  const currentPage = Number(searchParams?.page) || 1;
+ 
+  const totalPages = await fetchInvoicesPages(query);
+ 
+  return (
+    <div className="w-full">
+      <div className="flex w-full items-center justify-between">
+        <h1 className={`${lusitana.className} text-2xl`}>Invoices</h1>
+      </div>
+      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+        <Search placeholder="Search invoices..." />
+        <CreateInvoice />
+      </div>
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+        <Table query={query} currentPage={currentPage} />
+      </Suspense>
+      <div className="mt-5 flex w-full justify-center">
+        <Pagination totalPages={totalPages} />
+      </div>
+    </div>
+  );
+}
+```
+```tsx filename="pagination.tsx"
+'use client';
+ 
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import clsx from 'clsx';
+import Link from 'next/link';
+import { generatePagination } from '@/app/lib/utils';
+import { usePathname, useSearchParams } from 'next/navigation';
+ 
+export default function Pagination({ totalPages }: { totalPages: number }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
+ 
+  const createPageURL = (pageNumber: number | string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNumber.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+ 
+  // ...
+}
+```
+Here is what is happending:
+
+- `createPageURL` creates an instance of the current search parameters.
+- Then, it updates the "page" parameter to the provided page number.
+- Finally, it constructs the full URL using the pathname and updated search parameters.
 ## Mutating Data
+### Server Actions
+React Server Actions allow you to run asynchronous code directly on the server. They eliminate the need to create API endpoints to mutate your data. Instead, you write asynchronous functions that execute on the server and can be invoked from your Client or Server Components.
 
+In React, you can use the `action` attribute in the `<form>` element to invoke actions. The action will automatically receive the native FormData object, containing the captured data.
+```tsx
+// Server Component
+export default function Page() {
+  // Action
+  async function create(formData: FormData) {
+    'use server';
+ 
+    // Logic to mutate data...
+  }
+ 
+  // Invoke the action using the "action" attribute
+  return <form action={create}>...</form>;
+}
+```
+When a form is submitted through a Server Action, not only can you use the action to mutate data, but you can also revalidate the associated cache using APIs like `revalidatePath` and `revalidateTag`.
+
+Let's try to create a new invoice:
+
+1. Create a form to capture the user's input.
+2. Create a Server Action and invoke it from the form.
+3. Inside your Server Action, extract the data from the formData object.
+4. Validate and prepare the data to be inserted into your database.
+5. Insert the data and handle any errors.
+6. Revalidate the cache and redirect the user back to invoices page.
+
+#### Create a new route and form
+```tsx filename="/dashboard/invoices/create/page.tsx"
+import Form from '@/app/ui/invoices/create-form';
+import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
+import { fetchCustomers } from '@/app/lib/data';
+ 
+export default async function Page() {
+  const customers = await fetchCustomers();
+ 
+  return (
+    <main>
+      <Breadcrumbs
+        breadcrumbs={[
+          { label: 'Invoices', href: '/dashboard/invoices' },
+          {
+            label: 'Create Invoice',
+            href: '/dashboard/invoices/create',
+            active: true,
+          },
+        ]}
+      />
+      <Form customers={customers} />
+    </main>
+  );
+}
+```
+#### Create a Server Action
+Now we can create a new server action.
+```tsx filename="/app/lib/actions.ts"
+'use server';
+ 
+export async function createInvoice(formData: FormData) {
+  const rawFormData = {
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  };
+  // Test it out:
+  console.log(rawFormData);
+}
+```
+Then in the `<Form>` component, we can import the `createInvoice` action and use it in the `action` attribute of the form.
+
+```tsx filename="/app/ui/invoices/create-form.tsx"
+import { customerField } from '@/app/lib/definitions';
+import Link from 'next/link';
+import {
+  CheckIcon,
+  ClockIcon,
+  CurrencyDollarIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
+import { Button } from '@/app/ui/button';
+import { createInvoice } from '@/app/lib/actions';
+ 
+export default function Form({
+  customers,
+}: {
+  customers: customerField[];
+}) {
+  return (
+    <form action={createInvoice}>
+      // ...
+    </form>
+  )
+}
+```
+#### Validate and prepare the data
+We can use the `Zod` library to handle validation
+```tsx filename="/app/lib/actions.ts"
+'use server';
+ 
+import { z } from 'zod';
+import { sql } from '@vercel/postgres';
+
+const FormSchema = z.object({
+  id: z.string(),
+  customerId: z.string(),
+  amount: z.coerce.number(),
+  status: z.enum(['pending', 'paid']),
+  date: z.string(),
+});
+ 
+const CreateInvoice = FormSchema.omit({ id: true, date: true });
+ 
+export async function createInvoice(formData: FormData) {
+  const { customerId, amount, status } = CreateInvoice.parse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
+  const amountInCents = amount * 100;
+  const date = new Date().toISOString().split('T')[0];
+ 
+  await sql`
+    INSERT INTO invoices (customer_id, amount, status, date)
+    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+  `;
+}
+```
+#### Revaliate and redirect
+By default, routes are cached. Since we have updated the data displayed, we have to clear the cache and trigger a new request to the server. We can use the `revalidatePath` function to do this.
+```tsx filename="/app/lib/actions.ts"
+'use server';
+ 
+import { z } from 'zod';
+import { sql } from '@vercel/postgres';
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+
+const FormSchema = z.object({
+  id: z.string(),
+  customerId: z.string(),
+  amount: z.coerce.number(),
+  status: z.enum(['pending', 'paid']),
+  date: z.string(),
+});
+ 
+const CreateInvoice = FormSchema.omit({ id: true, date: true });
+ 
+export async function createInvoice(formData: FormData) {
+  const { customerId, amount, status } = CreateInvoice.parse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
+  const amountInCents = amount * 100;
+  const date = new Date().toISOString().split('T')[0];
+ 
+  await sql`
+    INSERT INTO invoices (customer_id, amount, status, date)
+    VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+  `;
+
+  revalidatePath('/dashboard/invoices');
+  redirect('/dashboard/invoices');
+}
+```
+Once the database has been updated, the `/dashboard/invoices` path will be revalidated, and fresh data will be fetched from the server.
 ## Handling Errors
-
-## Improving Accessibility
-
+We can handle errors gracefully using `try/catch` statements.
+### Adding try/catch to Server Actions
+```tsx filename="/app/lib/actions.ts"
+export async function createInvoice(formData: FormData) {
+  const { customerId, amount, status } = CreateInvoice.parse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
+ 
+  const amountInCents = amount * 100;
+  const date = new Date().toISOString().split('T')[0];
+ 
+  try {
+    await sql`
+      INSERT INTO invoices (customer_id, amount, status, date)
+      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+    `;
+  } catch (error) {
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+  }
+ 
+  revalidatePath('/dashboard/invoices');
+  redirect('/dashboard/invoices');
+}
+```
+### Handling all errors with `error.tsx`
+The `error.tsx` file can be used to define a UI boundary for a route segment. It serves as a catch-all for unexpected errors and allows you to display a fallback UI to your users. We can create an `error.tsx` file
+```tsx filename="/dashboard/invoices/error.tsx"
+'use client';
+ 
+import { useEffect } from 'react';
+ 
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Optionally log the error to an error reporting service
+    console.error(error);
+  }, [error]);
+ 
+  return (
+    <main className="flex h-full flex-col items-center justify-center">
+      <h2 className="text-center">Something went wrong!</h2>
+      <button
+        className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
+        onClick={
+          // Attempt to recover by trying to re-render the invoices route
+          () => reset()
+        }
+      >
+        Try again
+      </button>
+    </main>
+  );
+}
+```
+Note that `error.tsx` needs to be a client component. It accepts two props:
+- `error`: The error object that was thrown.
+- `reset`: A function that allows you to reset the route and attempt to recover from the error. When executed, the function will try to re-render the route segment.
+### Handling 404 errors with the `notFound` function
+While `error.tsx` is useful for catching all errors, `notFound` can be used when you try to fetch a resource that doesn't exist.
+```tsx filename="/dashboard/invoices/[id]/edit/page.tsx"
+import { fetchInvoiceById, fetchCustomers } from '@/app/lib/data';
+import { updateInvoice } from '@/app/lib/actions';
+import { notFound } from 'next/navigation';
+ 
+export default async function Page({ params }: { params: { id: string } }) {
+  const id = params.id;
+  const [invoice, customers] = await Promise.all([
+    fetchInvoiceById(id),
+    fetchCustomers(),
+  ]);
+ 
+  if (!invoice) {
+    notFound();
+  }
+ 
+  // ...
+}
+```
+Then, we have to create a `not-found.tsx` file
+```tsx filename="/dashboard/invoices/[id]/edit/not-found.tsx"
+import Link from 'next/link';
+import { FaceFrownIcon } from '@heroicons/react/24/outline';
+ 
+export default function NotFound() {
+  return (
+    <main className="flex h-full flex-col items-center justify-center gap-2">
+      <FaceFrownIcon className="w-10 text-gray-400" />
+      <h2 className="text-xl font-semibold">404 Not Found</h2>
+      <p>Could not find the requested invoice.</p>
+      <Link
+        href="/dashboard/invoices"
+        className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
+      >
+        Go Back
+      </Link>
+    </main>
+  );
+}
+```
+Now, `notFound` will take precedence over `error.tsx`, so you can reach out for it when you want to handle more specific errors.
 ## Adding Authentication
+### Setting Up
+Lets create a `/login` route
+```tsx filename="/app/login/page.tsx"
+import AcmeLogo from '@/app/ui/acme-logo';
+import LoginForm from '@/app/ui/login-form';
+ 
+export default function LoginPage() {
+  return (
+    <main className="flex items-center justify-center md:h-screen">
+      <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
+        <div className="flex h-20 w-full items-end rounded-lg bg-blue-500 p-3 md:h-36">
+          <div className="w-32 text-white md:w-36">
+            <AcmeLogo />
+          </div>
+        </div>
+        <LoginForm />
+      </div>
+    </main>
+  );
+}
+```
+We will use `NextAuth.js` to add authentication. First, we need to install the `next-auth` package.
+```bash
+npm install next-auth@beta
+```
+Then we have to generate a secret key. This key is used to encrypt cookies, ensuring the security of user sessions. Run the following command
+```bash
+openssl rand -base64 32
+```
+Then create a `.env` file, and add the generated key to the `AUTH_SECRET` variable
+```env
+AUTH_SECRET=your-secret-key
+```
+Note that this `.env` file is only accessbile locally. So in production, you will need to have to set up the `AUTH_SECRET` variable.
 
+Next, we will create an `auth.config.ts` file at the root of our project that exports an `authConfig` object. This object contains the configuration options for NextAuth.js. For now, it will only contain the `pages` option.
+```tsx filename="/auth.config.ts"
+import type { NextAuthConfig } from 'next-auth';
+ 
+export const authConfig = {
+  pages: {
+    signIn: '/login',
+  },
+};
+```
+We use the `pages` option to specify the route for custom sign-in, sign-out, and error pages. This is not required, but by adding `signIn: '/login'` into our pages option, the user will be redirected to our custom login page, rather than the NextAuth.js default page.
+### Protecting Routes with Middleware
+Next, add the logic to protect your routes. This will prevent users from accessing the dashboard pages unless they are logged in.
+```tsx filename="/auth.config.ts"
+import type { NextAuthConfig } from 'next-auth';
+ 
+export const authConfig = {
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    authorized({ auth, request: { nextUrl } }) {
+      const isLoggedIn = !!auth?.user;
+      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+      if (isOnDashboard) {
+        if (isLoggedIn) return true;
+        return false; // Redirect unauthenticated users to login page
+      } else if (isLoggedIn) {
+        return Response.redirect(new URL('/dashboard', nextUrl));
+      }
+      return true;
+    },
+  },
+  providers: [], // Add providers with an empty array for now
+} satisfies NextAuthConfig;
+```
+The `authorized` callback is used to verify if the request is authorized to access a page via Next.js Middleware. It is called before a request is completed, and it receives an object with the `auth` and `request` properties. The auth property contains the user's session, and the request property contains the incoming request.
+
+The `providers` option is an array where you list different login options. For now, it's an empty array to satisfy NextAuth config. You'll learn more about it in the next sections.
+
+Next, you will need to import the `authConfig` object into a Middleware file. In the root of your project, create a file called `middleware.ts`
+```tsx filename="/middleware.ts"
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
+ 
+export default NextAuth(authConfig).auth;
+ 
+export const config = {
+  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+};
+```
+Here you're initializing NextAuth.js with the `authConfig` object and exporting the `auth` property. You're also using the `matcher` option from Middleware to specify that it should run on specific paths.
+
+The advantage of employing Middleware for this task is that the protected routes will not even start rendering until the Middleware verifies the authentication, enhancing both the security and performance of your application.
+
+### Password hashing
+Create a new file called `auth.ts` that spreads your `authConfig` object:
+```tsx filename="/auth.ts"
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
+ 
+export const { auth, signIn, signOut } = NextAuth({
+  ...authConfig,
+});
+```
+### Adding Credentials Provider
+Next, you will need to add the` providers` option for NextAuth.js. `providers` is an array where you list different login options such as Google or GitHub. For this course, we will focus on using the Credentials provider only, it allows users to log in with a username and a password.
+```tsx filename="/auth.ts"
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
+import Credentials from 'next-auth/providers/credentials';
+ 
+export const { auth, signIn, signOut } = NextAuth({
+  ...authConfig,
+  providers: [Credentials({})],
+});
+```
+### Adding Sign in Functionality
+You can use the `authorize` function to handle the authentication logic. Similarly to Server Actions, you can use `zod` to validate the email and password before checking if the user exists in the database:
+```tsx filename="/auth.ts"
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
+import { authConfig } from './auth.config';
+import { sql } from '@vercel/postgres';
+import { z } from 'zod';
+import type { User } from '@/app/lib/definitions';
+import bcrypt from 'bcrypt';
+ 
+async function getUser(email: string): Promise<User | undefined> {
+  try {
+    const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
+    return user.rows[0];
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw new Error('Failed to fetch user.');
+  }
+}
+ 
+export const { auth, signIn, signOut } = NextAuth({
+  ...authConfig,
+  providers: [
+    Credentials({
+      async authorize(credentials) {
+        const parsedCredentials = z
+          .object({ email: z.string().email(), password: z.string().min(6) })
+          .safeParse(credentials);
+ 
+        if (parsedCredentials.success) {
+          const { email, password } = parsedCredentials.data;
+          const user = await getUser(email);
+          if (!user) return null;
+          const passwordsMatch = await bcrypt.compare(password, user.password);
+ 
+          if (passwordsMatch) return user;
+        }
+ 
+        console.log('Invalid credentials');
+        return null;
+      },
+    }),
+  ],
+});
+```
+If the passwords match you want to return the user, otherwise, return `null` to prevent the user from logging in.
+
+Then we can update our login form to contain auth logic from `actions.ts` file.
+```tsx filename="/app/lib/actions.ts"
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
+}
+
+export async function createInvoice(formData: FormData) {
+  const { customerId, amount, status } = CreateInvoice.parse({
+    customerId: formData.get('customerId'),
+    amount: formData.get('amount'),
+    status: formData.get('status'),
+  });
+ 
+  const amountInCents = amount * 100;
+  const date = new Date().toISOString().split('T')[0];
+ 
+  try {
+    await sql`
+      INSERT INTO invoices (customer_id, amount, status, date)
+      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+    `;
+  } catch (error) {
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+  }
+ 
+  revalidatePath('/dashboard/invoices');
+  redirect('/dashboard/invoices');
+}
+```
+Then in the `login-form.tsx` file, you can use React's `useFormState` to call the server action and handle form errors, and use `useFormStatus` to handle the pending state of the form:
+```tsx filename="/app/ui/login-form.tsx"
+'use client';
+ 
+import { lusitana } from '@/app/ui/fonts';
+import {
+  AtSymbolIcon,
+  KeyIcon,
+  ExclamationCircleIcon,
+} from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/20/solid';
+import { Button } from '@/app/ui/button';
+import { useFormState, useFormStatus } from 'react-dom';
+import { authenticate } from '@/app/lib/actions';
+ 
+export default function LoginForm() {
+  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+ 
+  return (
+    <form action={dispatch} className="space-y-3">
+      <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
+        <h1 className={`${lusitana.className} mb-3 text-2xl`}>
+          Please log in to continue.
+        </h1>
+        <div className="w-full">
+          <div>
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="email"
+            >
+              Email
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Enter your email address"
+                required
+              />
+              <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-gray-900"
+              htmlFor="password"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Enter password"
+                required
+                minLength={6}
+              />
+              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+        </div>
+        <LoginButton />
+        <div
+          className="flex h-8 items-end space-x-1"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {errorMessage && (
+            <>
+              <ExclamationCircleIcon className="h-5 w-5 text-red-500" />
+              <p className="text-sm text-red-500">{errorMessage}</p>
+            </>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+}
+ 
+function LoginButton() {
+  const { pending } = useFormStatus();
+ 
+  return (
+    <Button className="mt-4 w-full" aria-disabled={pending}>
+      Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
+    </Button>
+  );
+}
+```
+### Adding Sign Out Functionality
+We add the log out functionality to `<SideNav>` component by calling the `signOut` function from `auth.ts` in your `<form>` element
+```tsx filename="/ui/dashboard/side-nav.tsx"
+import Link from 'next/link';
+import NavLinks from '@/app/ui/dashboard/nav-links';
+import AcmeLogo from '@/app/ui/acme-logo';
+import { PowerIcon } from '@heroicons/react/24/outline';
+import { signOut } from '@/auth';
+ 
+export default function SideNav() {
+  return (
+    <div className="flex h-full flex-col px-3 py-4 md:px-2">
+      // ...
+      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+        <NavLinks />
+        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
+        <form
+          action={async () => {
+            'use server';
+            await signOut();
+          }}
+        >
+          <button className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3">
+            <PowerIcon className="w-6" />
+            <div className="hidden md:block">Sign Out</div>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+```
 ## Adding Metadata
+In web development, metadata provides additional details about a webpage. Metadata is not visible to the users visiting the page. Instead, it works behind the scenes, embedded within the page's HTML, usually within the `<head>` element. This hidden information is crucial for search engines and other systems that need to understand your webpage's content better.
+
+Metadata plays a significant role in enhancing a webpage's SEO, making it more accessible and understandable for search engines and social media platforms. Proper metadata helps search engines effectively index webpages, improving their ranking in search results. Additionally, metadata like Open Graph improves the appearance of shared links on social media, making the content more appealing and informative for users.
+
+There are various types of metadata, each serving a unique purpose. Some common types include:
+
+Title Metadata: Responsible for the title of a webpage that is displayed on the browser tab. It's crucial for SEO as it helps search engines understand what the webpage is about.
+```html
+<title>Page Title</title>
+```
+Description Metadata: A brief description of the webpage's content. It's used by search engines to provide a summary of the webpage in search results.
+```html
+<meta name="description" content="A brief description of the page content." />
+```
+Keyword Metadata: A list of keywords that are relevant to the webpage's content. It's used by search engines to understand the webpage's topic.
+```html
+<meta name="keywords" content="keyword1, keyword2, keyword3" />
+```
+Open Graph Metadata: This metadata enhances the way a webpage is represented when shared on social media platforms, providing information such as the title, description, and preview image.
+```html
+<meta property="og:title" content="Title Here" />
+<meta property="og:description" content="Description Here" />
+<meta property="og:image" content="image_url_here" />
+```
+Favicon Metadata: This metadata links the favicon (a small icon) to the webpage, displayed in the browser's address bar or tab.
+```html
+<link rel="icon" href="path/to/favicon.ico" />
+```
+Next.js has a Metadata API that can be used to define your application metadata. There are two ways you can add metadata to your application:
+- Config-based: Export a static `metadata` object or a dynamic `generateMetadata` function in a `layout.js` or `page.js` file.
+- File-based: Next.js has a range of special files that are specifically used for metadata purposes:
+  - `favicon.ico`, `apple-icon.jpg`, and `icon.jpg`: Utilized for favicons and icons
+  - `opengraph-image.jpg` and `twitter-image.jpg`: Employed for social media images
+  - `robots.txt`: Provides instructions for search engine crawling
+  - `sitemap.xml`: Offers information about the website's structure
+
+You have the flexibility to use these files for static metadata, or you can generate them programmatically within your project.
+
+With both these options, Next.js will automatically generate the relevant `<head>` elements for your pages.
+
+### Favicon and Open Graph image
+You can add `favicon.ico` and `opengraph-image.jpg` to the root of the `/app` folder.
+
+After doing this, Next.js will automatically identify and use these files as your favicon and OG image. You can verify this by checking the `<head>` element of your application in dev tools.
+### Page title and descriptions
+You can also include a metadata object from any `layout.js` or `page.js` file to add additional page information like title and description. Any metadata in `layout.js` will be inherited by all pages that use it.
+
+In your root layout, create a new `metadata` object with the following fields:
+```tsx filename="/app/layout.tsx"
+import { Metadata } from 'next';
+ 
+export const metadata: Metadata = {
+  title: 'Acme Dashboard',
+  description: 'The official Next.js Course Dashboard, built with App Router.',
+  metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+};
+ 
+export default function RootLayout() {
+  // ...
+}
+```
+Next.js will automatically add the title and metadata to your application.
+
+But what if you want to add a custom title for a specific page? You can do this by adding a `metadata` object to the page itself. Metadata in nested pages will override the metadata in the parent.
+
+For example, in the `/dashboard/invoices` page, you can update the page title:
+```tsx filename="/app/dashboard/invoices/page.tsx"
+import { Metadata } from 'next';
+ 
+export const metadata: Metadata = {
+  title: 'Invoices | Acme Dashboard',
+};
+```
+This works, but we are repeating the title of the application in every page. If something changes, like the company name, you'd have to update it on every page.
+
+Instead, you can use the `title.template` field in the `metadata` object to define a template for your page titles. This template can include the page title, and any other information you want to include.
+
+Update the `metedata` object in the root layout.
+```tsx filename="/app/layout.tsx"
+import { Metadata } from 'next';
+ 
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Acme Dashboard',
+    default: 'Acme Dashboard',
+  },
+  description: 'The official Next.js Learn Dashboard built with App Router.',
+  metadataBase: new URL('https://next-learn-dashboard.vercel.sh'),
+};
+```
+Then the `%s` in the template will be replaced with the specific page title.
+```tsx filename="/app/dashboard/invoices/page.tsx"
+import { Metadata } from 'next';
+ 
+export const metadata: Metadata = {
+  title: 'Invoices',
+};
+```
