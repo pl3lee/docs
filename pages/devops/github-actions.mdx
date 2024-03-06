@@ -1,0 +1,102 @@
+import { Steps } from 'nextra/components'
+
+# GitHub Actions
+Notes taken from [this](https://youtu.be/R8_veQiYBjI?si=SGEjlC0J5xk0XLp0) video.
+## What is GitHub Actions
+It is a platform to automate developer workflows, and CI/CD is one of the many worksflows. Workflows can include reviewing pull requests, running tests, preparing release notes etc. These are all organizational tasks that could take a lot of time, so automating them is a good idea.
+## How GitHub Actions automate these workflows
+When something happens IN or TO your repository (GitHub Events), automatic actions are executed in response.
+
+Some examples of GitHub Events are:
+- Push to a branch
+- Pull request created
+- Issue created
+- Contributor joined
+- etc.
+
+[Here](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#about-events-that-trigger-workflows) is a list of the events that trigger a workflow.
+
+So the flow of GitHub Actions is:
+<Steps>
+### Step 1: Listen to Event
+For example, an issue is created.
+### Step 2: Trigger Workflow
+A workflow is triggered to sort, label, and assign the issue to someone. And each of these steps are separate actions. A chain of actions then make up a workflow.
+</Steps>
+## CI/CD with GitHub Actions
+This is the most common workflow for your repository, it could consist of:
+- Running tests
+- Building the project image
+- Pushing the image to a registry
+- Deploying the image to a server
+
+To start with a workflow, we can use a template from the GitHub Actions website, or we can create a new file in the `.github/workflows` directory of our repository. Let's look at a sample workflow file:
+```yaml
+# the name of the workflow, this is optional
+name: CI/CD
+
+# describes the events that trigger the workflow, this is also optional
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# one or more jobs, this is required
+jobs:
+# the name of the job, this can be arbitrary
+# a job groups a set of actions that will be executed
+  build_and_push:
+    # the type of runner that the job will run on, can choose to run on ubuntu, windows, or macos
+    # ubuntu has docker preinstalled, so we do not have to install docker
+    runs-on: ubuntu-latest
+    steps:
+    # under path actions/ the reusable code is stored
+    # checkout is an action that copies the repository to the runner, so this is often required and the first step
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/personal-website:latest
+      
+  deploy:
+    needs: build_and_push
+    # creates a production environment
+    environment: 
+      name: Production
+      url: https://billylee.me
+    runs-on: ubuntu-latest
+    steps:
+    - name: Installing SSH key
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.DROPLET_SSH_KEY }}
+      
+    # here we use the run command to run a command-line command
+    # on the other hand, the uses command is used to run a predefined action  
+    - name: Deploy to DigitalOcean Droplet
+    # the pipe symbol is used to run a multiline command
+      run: |
+        ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP }} << 'EOF'
+          cd /root/personal-website
+          docker compose pull
+          docker compose up -d
+        EOF
+```
+Note that each job in a workflow runs in a fresh virtual environment, so they run in parallel by default. If we have a job that depends on another job, we can use the `needs` keyword to specify the dependency. In the example above, the `deploy` job depends on the `build_and_push` job, so it will only run after the `build_and_push` job has completed successfully.
+
+Also make sure that you have the necessary secrets set up in your repository settings, for example, `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `DROPLET_SSH_KEY`, and `DROPLET_IP` in the example above.
