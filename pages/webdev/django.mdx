@@ -1,0 +1,145 @@
+import { FileTree } from 'nextra/components'
+
+# Django
+This will follow the quick start [tutorial](https://docs.djangoproject.com/en/5.0/intro/tutorial01/) from Django's website.
+## Installation
+```bash
+python -m pip install Django
+```
+## Creating a Project
+We first create a project using the following command:
+```bash
+django-admin startproject mysite .
+```
+which creates a directory named `mysite` in the current directory.
+<FileTree>
+    <FileTree.File name="manage.py"/>
+    <FileTree.Folder name="mysite">
+        <FileTree.File name="__init__.py"/>
+        <FileTree.File name="asgi.py"/>
+        <FileTree.File name="settings.py"/>
+        <FileTree.File name="urls.py"/>
+        <FileTree.File name="wsgi.py"/>
+    </FileTree.Folder>
+</FileTree>
+- `manage.py` is a command-line utility that lets you interact with this Django project in various ways.
+- The `mysite` directory is the actual Python package for your project. Its name is the Python package name you'll need to use to import anything inside it (e.g. `mysite.urls`).
+- `mysite/__init__.py` is an empty file that tells Python that this directory should be considered a Python package.
+- `mysite/settings.py` is the settings/configuration for this Django project.
+- `mysite/urls.py` is the URL declarations for this Django project; a "table of contents" of your Django-powered site.
+- `mysite/asgi.py` and `mysite/wsgi.py` are the entry points for ASGI and WSGI servers, respectively.
+
+We can then run the server using the following command:
+```bash
+python manage.py runserver
+```
+And our development server starts on port 8000. If you want to change the port, you can do so by running the following command:
+```bash
+python manage.py runserver 8080
+```
+If you want to run the server on a specific IP address, you can do so by running the following command:
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+## Creating an App
+Now that the project is setup, we can start creating apps. Each app you write in Django consists of a Python package that follows a certain convention. The difference between a project and an app is that an app is a web application that does something – e.g., a database of public records or a simple poll app. A project is a collection of configuration and apps for a particular website. A project can contain multiple apps. An app can be in multiple projects.
+
+Let's create our poll app in the same directory as our `manage.py` file:
+```bash
+python manage.py startapp polls
+```
+This creates a directory named `polls` in the current directory.
+<FileTree>
+    <FileTree.File name="manage.py"/>
+    <FileTree.Folder name="mysite">
+        <FileTree.File name="__init__.py"/>
+        <FileTree.File name="asgi.py"/>
+        <FileTree.File name="settings.py"/>
+        <FileTree.File name="urls.py"/>
+        <FileTree.File name="wsgi.py"/>
+    </FileTree.Folder>
+    <FileTree.Folder name="polls">
+        <FileTree.File name="__init__.py"/>
+        <FileTree.File name="admin.py"/>
+        <FileTree.File name="apps.py"/>
+        <FileTree.File name="models.py"/>
+        <FileTree.File name="tests.py"/>
+        <FileTree.File name="views.py"/>
+        <FileTree.Folder name="migrations">
+            <FileTree.File name="__init__.py"/>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+### Writing your first view
+Let's write our first view. Open the file `polls/views.py` and put the following code in it:
+```python filename="polls/views.py"
+from django.http import HttpResponse
+
+def index(request):
+    return HttpResponse("Hello, world. You're at the polls index.")
+```
+This is the simplest view possible in Django. To call the view, we need to map it to a URL - and for this we need a URLconf.
+
+URLconf is responsible for mapping URLs (Uniform Resource Locators) to views in your Django project. It determines how incoming requests are handled and which view function or class-based view should be called to generate the response.
+
+To create a URLconf in the polls directory, create a file called `urls.py`. Your app directory should now look like this:
+<FileTree>
+    <FileTree.Folder name="polls">
+        <FileTree.File name="__init__.py"/>
+        <FileTree.File name="admin.py"/>
+        <FileTree.File name="apps.py"/>
+        <FileTree.File name="models.py"/>
+        <FileTree.File name="tests.py"/>
+        <FileTree.File name="views.py"/>
+        <FileTree.File name="urls.py"/>
+        <FileTree.Folder name="migrations">
+            <FileTree.File name="__init__.py"/>
+        </FileTree.Folder>
+    </FileTree.Folder>
+</FileTree>
+In the `polls/urls.py` file, include the following code:
+```python filename="polls/urls.py"
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    path("", views.index, name="index"),
+]
+```
+Then we can point the root `URLconf` at the `polls.urls` module. In `mysite/urls.py`, add an import for `django.urls.include` and insert an `include()` in the `urlpatterns` list, so you have:
+```python filename="mysite/urls.py"
+"""
+URL configuration for mysite project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/5.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+
+from django.contrib import admin
+from django.urls import include, path
+
+urlpatterns = [
+    path("polls/", include("polls.urls")),
+    path("admin/", admin.site.urls),
+]
+```
+The `include()` function allows referencing other URLconfs. Whenever Django encounters `include()`, it chops off whatever part of the URL matched up to that point and sends the remaining string to the included URLconf for further processing.
+
+Now when we go to `http://localhost:8000/polls`, we should see the text "Hello, world. You're at the polls index.".
+
+The `path()` function is passed four arguments, two required: `route` and `view`, and two optional: `kwargs` and `name`.
+- `route` is a string that contains a URL pattern. When processing a request, Django starts at the first pattern in `urlpatterns` and makes its way down the list, comparing the requested URL against each pattern until it finds one that matches.
+- `view` is a view function that Django should call when the pattern is matched.
+- `kwargs` is an arbitrary keyword argument that can be passed to the target view.
+- `name` is the name of the URL that will be used to identify the view. Naming your URL lets you refer to it unambiguously from elsewhere in Django, especially from within templates. This allows you to make global changes to the URL patterns of your project while only touching a single file.
