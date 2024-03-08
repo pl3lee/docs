@@ -399,3 +399,25 @@ DoesNotExist: Question matching query does not exist.
 >>> c = q.choice_set.filter(choice_text__startswith="Just hacking")
 >>> c.delete()
 ```
+## Introducing the Django Admin
+Django automates the creation of admin interfaces for models. First, we will need to create a user who can login to the admin site. Run the following command:
+```bash
+python manage.py createsuperuser
+```
+Then enter your desired username, email address, and password. Then run the development server:
+```bash
+python manage.py runserver
+```
+And access the admin site at `http://localhost:8000/admin`. Log in using the username and password you created in the previous step. You should see the admin interface, which is a powerful tool for managing your website.
+
+Let's add the poll app to the admin site. But first, we need to tell the admin that `Question` objects have an admin interface. Open the `polls/admin.py` file and add the following code:
+```python filename="polls/admin.py"
+from django.contrib import admin
+
+from .models import Question
+
+admin.site.register(Question)
+```
+Now we can see that `Question` is displayed on the admin site. Click on it and you can see a page that displays all the questions in the database and lets you choose one to change it.
+
+![Django Admin](/images/webdev/django/admin-page-edit-question.png)
