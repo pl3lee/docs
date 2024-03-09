@@ -1,9 +1,12 @@
 {   
     "auth": "Authentication & Authorization",
+    "jwt": "JSON Web Tokens",
     "nextjs-14": "Next.js 14",
     "react-testing": "React Testing",
     "react-query": "React Query",
     "typescript": "TypeScript",
     "css": "CSS",
-    "django": "Django"
+    "django": "Django",
+    "nest-js": "Nest.js",
+    "framer-motion": "Framer Motion"
 }
