@@ -421,3 +421,158 @@ admin.site.register(Question)
 Now we can see that `Question` is displayed on the admin site. Click on it and you can see a page that displays all the questions in the database and lets you choose one to change it.
 
 ![Django Admin](/images/webdev/django/admin-page-edit-question.png)
+## Writing more Views
+A view is a type of web page in your Django application that generally serves a specific function and has a specific template. For example, in our poll application, we might have the following views:
+- Question index page - displays the latest few questions
+- Question detail page - displays a question text, with no results but with a form to vote
+- Question results page - displays results for a particular question
+- Vote action - handles voting for a particular choice in a particular question
+
+In Django, each view is represented by a Python function. Django will choose the view by examining the URL that is requested. To get from a URL to a view, Django uses URLconfs. A URLConf maps URL patterns to views.
+
+Let's add a few more views to `polls/views.py`. These views are slightly different, because they take an argument:
+```python filename="polls/views.py"
+from django.shortcuts import render
+
+# Create your views here.
+from django.http import HttpResponse
+
+
+def index(request) -> HttpResponse:
+    return HttpResponse("Hello, world. You're at the polls index.")
+
+
+def detail(request, question_id):
+    return HttpResponse("You're looking at question %s." % question_id)
+
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+
+def vote(request, question_id):
+    return HttpResponse("You're voting on question %s." % question_id)
+```
+We can then wire these views into the `polls.urls` module by adding the following `path()` calls
+```python filename="polls/urls.py"
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    # ex: /polls/
+    path("", views.index, name="index"),
+    # ex: /polls/5/
+    path("<int:question_id>/", views.detail, name="detail"),
+    # ex: /polls/5/results/
+    path("<int:question_id>/results/", views.results, name="results"),
+    # ex: /polls/5/vote/
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+]
+```
+Now run our server, and then go to `localhost:8000/polls/34/` and you should see the text "You're looking at question 34.". Django runs the `detail()` function and display whatever ID you provide in the URL.
+
+## Writing Views that actually do something
+Each view is responsible for doing one of two things:
+1. Return an HttpResponse object containing the content for the requested page.
+2. Raising an exception such as `Http404`
+
+So, all Django wants is an `HTTPResponse`, or an exception. Let's modify the `index()` view so that it displays the latest 5 poll questions in the system, separated by commas, according to publication date. 
+```python filename="polls/views.py"
+from django.shortcuts import render
+
+# Create your views here.
+from django.http import HttpResponse
+from .models import Question
+
+
+def index(request) -> HttpResponse:
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    output = ", ".join([q.question_text for q in latest_question_list])
+    return HttpResponse(output)
+
+
+def detail(request, question_id):
+    return HttpResponse("You're looking at question %s." % question_id)
+
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+
+def vote(request, question_id):
+    return HttpResponse("You're voting on question %s." % question_id)
+```
+If we want to make a view look prettier, we can use templates. But we will not cover templates here, because I will most likely use a frontend framework for that. Take a look [here](https://docs.djangoproject.com/en/5.0/intro/tutorial03/) to learn about templates.
+
+## Namespacing URL names
+There might be a lot of apps in Django projects. How does Django differentiate the URL names between them? The answer is to add namespaces to your URLconf. In the `polls/urls.py` file, add an `app_name` to set the application namespace:
+```python filename="polls/urls.py"
+from django.urls import path
+
+from . import views
+
+app_name = "polls"
+urlpatterns = [
+    # ex: /polls/
+    path("", views.index, name="index"),
+    # ex: /polls/5/
+    path("<int:question_id>/", views.detail, name="detail"),
+    # ex: /polls/5/results/
+    path("<int:question_id>/results/", views.results, name="results"),
+    # ex: /polls/5/vote/
+    path("<int:question_id>/vote/", views.vote, name="vote"),
+]
+```
+and here are the files we have changed:
+```html filename="polls/templates/polls/index.html"
+{% if latest_question_list %}
+<ul>
+    {% for question in latest_question_list %}
+    <li>
+        <a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No polls are available.</p>
+{% endif %}
+```
+```python filename="polls/templates/polls/detail.html"
+<h1>{{ question.question_text }}</h1>
+<ul>
+    {% for choice in question.choice_set.all %}
+    <li>{{ choice.choice_text }}</li>
+    {% endfor %}
+</ul>
+```
+```python filename="polls/views.py"
+from django.shortcuts import get_object_or_404, render
+
+# Create your views here.
+from django.http import Http404
+from django.http import HttpResponse
+from .models import Question
+
+
+def index(request) -> HttpResponse:
+    latest_question_list = Question.objects.order_by("-pub_date")[:5]
+    context = {"latest_question_list": latest_question_list}
+    return render(request, "polls/index.html", context)
+
+
+def detail(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, "polls/detail.html", {"question": question})
+
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+
+def vote(request, question_id):
+    return HttpResponse("You're voting on question %s." % question_id)
+```
