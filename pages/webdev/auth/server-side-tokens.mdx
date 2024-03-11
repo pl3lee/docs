@@ -1,0 +1,32 @@
+# Server-side Tokens
+A server-side token is any long, random string that is stored on the server. It may be persisted in a database or in-memory data store(e.g. Redis) and is used for authentication and verification. A token can be validated by checking if it exists in storage. Examples include session IDs, email verification tokens, and access tokens. For example, a database table that stores session IDs might look like this:
+```sql
+CREATE TABLE token (
+	token STRING NOT NULL UNIQUE,
+	expires_at INTEGER NOT NULL,
+	user_id INTEGER NOT NULL,
+
+	FOREIGN KEY (user_id) REFERENCES user(id)
+)
+```
+For single-use tokens, any retrieval should also guarantee deletion. In SQL for example, an atomic operation such as a transaction should be used when fetching a token.
+
+## Generating Tokens
+Tokens must be generated using a cryptographically secure random generator. Fast, pseudo-random generators like those generally provided by standard math packages should be avoided for this. Tokens should be case-sensitive, but you may want to constrain your token generation to lowercase letters if your storage is case-insensitive (e.g. MySQL).
+```go
+import (
+	"crypto/rand"
+	"encoding/base32"
+)
+
+// Creates a slice of 15 bytes. This slice will be filled with random data
+bytes := make([]byte, 15)
+
+// Fills the slice with cryptographically secure random data. Each byte can have 256 different values (from 0 to 255), so the total number of possible combinations is 256^15
+rand.Read(bytes)
+
+// Converts the byte slice into a Base32-encoded string. Base32 encoding is used to make the string URL-safe and file-system friendly
+sessionId := base32.StdEncoding.EncodeToString(bytes)
+```
+## Storing Tokens
+Tokens that require an extra level of security, such as password reset tokens, should be hashed with SHA-256. Tokens can be validated by hashing the incoming token before querying.

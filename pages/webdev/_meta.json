@@ -1,5 +1,5 @@
 {   
-    "auth": "Authentication & Authorization",
+    "auth": "Auth",
     "jwt": "JSON Web Tokens",
     "nextjs-14": "Next.js 14",
     "react-testing": "React Testing",

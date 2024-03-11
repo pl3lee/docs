@@ -1,0 +1,57 @@
+# Sessions
+Sessions are a way to persist state in the server. It is especially useful for managing the authentication state, such as the client's identity. We can assign each session with a unique ID and store it on the server to use it as a token. Then the client can associate the request with a session by sending the session ID with it. To implement authentication, we can simply store user data alongside the session.
+
+## Session Lifetime
+A new session is created whenever a user signs in. For security-critical applications, it is crucial for sessions to expire automatically. The expiration should match how long the user is expected to use your application in a single sitting.
+
+However, for less critical websites, a good practice would be to set the expiration to a reasonable time, such as 30 days, but extend teh expiration whenever the session is used. For example, sessions may expire in 30 days by default, but the expiration gets pushed back 30 days when it is used within 15 days before expiration. This invalidates sessions for inactive users, but keeps the session alive for active users.
+
+```go
+const sessionExpiresIn = 30 * 24 * time.Hour
+
+func validateSession(sessionId string) (*Session, error) {
+    // Get the session from the storage
+	session, ok := getSessionFromStorage(sessionId)
+    // checks if session exists from the storage
+	if !ok {
+		return nil, errors.New("invalid session id")
+	}
+    // checks if the session is expired
+	if time.Now().After(session.ExpiresAt) {
+		return nil, errors.New("expired session")
+	}
+    // if the session is about to expire, extend the expiration
+	if time.Now().After(session.expiresAt.Sub(sessionExpiresIn / 2)) {
+        // update the expiration
+		session.ExpiresAt = time.Now().Add(sessionExpiresIn)
+        // update the session expiration in the database
+		updateSessionExpiration(session.Id, session.ExpiresAt)
+	}
+	return session, nil
+}
+```
+## Session Invalidation
+Sessions can be invalidated by deleting it from both server and client storage.
+
+When the user signs out, invalidate the current session, or for security-critical applications, invalidate all sessions belonging to that user.
+
+All sessions of the user should also be invalidated when they gain new permissions (email verification, new role, etc) or change passwords.
+
+## Client Storage
+The client should store the session ID in the user's device to be used for subsequent requests. The browser mainly provides 2 ways to store data - cookies and the Web Storage API. Cookies should be preferred for websites as they're automatically included in requests by the browser.
+
+### Cookies
+Session cookies should have the following attributes:
+
+- `HttpOnly`: Cookies are only accessible server-side
+- `SameSite=Lax`: Use Strict for critical websites
+- `Secure`: Cookies can only be sent over HTTPS
+- `Max-Age` or `Expires`: Must be defined to persist cookies
+- `Path=/`: Cookies can be accessed from all routes
+
+The maximum expiration for a cookie is anywhere between 1 and 2 years. If you plan for the session to be long-lived, continuously set the cookie on a set interval (e.g. when you extend the session expiration).
+
+`Lax` should be preferred over `Strict` for the `SameSite` attribute as using `Strict` will cause the browser to not send the session cookie when the user visits your application via an external link.
+
+### Web Storage API
+Avoid using the Web Storage API for session storage as it is vulnerable to XSS attacks. Only accept session IDs from cookies and request headers.
