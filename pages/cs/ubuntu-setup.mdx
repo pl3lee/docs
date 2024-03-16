@@ -1,4 +1,5 @@
 # Ubuntu Setup
+## Install Script
 This is a script that automates the setup of a new Ubuntu installation. It installs the following:
 - VSCode
 - Git
@@ -10,7 +11,7 @@ This is a script that automates the setup of a new Ubuntu installation. It insta
 - Python with pip
 - Jupyter Lab
 
-## Usage
+### Usage
 Copy and paste the code below into a file, then change its permissions to make it executable by running `chmod +x <filename>`. Finally, run the script with `./<filename>`.
 
 ```bash
@@ -73,4 +74,17 @@ sudo apt-get install ttf-mscorefonts-installer
 # Installs pip
 sudo apt install python3-pip
 pip install jupyterlab
+```
+
+## Setting Up SSH Server
+This sets up the Ubuntu machine as an SSH server. It allows you to connect to the machine remotely using SSH.
+```bash
+sudo apt install openssh-server
+sudo systemctl enable ssh
+sudo ufw allow ssh
+sudo systemctl start ssh
+```
+Then you can connect to the machine using `ssh <username>@<ip>`. To add your ssh key to the server, run the following command on your local machine:
+```bash
+ssh-copy-id <username>@<ip>
 ```
