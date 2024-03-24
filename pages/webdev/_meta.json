@@ -5,6 +5,7 @@
     "react-testing": "React Testing",
     "react-query": "React Query",
     "typescript": "TypeScript",
+    "express-ts": "Express.js with TypeScript",
     "css": "CSS",
     "django": "Django",
     "nest-js": "Nest.js",
