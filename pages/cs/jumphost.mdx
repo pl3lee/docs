@@ -1,0 +1,57 @@
+import { Steps } from 'nextra/components'
+
+# Setup Jumphost
+Jumphost is a server that is used as a gateway to access other servers. It is used to access the servers that are not directly accessible from the internet. It is also used to access the servers that are in a private network.
+
+For example, suppose you have several virtual machine hosted in your own home network. Now, you would like to ssh into these virtual machines from your office. In your router page, you could try to port forward the ssh port (22) of each virtual machine to the internet, but this does not work because you have only one public IP address. Moreover, it is not a good idea to expose the virtual machines to the internet.
+
+Instead, you could setup another virtual machine in your home network, allow ssh access to this virtual machine from the internet, and then ssh into the other virtual machines from this virtual machine. This virtual machine is called a jumphost.
+
+In my case, I have 2 virtual machines that I would like to ssh into my home network with local IP addresses `192.168.50.202` and `192.168.50.203`. I setup a jumphost with local IP address `192.168.50.201`, go into the router page, and port forward port 22 to the jumphost ip address `192.168.50.201`. Then, I can point my domain name to the public IP address of my home network and ssh into the jumphost with the domain name. From the jumphost, I can ssh into the other virtual machines. 
+
+## Instructions
+<Steps>
+### Step 1
+Setup a virtual machine in your home network. Setup manual IP address for the virtual machine. For Ubuntu Server,
+- Subnet: `192.168.50.0/24`
+- IP Address: `192.168.50.202`
+- Gateway: `192.168.50.1` assuming that the router IP address is `192.168.50.1`
+- DNS: `192.168.50.1`
+### Step 2
+Allow SSH access to the virtual machine by installing `openssh-server`. In Ubuntu Server, it will prompt you to install it during the installation process.
+### Step 3
+Setup a jumphost virtual machine in your home network. Setup manual IP address for the virtual machine. For Ubuntu Server,
+- Subnet: `192.168.50.0/24`
+- IP Address: `192.168.50.201`
+- Gateway: `192.168.50.1` assuming that the router IP address is `192.168.50.1`
+- DNS: `192.168.50.1`
+
+### Step 4
+Allow SSH access to the jumphost virtual machine by installing `openssh-server`. In Ubuntu Server, it will prompt you to install it during the installation process. Also add your public ssh key (of the local machine) to the `~/.ssh/authorized_keys` file of the jumphost virtual machine.
+### Step 5
+Generate a ssh key pair in your jumphost virtual machine by doing `ssh-keygen`. 
+
+### Step 6
+Copy the public ssh key of the **jumphost** virtual machine to the `~/.ssh/authorized_keys` file of the **virtual machines** that you would like to ssh into.
+
+### Step 7
+In your router page, port forward port 22 to the jumphost ip address `192.168.50.201`
+
+### Step 8 (Optional)
+Point your domain name to the public IP address of your home network. 
+
+### Step 9
+In your local machine VSCode, go to the Remote Explorer tab and click on the Gear icon next to SSH to open the SSH config file. Add the following lines to the top of the file.
+```bash
+Host *
+  ServerAliveInterval 60
+
+Host jump-host
+  HostName your-domain.com
+
+Host ubuntu-school-1
+  HostName 192.168.50.202
+  User your-username
+  ProxyCommand ssh -W %h:%p jump-host
+```
+</Steps>

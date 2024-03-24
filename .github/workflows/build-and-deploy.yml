@@ -28,7 +28,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/docs:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/docs:${{ github.sha }}
       
   deployment:
     needs: build_and_push
@@ -46,6 +46,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no root@${{ secrets.DROPLET_IP }} << 'EOF'
           cd /root/docs
+          echo IMAGE_TAG=${{ secrets.DOCKER_USERNAME }}/docs:${{ github.sha }} > .env
           docker compose pull
           docker compose up -d
         EOF
