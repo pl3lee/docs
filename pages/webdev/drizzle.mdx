@@ -1,0 +1,166 @@
+import { Callout } from 'nextra/components'
+
+# Drizzle ORM
+Notes taken from [this](https://youtu.be/7-NZ0MlPpJA?si=t771NY9xiT_Tc0Wh) video.
+
+Sample repository [here](https://github.com/pl3lee/drizzle-sample).
+## What is Drizzle
+Drizzle is an ORM (Object Relational Manager) which allows us to interact with a database very easily instead of writing raw SQL queries.
+
+## Drizzle Setup
+We will use PostgreSQL as our database with the Postgres.JS driver. Let's first install the dependencies that we need
+```bash
+npm install drizzle-orm postgres dotenv
+npm install -D drizzle-kit
+```
+drizzle-kit allows us to generate database migrations. Let's first create a config file for drizzle. Create a file called `drizzle.config.ts` and a folder inside our `src` directory called `drizzle`. Inside the `drizzle` folder, create a file called `schema.ts`. This will store all our database schemas. Let's create the config file first.
+```typescript filename="drizzle.config.ts" copy showLineNumbers
+import { defineConfig } from "drizzle-kit"
+
+export default defineConfig({
+    // the path to database schemas
+    schema: "./src/drizzle/schema.ts",
+    // the output of database migration files
+    out: "./src/drizzle/migrations",
+    // the database we are using
+    driver: "pg",
+    // the database connection string
+    dbCredentials: {
+        connectionString: process.env.DATABASE_URL as string
+    },
+    // tells us what happens when we generate a migration
+    verbose: true,
+    // makes migrations more secure
+    strict: true
+})
+```
+Then let's define our schema. In the `schema.ts` file, we have to `export` all constant variables for our tables. All variables have to be exported in order for Drizzle to work.
+```typescript filename="/src/drizzle/schema.ts" copy showLineNumbers
+import { pgTable, uuid, varchar } from "drizzle-orm/pg-core"
+
+// we are creating a table called "user"
+export const UserTable = pgTable("user", {
+    // the argument id is the name of the column
+    // specifies that this is a primary key, and gets a random value by default
+    // if we want an auto incrementing id, we can use 
+    // serial("id").primaryKey()
+    // serial is a function that generates an auto incrementing id
+    id: uuid("id").primaryKey().defaultRandom(),
+    name: varchar("name", { length: 255 }).notNull()
+})
+```
+<Callout type="info" emoji="ℹ️">
+  `varchar` are strings in SQL. We have to specify the length of the string. 
+</Callout>
+## Migration Setup
+Now that we have our basic scheme setup, we can generate a migration file. We can do this by running the following command
+```bash
+npx drizzle-kit generate:pg
+```
+We can then see the migration file being generated in the `migrations` folder. If we want to remove a migration for some reason, we can run
+```bash
+npx drizzle-kit drop
+```
+For convenience, let's add some commands to our `package.json` file
+```json filename="package.json"
+{
+  "scripts": {
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "ts-node src/drizzle/migrate.ts"
+  }
+}
+```
+Note that this only creates a migration file, but we have not actually applied it yet. We have to create a file that let's us apply the migrations. Let's create a file called `migrate.ts` in the `drizzle` folder.
+```typescript filename="/src/drizzle/migrate.ts" copy showLineNumbers
+import dotenv from 'dotenv';
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator"
+import postgres from "postgres";
+
+dotenv.config();
+
+// define migration client
+const migrationClient = postgres(process.env.DATABASE_URL as string, { max: 1})
+
+async function main() {
+    // migrate, pass in where our migration folder is
+    await migrate(drizzle(migrationClient), {
+        migrationsFolder: "./src/drizzle/migrations"
+    })
+
+    await migrationClient.end()
+}
+
+main()
+```
+Now the last step is to add our database URL to a `.env` file. 
+``` filename=".env" copy
+DATABASE_URL=postgresql://postgres:password@localhost:5432/drizzle-sample
+```
+Before we run our migration, we have to create a database called `drizzle-sample`. We can do this by running the following command, assuming that we have PostgreSQL running in a Docker container called `postgres`.
+```bash
+docker exec -it postgres bash
+psql -h localhost -U postgres
+CREATE DATABASE "drizzle-sample";
+\l
+```
+The final command displays all our databases, we can check that we have created the database correctly. Now we can run our migration. Press `Ctrl + D` to exit the PostgreSQL shell and the Docker container.
+```bash
+npm run db:migrate
+```
+What if we want a GUI to view our database? We can use Drizzle Studio
+```bash
+npm install pg
+npx drizzle-kit studio
+```
+<Callout type="info" emoji="ℹ️">
+  Remember to forward the port 4983 if you are using a dev container!
+</Callout>
+Then going to `https://local.drizzle.studio` we can see our newly created table `user`. 
+## Finalizing Setup
+Now, let's connect our app to our database. We can do this by creating a file called `db.ts` in the `drizzle` folder.
+```typescript filename="/src/drizzle/db.ts" copy showLineNumbers
+import { drizzle } from "drizzle-orm/postgres-js"
+import * as schema from "./schema"
+import postgres from "postgres"
+import dotenv from 'dotenv';
+dotenv.config();
+
+const client = postgres(process.env.DATABASE_URL as string)
+export const db = drizzle(client, { schema, logger: true })
+```
+Then in our `index.ts` file, we can import our `db` object and use it to interact with our database.
+```typescript filename="/src/index.ts" copy showLineNumbers {13-24}
+import express from 'express';
+import dotenv from 'dotenv';
+import { db } from './drizzle/db';
+import { UserTable } from './drizzle/schema';
+dotenv.config();
+
+export const app = express();
+const port = 3001;
+
+app.use(express.json());
+
+
+app.put("/user", async (req, res) => {
+    const { name } = req.body
+    try {
+        await db.insert(UserTable).values({
+            name: name
+        })
+        const user = await db.query.UserTable.findFirst()
+        res.json(user)
+    } catch (e) {
+        res.status(500).json(e)
+    }
+})
+
+
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});
+```
+Now if we send a PUT request to `http://localhost:3001/user` with a JSON body of `{"name": "John"}`, we should see a response of `{"id": "random-uuid", "name": "John"}`. We can also check our database to see if the user has been added using Drizzle Studio.
+
+## Schema Advanced
