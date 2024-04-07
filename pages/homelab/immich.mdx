@@ -1,0 +1,19 @@
+# Immich
+Local IP Address: `192.168.50.48:9090`
+
+Public IP Address: `https://billy-immich.57russell.com`
+## Using immich-go to upload files to Immich
+1. First download the immich-go binary from the releases page [here](https://github.com/simulot/immich-go)
+2. Move the binary to a directory where you are placing your files to upload. So, suppose that you have a directory called `photos` and inside there are subdirectories, representing the albums, then you can move the binary to the same level as the `photos` directory.
+3. Run the binary with the following command:
+
+If you are uploading the whole `photos` directory: 
+```bash
+./immich-go -server http://192.168.50.48:9090 -key <API key of user> upload -create-album-folder=true photos
+```
+This creates an album for each subdirectory in the `photos` directory.
+
+If you are uploading from a Google takeout (you do not need to unzip the takeout file):
+```bash
+./immich-go -server http://192.168.50.48:9090 -key <API key of user> upload -google-photos <path to the takeout file>
+```
