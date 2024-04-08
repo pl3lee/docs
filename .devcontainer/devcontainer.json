@@ -3,7 +3,7 @@
 {
 	"name": "Personal Docs",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:jammy",
+	"image": "pl3lee/texlive-devcontainer:latest",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
@@ -24,7 +24,7 @@
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
-			"extensions": ["streetsidesoftware.code-spell-checker", "eamodio.gitlens", "unifiedjs.vscode-mdx", "rvest.vs-code-prettier-eslint", "bradlc.vscode-tailwindcss", "github.copilot", "github.copilot-chat"]
+			"extensions": ["streetsidesoftware.code-spell-checker", "eamodio.gitlens", "unifiedjs.vscode-mdx", "rvest.vs-code-prettier-eslint", "bradlc.vscode-tailwindcss", "github.copilot", "github.copilot-chat", "mathematic.vscode-latex", "jeffersonqin.latex-snippets-jeff", "tecosaur.latex-utilities", "james-yu.latex-workshop", "yzhang.markdown-all-in-one"]
 		}
 	},
 
