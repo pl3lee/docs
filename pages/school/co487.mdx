@@ -1,0 +1,54 @@
+# CO487 - Applied Cryptography
+This page is a condensed version of the course notes for CO487. It is intended to be a quick reference for the course material in order to help me study for the final exam.
+## Definitions
+Here are some terms and concepts that we are expected to memorize
+- **Confidentiality**: Keeping data secret from all but those authorized to see it.
+- **Data integrity**: Ensuring data has not been altered by unauthorized means, meaning the data has not been modified or tampered with.
+- **Data origin authentication**: Corroborating the source of data, meaning that the data is from the source it claims to be from.
+- **Non-repudiation**: Preventing an entity from denying previous commitments or actions.
+- **Totally Insecure**: Given a symmetric key encryption scheme, if an adversary can recover the secret key $k$, or systematically recover plaintext from ciphertext, without necessarily learning $k$, then the scheme is said to be totally insecure (or totally broken).
+- **Semantically Secure**: If the adversary cannot learn any partial information about the plaintext from the ciphertext (except possibly its length), the encryption scheme is said to be semantically secure.
+- **Secure symmetric-key encryption scheme**: A symmetric-key encryption scheme is secure if it is semantically secure against chosen-plaintext attack by a computationally bounded adversary.
+- **Security level of a cryptographic scheme**: A cryptographic scheme is said to have a security level of $\ell$ bits if the fastest known attack on the scheme takes approximately $2^\ell$ operations.
+- **Preimage-resistant hash function**: A hash function $H: \{0,1\}^* \to \{0,1\}^n$ is preimage resistant if, given a hash value $y \in_R \{0,1\}^n$, it is computationally infeasible to find any $x \in \{0,1\}^*$ with $H(x) = y$ ($x$ is called a preimage of $y$). That is, given $y$, it is almost impossible to find the preimage.
+- **Second-preimage resistant hash function**: A hash function $H: \{0,1\}^* \to \{0,1\}^n$ is 2nd preimage resistant if given $x \in_R \{0,1\}^*$, it is computationally infeasible to find another $x' \in \{0,1\}^*$, where $x \neq x'$, such that $H(x) = H(x')$. That is, it is impossible to find another string that has the same hash value.
+- **Collision-resistant hash function**: A hash function $H: \{0,1\}^* \to \{0,1\}^n$ is collision resistant if it is computationally infeasible to find $x, x' \in \{0,1\}^*$ with $x \neq x'$ such that $H(x) = H(x')$. Such a pair $(x,x')$ is called a collision.
+- **Secure MAC scheme**: A MAC scheme is secure if given some tags $\text{MAC}_k(x_i)$ for messages $x_i'$s of one's own choosing, it is computationally infeasible to compute a message-tag pair $(x, \text{MAC}_k(x))$ for a new message $x$. More concisely, a MAC scheme is secure if it is existentially unforgeable against chosen-message attack.
+- **Secure authenticated encryption scheme**: An authenticated encryption scheme $AE$ is AE-secure if $AE$ is semantically secure against chosen-plaintext attack, and $AE$ has ciphertext integrity, i.e. an adversary who is able to obtain ciphertext/tag pairs for messages of its own choosing cannot produce a valid ciphertext/tag pair for a new message.
+- **Input size**: The input size is the number of bits required to write down the input using a reasonable encoding.
+- **Running time of an algorithm**: The running time of an algorithm is an upper bound, as a function of the input size, of the worst case number of basic operations the algorithm executes over all inputs of a fixed size.
+- **Polynomial-time algorithm**: An algorithm is a polynomial-time algorithm if its expected running time is $O(k^c)$, where $k$ is the input size and $c$ is a fixed positive integer. 
+- **Secure public-key encryption scheme**: A public-key encryption scheme is secure if it is semantically secure against chosen-ciphertext attacks by a computationally bounded adversary.
+- **Exponential running time of an algorithm**: An exponential-time algorithm is one whose worst-case running time is not of the form $O(n^c)$ for any constant $c$, where $n$ is the input size. Fully exponential-time functions are of the form $2^{cn}$, where $c$ is a constant. Example: $O(2^{n / 2})$.
+- **Subexponential running time of an algorihtm**: One whose worst-case running time function is of the form $2^{o(n)}$, and not of the form $O(n^c)$ for any constant $c$. Example: $O(2^{\sqrt n})$.
+- **Security of a signature scheme**: A signature scheme is secure if it is existentially unforgeable by a computationally bounded adversary who launches a chosen-message attack.
+- **Elliptic curve**: An elliptic curve $E$ over $F$, where $F = \mathbb Z_p$, $p$ is prime, or $F = \mathbb R$ is defined by an equation 
+
+    $$
+    \begin{align*}
+        E/F: Y^2 = X^3 + aX + b
+    \end{align*}
+    $$
+    where $a, b \in F$.
+- **Point multiplication**: Let $P \in E(\mathbb Z_p)$ and let $k \in \mathbb N$. Then $kP = \underbrace{P + P + \cdots + P}_{k \text{ times}}$. Also, $0P = \infty$, and $(-k)P = -(kP)$.
+
+## Symmetric-Key Encryption
+### Basic Idea
+The most basic form of using a Symmetric-key encryption scheme to achieve confidentiality is as follows:
+1. Two parties, Alice and Bob agrees on a shared secret key $k$ by communicating over the secured channel.
+2. Alice computes $c = E_k(m)$ and sends the ciphertext $c$ to Bob over the unsecured channel.
+3. Bob retrieves the plaintext by decrypting the ciphertext: $m = D_k(c)$.
+
+### Types of Attacks
+1. Ciphertext-only attack: The adversary knows some ciphertext
+2. Known-plaintext attack: The adversary knows some plaintext and corresponding ciphertext.
+3. Chosen-plaintext attack: The adversary can choose plaintexts and obtain the corresponding ciphertexts.
+
+Thus, for a chosen plaintext attack, the adversary breaks a SKES if she achieves the following:
+1. The adversary is given a challenge ciphertext $c$.
+2. The adversary can choose plaintexts $m_1, m_2, \ldots, m_q$ and obtain the corresponding ciphertexts $c_1, c_2, \ldots, c_q$.
+3. The adversary obtains some information about the plaintext $m$ corresponding to $c$.
+
+### Stream Ciphers
+
+### Block Ciphers
