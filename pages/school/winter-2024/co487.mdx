@@ -181,3 +181,185 @@ HMAC is also commonly used as a key derivation function (KDF). Suppose that Alic
 $$sk_1 = \text{HMAC}_k(1), \quad sk_2 = \text{HMAC}_k(2), \ldots$$
 
 ### GSM
+GSM is used for 2G and 2.5G. It is used by smartphones to authenticate themselves to cell phone service providers. Suppose that Alice is a cell phone, and Bob a service provider.
+1. Alice sends an authentication request to Bob
+2. Bob selects a challenge $r \in_R \{0,1\}^{128}$ and sends it to Alice
+3. Alice's SIM card uses $k$ (stored in the SIM card itself) to compute the response $t = \text{MAC}_k(r)$ and sends it to Bob
+4. Bob verifies that $t = \text{MAC}_k(r)$
+5. Alice and Bob computes an encryption key $K_E = \text{KDF}_k(r)$, and uses it to encrypt the communication between them.
+
+Therefore, the main idea is that assuming that Alice is a valid customer with key $k$, then Alice can compute the correct response $t = \text{MAC}_k(r)$ for any challenge $r$.
+
+## Authenticated Encryption
+We want to achieve both confidentiality and authentication. Confidentiality is achieved using a symmetric key encryption scheme, for example AES-CBC. Authentication is achieved using a MAC scheme, for example HMAC. If both confidentiality and authentication are required, then we can use Encrypt-then-MAC, where the plaintext is first encrypted, then the tag is computed by MACing the ciphertext. The ciphertext and tag are then sent to the receiver. An authenticated encryption scheme $AE$ is AE-secure if $AE$ is semantically secure against chosen-plaintext attack, and $AE$ has ciphertext integrity, i.e. an adversary who is able to obtain ciphertext/tag pairs for messages of its own choosing cannot produce a valid ciphertext/tag pair for a new message.
+
+### AES-GCM
+AES-GCM is an authenticated encryption scheme that uses AES in counter mode (AES-CTR) for encryption and GMAC, a custom designed MAC scheme for authentication.
+
+The main idea of AES-CTR is that we have a nonce, then we have a counter that keeps incrementing the nonce by 1. Each ciphertext block $C_i$ is then calculated by using AES encryption on the counter, and XORing the result with the plaintext block $M_i$. 
+$$
+C_i = E_k(\text{counter}) \oplus M_i
+$$
+Decryption is essentially the same, except that the plaintext block is calculated by using AES encryption on the counter, and XORing the result with the ciphertext block $C_i$.
+$$
+M_i = E_k(\text{counter}) \oplus C_i
+$$
+Then, AES-GCM uses AES-CTR to first encrypt the data, then computes the tag using GMAC. Note that how GMAC works is basically it generates a keystream (that depends on the nonce IV) that is the same length as the ciphertext, so it acts as like a one time pad for the ciphertext.
+
+Therefore, it is important to never reuse the nonce IV, otherwise the keystream will be the same. Once Eve receives two ciphertexts with the same nonce IV, she can XOR the two ciphertexts to obtain the XOR of the two plaintexts, which does not depend on the key.
+### AWS
+The main idea is that each customer has a Customer Main Key (CMK) that is stored in HSMs, which are dedicated devices in AWS to store keys. The CMK is used to encrypt the data encryption key (DEK) that is used to encrypt the data. Each piece of data is encrypted with a different DEK.
+
+## Public-Key Cryptography
+In public-key cryptography, communicating parties share some authenticated (but non-secret) information. Thus, each entity has a private/public key pair. In general, public-key cryptography works as follows.
+
+To send a message $m$ to Bob, Alice does the following:
+1. Obtain an authentic copy of Bob's public key $P_B$
+2. Encrypt the message $m$ using Bob's public key $P_B$ to obtain the ciphertext $c = E(P_B, m)$
+3. Send the ciphertext $c$ to Bob
+
+Then to decrypt the message, Bob does the following:
+1. Use his private key $S_B$ to decrypt the ciphertext $c$ to obtain the message $m = D(S_B, c)$
+
+To sign a message $m$, Alice does the following:
+1. User her private key $S_A$ to sign the message $m$ to obtain the signature $s = \text{Sign}(S_A, m)$
+2. Send the message $m$ and the signature $s$ to Bob
+
+Then to verify the signature, Bob does the following:
+1. Obtain an authentic copy of Alice's public key $P_A$
+2. Verify the signature $s$ on the message $m$ using Alice's public key $P_A$ to obtain the result $r = \text{Verify}(P_A, m, s)$
+3. Accept the message $m$ if $r = \text{Accept}$, otherwise reject the message
+
+### Hybrid Schemes
+One disadvantage of public-key cryptography is that it is slow when compared to symmetric-key cryptography. Therefore, the most common approach is to use public key cryptography to obtain a secret key used for symmetric-key cryptography.
+
+### Repeated Square-and-Multiply
+Suppose that we want to compute $a^m \mod n$. We can write $m$ in binary form, $m = 2^{m_1} + 2^{m_2} + \cdots + 2^{m_{r-1}} + 2^{m_r}$. Then we can compute $a^{2^i} \mod n$ for $i = 0,1,\ldots,r$ and simply multiply them together to get $a^m \mod n$.
+
+As an example, consider $a^{137} \mod n$. We can write $137$ in binary: 
+$$
+137 = 2^7 + 2^3 + 2^0 
+$$
+and we can write
+$$
+a^{137} = a^{2^7} \cdot a^{2^3} \cdot a^{2^0}
+$$
+Then compute
+$$
+a, a^2 \mod n, a^{2^2} \mod n, a^{2^3} \mod n, \ldots, \quad a^{2^7} \mod n
+$$
+Finally, we can multiply:
+$$
+a \cdot a^8 \cdot a^{128} \mod n = a^{137} \mod n
+$$
+
+## RSA Public-Key Cryptography
+### Basic RSA Encryption Scheme
+#### Key Generation
+Each entity does the following to generate a public/private key pair:
+1. Randomly select two large distinct primes $p, q$ of the same bitlength
+2. Compute $n = pq$ and $\phi = (p-1)(q-1)$. $n$ is called the RSA modulus.
+3. Select an arbitrary integer $e$ with $1 < e < \phi$ and $\gcd(e, \phi) = 1$. $e$ is called the encryption exponent.
+4. Compute $d = e^{-1} \mod \phi$. $d$ is called the decryption exponent. This can be done using the Extended Euclidean Algorithm.
+5. The public key is $(n, e)$ and the private key is $d$.
+
+#### Encryption
+Suppose that $B$ wants to send a message $m$ to $A$.
+1. Obtain $A$'s public key $(n, e)$
+2. Compute the ciphertext $c = m^e \mod n$ using repeated square and multiply.
+3. Send $c$ to $A$
+
+#### Decryption
+$A$ decrypts the ciphertext $c$ as follows:
+1. Compute $m = c^d \mod n$
+
+#### Security of RSA Encryption
+If an adversary can factor $n$, she can compute the private key $d$ from the public key $(n,e)$. A basic notion of security is that it should be computationally infeasible to compute plaintext $m$ from ciphertext $c$. This is known as the RSA problem.
+
+#### Dictionary Attack
+If the plaintext $m$ is chosen from a relatively small set $M$ of messages, then the adversary can launch a dictionary attack. Given a target ciphertext $c$, the adversary can compute all $m \in M$ until $c$ is obtained. So, the adversary can simply create a dictionary of all $(m, c)$ pairs, and when she receives a new ciphertext $c'$, she can look up the dictionary to find the corresponding plaintext $m'$.
+
+A countermeasure is to append a randomly selected 128-bit string (called a salt) to $m$ prior to encryption
+$$
+m' = \text{salt} \| m
+$$
+So, $m$ is now encrypted to one of $2^{128}$ possible ciphertexts, so a dictionary attack is infeasible.
+
+#### Chosen-ciphertext Attack
+Suppose that the adversary has a ciphertext $c$. The adversary can obtain the plaintext $m$ as follows:
+1. Select arbitrary $x \in [2, n - 1]$ with $\gcd(x, n) = 1$. Note that $\gcd(x, n) \neq 1$ implies that the GCD is either $p, q$, or $n$ since $n$ is prime. It cannot be $n$ since $x < n - 1$. If it is $p$ or $q$, then the adversary is lucky and she can factor $n$. So let's assume $\gcd = 1$.
+2. Compute $\hat c = c x^e \mod n$, where $(n, e)$ is $A$'s public key.
+3. Obtain the decryption $\hat m$ from the oracle. So we get
+$$
+\hat m \equiv \hat c^d \equiv (c x^e)^d \equiv c^d x^{ed} \equiv c^d x \equiv m x \mod n
+$$
+That is, $\hat m = m x \mod n$.
+4. Compute $x^{-1} \mod n$ using the Extended Euclidean Algorithm. Multiply the equation above by $x^{-1}$ to obtain $m = \hat m x^{-1} \mod n$.
+
+A countermeasure to this attack is add some prescribed formatting to $m$ prior to encryption. So, after decrypting the ciphertext $c$, if the plaintext is not properly formatted, then $A$ rejects $c$ and does not return a plaintext. This way, the adversary cannot obtain the plaintext $\hat m$.
+
+### Basic RSA Signature Scheme
+#### Key Generation
+Key generation is exactly the same as the encryption scheme.
+1. Randomly select two large distinct primes $p, q$ of the same bitlength
+2. Compute $n = pq$ and $\phi = (p-1)(q-1)$. $n$ is called the RSA modulus.
+3. Select an arbitrary integer $e$ with $1 < e < \phi$ and $\gcd(e, \phi) = 1$. $e$ is called the encryption exponent.
+4. Compute $d = e^{-1} \mod \phi$. $d$ is called the decryption exponent. This can be done using the Extended Euclidean Algorithm.
+5. The public key is $(n, e)$ and the private key is $d$.
+
+#### Signature Generation
+Suppose that $A$ wants to sign a message $m$.
+1. Hash the message $m$ to obtain $M = H(m)$
+2. Compute $s = M^d \mod n$
+3. Send the signature $s$ to $B$
+
+This works because if we raise $s$ to the power of $e$, we get
+$$
+s^e \equiv M^{de} \equiv M \mod n
+$$
+since $ed = 1$.
+#### Signature Verification
+To verify a message $m$ with signature $s$, $B$ does the following:
+1. Obtain an authentic copy of $A$'s public key $(n, e)$
+2. Compute $M = H(m)$
+3. Compute $M' = s^e \mod n$
+4. Accept if $M' = M$, otherwise reject
+
+#### Requirements for Hash Function
+##### Preimage Resistance
+The hash function $H$ must be preimage resistant. If $H$ is not preimage resistant, then signatures can be forged as follows:
+1. Select $s \in_R [0, n - 1]$ and compute $M = s^e \mod n$
+2. Find the preimage of $M$ under $H$, so find $m$ such that $H(m) = M$
+3. Then $s$ is a valid signature for $m$.
+
+##### Second Preimage Resistance
+The hash function $H$ must be second preimage resistant. If $H$ is not second preimage resistant, then signatures can be forged as follows:
+1. Suppose that $(m, s)$ is a valid signed message
+2. Find an $m'$ with $m' \neq m$ such that $H(m') = H(m)$
+3. Then $(m', s)$ is a valid signed message.
+
+##### Collision Resistance
+The hash function $H$ must be collision resistant. If $H$ is not collision resistant, then signatures can be forged as follows:
+1. Select $m_1, m_2$ with $m_1 \neq m_2$ and $H(m_1) = H(m_2)$
+2. Induce $A$ to sign $m_1$ to obtain $s = H(m_1)^d \mod n$
+3. $s$ is also a valid signature for $m_2$.
+
+### PKCS #1 v1.5 RSA Signature Scheme
+#### Signature Generation
+The main idea is that we hash the message $m$ to obtain $h = H(m)$, then we format $h$ to obtain $M$ as follows:
+$$
+M = 00 \mathbin\| 01 \mathbin\| \text{FF} \ldots \text{FF} \mathbin\| 00 \mathbin\| \text{hash name} \mathbin\| h
+$$
+where $M$ has the same length as $n$.
+#### Signature Verification
+1. Obtain an authentic copy of $A$'s public key $(n, e)$
+2. Compute $M = s^e \mod n$, and write $M$ as a string of $k$ bytes, where $k$ is the bytelength of $n$
+3. Check the formatting of $M$ to ensure that it is of the form $00 \mathbin\| 01 \mathbin\| \text{FF} \ldots \text{FF} \mathbin\| 00 \mathbin\| \text{hash name} \mathbin\| h$
+4. Obtain the hash name and $h$.
+5. Compute $h' = H(m)$
+6. Accept if $h' = h$, otherwise reject
+
+#### Bleichenbacher's Attack
+The above signature scheme is vulnerable to Bleichenbacher's attack if the formatting check is not done properly. The main idea is that the adversary can forge a signature by sending a carefully crafted message to the verifier such that when the verifier applies the exponent $e$ to the signature $s$, the result will be a string that has proper formatting, and thus the verifier will accept the signature. Therefore, the adversary never needs to know the private key $d$ in order to forge a signature.
+
+## Elliptic Curve Cryptography
