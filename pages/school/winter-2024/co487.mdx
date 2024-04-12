@@ -1,5 +1,5 @@
 # CO487 - Applied Cryptography
-This page is a condensed version of the course notes for CO487. It is intended to be a quick reference for the course material in order to help me study for the final exam.
+This page is a condensed version of the course notes for CO487. It is intended to be a quick reference for the course material in order to help me study for the final exam. The full course notes can be found [here](/files/school/winter-2024/co487/CO487-Lecture-Notes.pdf).
 ## Definitions
 Here are some terms and concepts that we are expected to memorize
 - **Confidentiality**: Keeping data secret from all but those authorized to see it.
@@ -31,6 +31,16 @@ Here are some terms and concepts that we are expected to memorize
     $$
     where $a, b \in F$.
 - **Point multiplication**: Let $P \in E(\mathbb Z_p)$ and let $k \in \mathbb N$. Then $kP = \underbrace{P + P + \cdots + P}_{k \text{ times}}$. Also, $0P = \infty$, and $(-k)P = -(kP)$.
+
+## Algorithms Introduced
+- Symmetric-key encryption schemes: DES, Double-DES, AES
+- Hash functions: SHA-2 family
+- MACs: CBC-MAC, EMAC, HMAC
+- Authenticated Encryption: AES-GCM
+- Public-key encryption schemes: RSA
+- Key exchange: ECDH
+- Public-key signature schemes: RSA, PKCS #1 v1.5, ECDSA
+
 
 ## Symmetric-Key Encryption
 ### Basic Idea
@@ -518,3 +528,39 @@ There are two main key establishment schemes in the handshake protocol:
 2. **Elliptic Curve Diffie-Hellman (ECDH)**: The server selects a one time ECDH public key $X = xP$ and signs it with its RSA or ECDSA signature key. The client also selects a one time ECDH public key $Y = yP$. The session key $k$ is then $k = KDF(xyP)$.
 
 The main advantage of ECDH over RSA key transport is that it provides forward secrecy. If the server's RSA private key is compromised, then all past sessions are compromised. However, if the server's ECDH private key is compromised, then only the current session is compromised.
+
+#### Public Key Management in TLS
+Root CA public keys are pre-installed in browsers, and root CAs certify public keys of intermediate CAs. Then, web servers get their public keys certified by Intermediate CAs. Here is an example of TLS certificate chain. Suppose that Alice is a web browser, and Bob is CIBC's server. Upon visiting CIBC's website,
+1. Alice first gets CIBC's certificate which contains CIBC's name, RSA public key $(n_C, e_C)$, and DigiCert-S's (which is an intermediate CA) RSA signature $s_1$ on this data.
+2. Then, Alice gets DigiCert-S's certificate, which contains DigiCert-S's name, RSA public key $(n_S, e_S)$, and DigiCert-S-G's (which is a root CA) RSA signature $s_2$ on this data.
+3. Alice then gets DigiCert-S-G's certificate, which contains DigiCert-S-G's name, RSA public key $(n_G, e_G)$, and DigiCert-S-G's RSA signature $s_3$ on this data.
+4. Alice the verifies DigiCert-S-G's signature $s_3$ using the public key of DigiCert-S-G, and then verifies DigiCert-S's signature $s_2$ using the public key of DigiCert-S, and finally verifies CIBC's signature $s_1$ using the public key of CIBC.
+5. Bob sends a randomly selected point $Y = yP$ on the elliptic curve P-256, and a signature $s_4$ on $Y$.
+6. Alice verifies Bob's signature $s_4$ using Bob's public key, authenticating $Y$.
+7. Alice sends a randomly selected point $X = xP$ on the elliptic curve P-256, and computes the session key $k = KDF(xY)$.
+8. Bob computes the session key $k = KDF(yX)$.
+9. Alice and Bob can now communicate securely using the session key $k$ with AES-GCM.
+
+## Signal Protocol
+Signal is a messaging protocol used in many messaging apps.
+### Signal Objectives
+Participants include communicating parties Alice and Bob, and Whatsapp, and third party $E$. For our purpose, we can consider Whatsapp and $E$ as adversaries. The Signal protocol aims to provide the following:
+- Long-lived sessions: Alice and Bob establish a long-lived secure communications session. The session lasts until events such as app reinstall or device change.
+- Fresh session keys: Each message is encrypted/authenticated with a fresh session key. Encrypt-then-MAC is used, where the encryption function is AES-CBC, and the MAC function is HMAC, using 256-bit keys $k_1, h_1$ respectively.
+- Asynchronous setting: Alice can send Bob a secure message even if Bob is offline. Messages can be delayed, delivered out of order, or can be lost entirely without problem.
+- Immediate decryption: Bob can decrypt a ciphertext as soon as he receives it.
+- End-to-end encryption: Whatsapp and $E$ do not possess any of Alice's or Bob's secret keys, nor do they get access to any plaintext.
+- Forward secrecy: If a party's state is leaked (i.e. all secret keys are leaked), then none of the previous messages should be compromised (assuming they have been deleted from the state).
+- Post-compromise security: Parties recover from a state compromise, that is, after all secret keys are found, the parties can recover and establish a new secure session, and the adversary cannot decrypt any future messages.
+
+### Forward Secrecy and Post-compromise Security
+Suppose that Alice and Bob share a secret key $k$. They can ratchet (only going one way) $k$ and derive message encryption keys $mk_1,mk_2,\ldots$ as follows:
+
+![Key Ratchet](/images/school/winter-2024/co487/signal-protocol-key-ratchet.png)
+
+Keys are deleted as soon as they are no longer needed. For example, $k$ is deleted as soon as $k_1$ and $mk_1$ are computed. Also, $mk_1$ is deleted as soon as it is used to encrypt (or decrypt) a message. Suppose that $E$ learns $k_2$ and $mk_2$ (e.g. by gaining access to Alice's device). Then $E$ cannot compute previous keys $k_1$ and $mk_1$. 
+
+In the figure above, $DH_i = ECDH(X_i, Y_i)$, where $X_i$ is contributed by Alice and $Y_i$ is contributed by Bob. Therefore, even if $E$ learns $k_2$ and $mk_2$, $E$ cannot compute $k_3$ or $mk_3$ unless she also learns $x_3$ or $y_3$.
+
+### Signal Protocol Overview
+The main idea is that communicating parties establish an initial root key, and uses this initial root key to seed a root key chain. The root key chain is then used to seed the other two key chains, receiving and sending. Then for each message, Alice and Bob ratchets their key chains and uses the message keys to encrypt and authenticate the message.
