@@ -363,3 +363,120 @@ where $M$ has the same length as $n$.
 The above signature scheme is vulnerable to Bleichenbacher's attack if the formatting check is not done properly. The main idea is that the adversary can forge a signature by sending a carefully crafted message to the verifier such that when the verifier applies the exponent $e$ to the signature $s$, the result will be a string that has proper formatting, and thus the verifier will accept the signature. Therefore, the adversary never needs to know the private key $d$ in order to forge a signature.
 
 ## Elliptic Curve Cryptography
+An elliptic curve over $F$ is defined by an equation
+$$
+E/F: Y^2 = X^3 + aX + b
+$$
+And the set of $F$-rational points on $E$ is
+$$
+E(F) = \{(x, y) \in F \times F: y^2 = x^3 + ax + b\} \cup \{\infty\}
+$$
+where $\infty$ is a special point called the point at infinity.
+
+Now, all $x$ coordinates give at most two $y$ coordinates, so the number of points in $E(\mathbb Z_p)$ is at most $2p + 1$ (accounting for $\infty$). By Hasse's Theorem, we have
+$$
+\# E(\mathbb Z_p) \approx p
+$$
+### Point Addition
+Let $P, Q \in E(\mathbb R)$. Let $\ell$ denote the straight line through $P$ and $Q$. Let $T \in E(\mathbb R)$ be the third point of intersection of $\ell$ with the elliptic curve. Then $P + Q$ is the reflection of $T$ in the $x$-axis. Here are the four rules for point addition:
+1. $P + \infty = \infty + P = P$ for all $P \in E(\mathbb R)$
+2. If $P = (x, y) \in E(F)$, then $-P = (x, -y)$, also $-\infty = \infty$. Then their sum is
+$$
+P + (-P) = -P + P = \infty
+$$
+3. If $P = (x_1, y_1)$ and $Q = (x_2, y_2)$, and $P \neq \pm Q$. Then $P + Q = (x_3, y_3)$, where
+$$
+x_3 = \lambda^2 - x_1 - x_2, \quad y_3 = -y_1 + \lambda(x_1 - x_3), \quad \lambda = \frac{y_2 - y_1}{x_2 - x_2}
+$$
+4. Let $P = (x_1, y_1)$, and $P \neq -P$. Then $P + P = (x_3, y_3)$, where
+$$
+x_3 = \lambda^2 - 2x_1, \quad y_3 = -y_1 + \lambda(x_1 - x_3), \quad \lambda = \frac{3x_1^2 + a}{2y_1}
+$$
+### Point Multiplication
+Let $P \in E(\mathbb Z_p)$ and let $k \in \mathbb N$. Then
+$$
+kP = \underbrace{P + P + \cdots + P}_{k \text{ times}}
+$$
+Also, $0P = \infty$, and $(-k)P = -(kP)$.
+### Generator
+Suppose $n = \# E(\mathbb Z_p)$. Let $P \in E(\mathbb Z_p)$ that is not $\infty$. If $nP = \infty$, and the points $\infty, P, 2P,\ldots, (n-1)P$ are distinct, then $P$ is called a generator of $E(\mathbb Z_p)$.
+### Elliptic Curve Discrete Logarithm Problem (ECDLP)
+Let $P, Q \in E(\mathbb Z_p)$ be two points. Finding $\ell \in [0, n - 1]$ where $\ell$ is an integer such that $Q = \ell P$ is called the ECDLP. The integer $\ell$ is called the discrete logarithm of $Q$ to the base $P$, written $\ell = \log_P Q$.
+
+Here are some algorithms for solving the ECDLP:
+1. **Brute force**. Compute $P, 2P, 3P, \ldots$ until $Q$ is encountered. The running time of this attack is $O(n)$ point additions, or $O(p)$ point additions since $n \approx p$ by Hasse's theorem. Since the input size is $\log p$, meaning $p \approx 2^{\log p}$, we have $O(2^{\log p})$ point additions, which is fully-exponential.
+2. **Shanks' Algorithm**. This is a meet-in-the-middle attack. The main idea is that let $m = \lceil \sqrt n \rceil$, then by division algorithm, we have
+   $$
+   \ell = qm + r \implies \ell - qm = r
+   $$
+   Multiplying both sides by $P$ gives
+   $$
+   \ell P - qmP = rP
+   $$
+   We let $M = mP$, and since $Q = \ell P$, we can rewrite as
+   $$
+   Q - qM = rP
+   $$
+   Then we loop through $r = 0,1,\ldots,m-1$ and compute $rP$ and store it in a table. Then we loop through $q = 0,1,\ldots,m-1$ and compute $Q - qM$ and check if it is in the table. If it is, then we have found $\ell$.
+3. **Pollard's Algorithm**. Just remember the running time is $\approx \sqrt p$ point additions.
+   
+### Elliptic Curve Diffie-Hellman (ECDH)
+ECDH is a key exchange protocol. Suppose that Alice and Bob want to agree on a shared secret key $k$.
+1. Alice selects $x \in_R [1, n - 1]$ and computes $X = xP$, then sends $X$ to Bob.
+2. Bob selects $y \in_R [1, n - 1]$ and computes $Y = yP$, then sends $Y$ to Alice.
+3. Alice computes $K = yX$ and $k = KDF(K)$
+4. Bob computes $K = xY$ and $k = KDF(K)$
+
+$X, Y$ are now Alice and Bob's public keys, and $x, y$ are their private keys. The shared secret key $k$ is the same for both Alice and Bob since
+$$
+yX = y(xP) = x(yP) = xY
+$$
+However, this is susceptible to the MITM attack.
+
+![ECDH MITM Attack](/images/school/winter-2024/co487/ECDH-MITM.png)
+
+The solution is to use authenticated ECDH. Alice and Bob authenticate each other's public keys using ECDSA.
+### Elliptic Curve Digital Signature Algorithm (ECDSA)
+We have the following domain parameters
+- Elliptic curve $E$, defined over $\mathbb Z_p$ with $n = \# E(\mathbb Z_p)$ prime
+- A generator $P \in E(\mathbb Z_p)$
+- A collision resistant hash function $H$ whose output has the same bitlength as $n$.
+
+#### Key Generation
+1. Select $a \in_R [1, n - 1]$ and compute $A = aP$
+2. Alice's private key is $a$ and the public key is $A$
+
+#### Signature Generation
+Suppose that Alice wants to sign a message $M$.
+1. Compute $m = H(M)$ and interpret $m$ as an integer
+2. Select a per-message secret key $k \in_R [1, n - 1]$
+3. Compute $R = kP$. Let $r = x(R)$ be the x-coordinate of $R$ modulo $n$. Check that $r \neq 0$
+4. Compute $s = k^{-1}(m + ar) \mod n$ and check that $s \neq 0$
+5. Alice's signature on $M$ is $(r, s)$
+
+Note that a fresh $k$ should be used for each signature.
+
+#### Signature Verification
+Suppose that Bob receives a message $M$ with signature $(r, s)$.
+1. Obtain an authentic copy of Alice's public key $A$
+2. Check that $r, s$ are integers in $[1, n - 1]$
+3. Compute $m = H(M)$
+4. Compute $u_1 = ms^{-1} \mod n$ and $u_2 = rs^{-1} \mod n$
+5. Compute $V = u_1 P + u_2 A$ and verify that $V \neq \infty$
+6. Compute $v = x(V) \mod n$
+7. Accept the signature if $v = r$, otherwise reject
+
+Let's see why this works. Given $M, (r, s)$ and $A$, we need to verify that $s = k^{-1} (m + ar) \mod n$. We have
+$$
+\begin{align*}
+   s &= k^{-1} (m + ar) \mod n \tag*{$\iff$} \\
+   k &\equiv s^{-1} (m + ar) \pmod n \tag*{$\iff$} \\
+   k \equiv \underbrace{s^{-1}m}_{u_1} + \underbrace{(s^{-1}r)}_{u_2} a \pmod n \tag*{$\iff$} \\
+   kP &= u_1 P + u_2 a P \tag*{$\iff$} \\
+   R &= u_1 P + u_2 aP \tag*{$\iff$} \\
+   R &= u_1 P + u_2 A
+\end{align*}
+$$
+Now, $u_1 = s^{-1}m$ is known, and $u_2 = s^{-1}r$ is known. So $R = u_1 P + u_2 A$ is known and can be computed. Then we compute $v = x(R) \mod n$ and check if $v = r$.
+
+## Bluetooth Security
