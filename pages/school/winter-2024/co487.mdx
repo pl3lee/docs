@@ -480,3 +480,41 @@ $$
 Now, $u_1 = s^{-1}m$ is known, and $u_2 = s^{-1}r$ is known. So $R = u_1 P + u_2 A$ is known and can be computed. Then we compute $v = x(R) \mod n$ and check if $v = r$.
 
 ## Bluetooth Security
+When two bluetooth devices pair, there are 5 phases
+1. **Public Key Exchange**: Establish an (unauthenticated) shared secret
+2. **Authentication stage 1**: Provide some protection against active MITM attacks
+3. **Authentication stage 2**: Confirm that both devices have successfully completed the exchange and confirm the Bluetooth addresses
+4. **Link Key calculation**: Compute the long term link key
+5. **Authentication and Encryption**: Check that the communicating devices hold the same link key (and thus are paired) and then derive a shared secret encryption key $K_E$, which is used to encrypt and authenticate data for that session.
+
+The details of each phase are not that important, and do not need to be memorized.
+
+## Key Management
+One techniques for distributing public keys over the internet is by offline certification authorities (CAs).
+### Certificate Authority (CA)
+A CA issues certificates that bind an entity's identity $A$ to its public key. $A$'s certificate $\text{Cert}_A$ consists of
+- Data part $D_A$: contains $A$'s identity, her public key, and other information such as validity period.
+- Signature part $S_{CA}$: The CA's signature on $D_A$.
+
+Then another party $B$ obtains an authentic copy of $A$'s public key as follows:
+1. Obtain an authentic copy of CA's public key
+2. Obtain $\text{Cert}_A$ from the CA 
+3. Verify the CA's signature $S_{CA}$ on $D_A$ using the CA's public key
+
+### Transport Layer Security (TLS)
+The main components of TLS are
+1. Handshake protocol: Allows the server to authenticate itself to the client, and then negotiate cryptographic keys.
+2. Record protocol: Used to encrypt and authenticate transmitted data for the remainder of the session.
+
+#### Handshake Protocol
+There are four phases in the handshake protocol:
+1. **Establish Security capabilities**: This negotiates protocol version, cryptographic algorithms, security levels, etc.
+2. **Server authentication and key exchange**: The server sends its certificate, and key exchange parameters
+3. **Client authentication and key exchange**: Client sends its certificate and key exchange parameters
+4. **Finish**: Both parties send a finished message to confirm that the handshake is complete.
+
+There are two main key establishment schemes in the handshake protocol:
+1. **RSA key transport**: The shared secret key $k$ is selected by the client and encrypted with the server's RSA public key.
+2. **Elliptic Curve Diffie-Hellman (ECDH)**: The server selects a one time ECDH public key $X = xP$ and signs it with its RSA or ECDSA signature key. The client also selects a one time ECDH public key $Y = yP$. The session key $k$ is then $k = KDF(xyP)$.
+
+The main advantage of ECDH over RSA key transport is that it provides forward secrecy. If the server's RSA private key is compromised, then all past sessions are compromised. However, if the server's ECDH private key is compromised, then only the current session is compromised.
