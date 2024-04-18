@@ -180,7 +180,7 @@ CBC-MAC is secure if only fixed-length messages are allowed. If variable-length 
 4. Output the forgery $(x, t_2)$
 
 #### EMAC
-One countermeasure to the attack above is to use EMAC, which stands for Encrypted CBC-MAC, where the CMC-MAC tag is encrypted using a second key $s$, so
+One countermeasure to the attack above is to use EMAC, which stands for Encrypted CBC-MAC, where the CBC-MAC tag is encrypted using a second key $s$, so
 $$
 \text{EMAC}_{k, s}(x) = E_s(\text{CBC-MAC}_k(x))
 $$
@@ -304,6 +304,7 @@ $$
 \hat m \equiv \hat c^d \equiv (c x^e)^d \equiv c^d x^{ed} \equiv c^d x \equiv m x \mod n
 $$
 That is, $\hat m = m x \mod n$.
+
 4. Compute $x^{-1} \mod n$ using the Extended Euclidean Algorithm. Multiply the equation above by $x^{-1}$ to obtain $m = \hat m x^{-1} \mod n$.
 
 A countermeasure to this attack is add some prescribed formatting to $m$ prior to encryption. So, after decrypting the ciphertext $c$, if the plaintext is not properly formatted, then $A$ rejects $c$ and does not return a plaintext. This way, the adversary cannot obtain the plaintext $\hat m$.
