@@ -1,5 +1,7 @@
-{
+{   
     "server-config": "Server Configuration",
+    "ubuntu-setup": "Ubuntu Setup",
+    "jumphost": "Setup Jumphost",
     "immich": "Immich",
     "nfs": "NFS Shares"
 }
