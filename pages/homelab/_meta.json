@@ -1,4 +1,5 @@
 {
+    "server-config": "Server Configuration",
     "immich": "Immich",
     "nfs": "NFS Shares"
 }
