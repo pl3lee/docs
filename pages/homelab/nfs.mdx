@@ -1,0 +1,46 @@
+import { Steps, Callout } from 'nextra/components'
+
+
+# NFS Shares
+<Steps>
+
+### Step 1
+Enable NFS Shares in settings, and click on the share that you want to enable NFS for.
+
+### Step 2
+Set `Export` to `Yes`.
+
+Set `Security` to `Private`.
+
+### Step 3 (Optional - if you want to allow access to certain IPs)
+Set `Rule` to allow full access to certain trusted IPs, for example if you want to access the NFS share from the machine `10.10.1.6` and `10.10.1.7`, set the rule to `10.10.1.6(sec=sys,rw) 10.10.1.7(sec=sys,rw)`
+
+### Step 4 (Linux)
+On Linux, install NFS with `sudo apt update && sudo apt install nfs-common`.
+
+Create a directory to mount the NFS share to, for example `mkdir /home/user/NFS/share1`.
+
+Use nano to edit `/etc/fstab` with `sudo nano /etc/fstab`, and add the following line to the end of the file:
+
+```
+{IP of NFS server}:{path to NFS share}  {path to local directory}   nfs defaults    0   0
+```
+
+<Callout type="info" emoji="ℹ️">
+  Notice that all the spaces are a single tab.
+</Callout>
+
+Then you can mount the NFS share with `sudo mount {path to local directory}`.
+
+### Step 4 (MacOS)
+Enter `showmount -e {IP of NFS server}` to see the available NFS shares.
+
+Create a directory to mount the NFS share to, for example `mkdir /Users/user/NFS/share1`.
+
+Enter the following command to mount the NFS share:
+
+```
+sudo mount -o resvport {IP of NFS server}:/mnt/user/unraidshare /users/yourname/yourfolderyoumade
+```
+
+</Steps>
