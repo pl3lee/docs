@@ -1,0 +1,210 @@
+import { Steps, Callout } from 'nextra/components'
+
+# Nest.js
+Notes taken from [this](https://youtu.be/pcX97ZrTE6M?si=p0Tw3TtoHyaHKZL0) video.
+
+## Setup
+Let's first install the Nest CLI:
+```bash copy
+npm install -g @nestjs/cli@latest
+```
+Then we can create a new project in a subdirectory:
+```bash copy
+nest new project-name
+```
+or in the current directory:
+```bash copy
+nest new .
+```
+It generates a new project with a bunch of files and directories. To start the dev server, we can run:
+```bash copy
+npm run start:dev
+```
+The `main.ts` file in the `src` directory is the entry point of the application, we will change the port to 3001.
+```typescript filename="src/main.ts" showLineNumber copy 
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3001);
+}
+bootstrap();
+```
+Let's try sending a GET request to our server. In Postman, send a GET request to `http://localhost:3001/` and we should get a response with a message `Hello World!`.
+
+We can look at the files `main.ts`, `app.module.ts`, `app.controller.ts`, and `app.service.ts` to understand how the application is structured. We can see that when we make a request to the server, it goes to the controller, which then calls the service to get the data. For example, controllers defines the routes by using decorators and methods like `@Get()`, `@Post()`, etc. Then, those methods call the service to get the data or business logic.
+
+## Modules
+Modules are a way to organize the code in a more structured way. The `App` module that we have is the root module of the application. We can group business logic into different modules. For example, we can have a `Users` that manages the users and a `Products` module that manages the products. Each module can depend on other modules. We can generate new modules using the CLI:
+```bash copy
+nest generate module ninjas
+```
+Then let's also generate a controller and a service for the `ninjas` module:
+```bash copy
+nest generate controller ninjas
+nest generate service ninjas
+```
+Alternatively, we can generate all of them at once:
+```bash copy
+nest generate resource users
+```
+However, this generates a lot more boilerplate that we might not need.
+
+## Controllers
+Let's create a ninjas API that lets us manage an army of ninjas. Let's first define some endpoints. 
+- **GET** `/ninjas` to get all ninjas
+- **GET** `/ninjas/:id` to get a single ninja
+- **POST** `/ninjas` to create a new ninja
+- **PUT** `/ninjas/:id` to update a ninja
+- **DELETE** `/ninjas/:id` to delete a ninja
+
+So at a high level, a controller basically defines these. Thus, for our `ninjas` controller, everything in our path is going to have `/ninjas` in front of it. We can define the routes using decorators like `@Get()`, `@Post()`, etc. We can also define the path of the route by passing it as an argument to the decorator. For example, to define a GET route with id, we can do `@Get(':id')`. So we have the following code in our `ninjas.controller.ts`:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy
+import { Controller, Delete, Get, Post, Put } from '@nestjs/common';
+
+@Controller('ninjas')
+export class NinjasController {
+  // GET /ninjas - returns all ninjas
+  @Get()
+  getNinjas() {
+    return [];
+  }
+  // GET /ninjas/:id - returns a single ninja
+  @Get(':id')
+  getOneNinja() {
+    return {};
+  }
+  // POST /ninjas - creates a new ninja
+  @Post()
+  createNinja() {
+    return {};
+  }
+  // PUT /ninjas/:id - updates a ninja
+  @Put(':id')
+  updateNinja() {
+    return {};
+  }
+  // DELETE /ninjas/:id - deletes a ninja
+  @Delete(':id')
+  deleteNinja() {
+    return {};
+  }
+}
+```
+Now, in our GET endpoint with id, how do we parse out the id from the URL? We can do that by using the `@Param()` decorator. We can pass the name of the parameter to the decorator. For example, to get the id from the URL, we can do `@Param('id') id: string)`. So we can update our methods as follows:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {1,12,24,31}
+import { Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+
+@Controller('ninjas')
+export class NinjasController {
+  // GET /ninjas - returns all ninjas
+  @Get()
+  getNinjas() {
+    return [];
+  }
+  // GET /ninjas/:id - returns a single ninja
+  @Get(':id')
+  getOneNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+  // POST /ninjas - creates a new ninja
+  @Post()
+  createNinja() {
+    return {};
+  }
+  // PUT /ninjas/:id - updates a ninja
+  @Put(':id')
+  updateNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+  // DELETE /ninjas/:id - deletes a ninja
+  @Delete(':id')
+  deleteNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+}
+```
+We can also add query parameters for filters. Let's add a type filter to our GET endpoint that returns all ninjas. Similarly, we use a `@Query()` decorator to get the query parameters. For example, to get the type filter, we can do `@Query('type') type: string`. So we can update our method as follows:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy
+// ...
+@Get()
+getNinjas(@Query('type') type: string) {
+    return [{ type }];
+}
+// ...
+```
+This is the same pattern for the request body. We can use the `@Body()` decorator to get the request body. But first, let's define some DTOs (Data Transfer Objects) to validate the request body. This is basically a class that defines the shape of the data that we expect. Let's define DTOs for `createNinja` and `updateNinja` methods. We can create a new directory inside the `ninjas` directory called `dto` and create two files `create-ninja.dto.ts` and `update-ninja.dto.ts`:
+```typescript filename="src/ninjas/dto/create-ninja.dto.ts" showLineNumbers copy
+export class CreateNinjaDto {
+  name: string;
+}
+```
+```typescript filename="src/ninjas/dto/update-ninja.dto.ts" showLineNumbers copy
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateNinjaDto } from './create-ninja.dto';
+
+export class UpdateNinjaDto extends PartialType(CreateNinjaDto) {}
+```
+Now we can update our POST and PUT methods:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {29-42}
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { CreateNinjaDto } from './dto/create-ninja.dto';
+import { UpdateNinjaDto } from './dto/update-ninja.dto';
+
+@Controller('ninjas')
+export class NinjasController {
+  // GET /ninjas?type=... - returns all ninjas
+  @Get()
+  getNinjas(@Query('type') type: string) {
+    return [{ type }];
+  }
+  // GET /ninjas/:id - returns a single ninja
+  @Get(':id')
+  getOneNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+  // POST /ninjas - creates a new ninja
+  @Post()
+  createNinja(@Body() createNinjaDto: CreateNinjaDto) {
+    return {
+      name: createNinjaDto.name,
+    };
+  }
+  // PUT /ninjas/:id - updates a ninja
+  @Put(':id')
+  updateNinja(@Param('id') id: string, @Body() updateNinjaDto: UpdateNinjaDto) {
+    return {
+      id,
+      name: updateNinjaDto.name,
+    };
+  }
+  // DELETE /ninjas/:id - deletes a ninja
+  @Delete(':id')
+  deleteNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+}
+```
+<Callout type="info" emoji="ℹ️">
+  The primary responsibility of a controller is to just define the routes. It is in charge of parsing the request and ultimately forwarding them to services or providers, which are responsible for the business logic. So, do not put any logic in the controller.
+</Callout>
