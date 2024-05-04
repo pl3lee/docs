@@ -131,12 +131,12 @@ export class NinjasController {
   }
 }
 ```
-We can also add query parameters for filters. Let's add a type filter to our GET endpoint that returns all ninjas. Similarly, we use a `@Query()` decorator to get the query parameters. For example, to get the type filter, we can do `@Query('type') type: string`. So we can update our method as follows:
+We can also add query parameters for filters. Let's add a weapon filter to our GET endpoint that returns all ninjas. Similarly, we use a `@Query()` decorator to get the query parameters. For example, to get the weapon filter, we can do `@Query('weapon') weapon: string`. So we can update our method as follows:
 ```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy
 // ...
 @Get()
-getNinjas(@Query('type') type: string) {
-    return [{ type }];
+getNinjas(@Query('weapon') weapon: string) {
+    return [{ weapon }];
 }
 // ...
 ```
@@ -208,3 +208,310 @@ export class NinjasController {
 <Callout type="info" emoji="ℹ️">
   The primary responsibility of a controller is to just define the routes. It is in charge of parsing the request and ultimately forwarding them to services or providers, which are responsible for the business logic. So, do not put any logic in the controller.
 </Callout>
+
+## Providers
+Providers are services, they are a class that has a decorator `@Injectable()`. This means that we can inject this service into other classes that depend on it. Let's create a simple array for our ninjas in the `ninjas.service.ts`, and we also have a method that returns all ninjas, optionally filtered by weapon:
+```typescript filename="src/ninjas/ninjas.service.ts" showLineNumbers copy
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class NinjasService {
+  private ninjas = [
+    { id: 0, name: 'ninjaA', weapon: 'stars' },
+    { id: 1, name: 'ninjaB', weapon: 'nunchucks' },
+  ];
+
+  getNinjas(weapon?: 'stars' | 'nunchucks') {
+    if (weapon) {
+      return this.ninjas.filter((ninja) => ninja.weapon === weapon);
+    }
+    return this.ninjas;
+  }
+}
+```
+Then, how do we use this service in our controller? Turns out we can provide a constructor in our controller and inject the service into it.
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {13, 17-24}
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { CreateNinjaDto } from './dto/create-ninja.dto';
+import { UpdateNinjaDto } from './dto/update-ninja.dto';
+import { NinjasService } from './ninjas.service';
+
+@Controller('ninjas')
+export class NinjasController {
+  // since our service is an injectable, we are telling nest to automatically inject and instantiate the service into the controller
+  constructor(private readonly ninjaServices: NinjasService) {}
+
+  // GET /ninjas?weapon=... - returns all ninjas
+  @Get()
+  getNinjas(@Query('weapon') weapon: 'stars' | 'nunchucks') {
+    return this.ninjaServices.getNinjas(weapon);
+  }
+  // GET /ninjas/:id - returns a single ninja
+  @Get(':id')
+  getOneNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+  // POST /ninjas - creates a new ninja
+  @Post()
+  createNinja(@Body() createNinjaDto: CreateNinjaDto) {
+    return {
+      name: createNinjaDto.name,
+    };
+  }
+  // PUT /ninjas/:id - updates a ninja
+  @Put(':id')
+  updateNinja(@Param('id') id: string, @Body() updateNinjaDto: UpdateNinjaDto) {
+    return {
+      id,
+      name: updateNinjaDto.name,
+    };
+  }
+  // DELETE /ninjas/:id - deletes a ninja
+  @Delete(':id')
+  deleteNinja(@Param('id') id: string) {
+    return {
+      id,
+    };
+  }
+}
+```
+Now let's complete the rest of the methods in the service. 
+```typescript filename="src/ninjas/dto/create-ninja.dto.ts" showLineNumbers copy {3}
+export class CreateNinjaDto {
+  name: string;
+  weapon: 'stars' | 'nunchucks';
+}
+```
+```typescript filename="src/ninjas/ninja.service.ts" showLineNumbers copy {19-55}
+import { Injectable } from '@nestjs/common';
+import { CreateNinjaDto } from './dto/create-ninja.dto';
+import { UpdateNinjaDto } from './dto/update-ninja.dto';
+
+@Injectable()
+export class NinjasService {
+  private ninjas = [
+    { id: 0, name: 'ninjaA', weapon: 'stars' },
+    { id: 1, name: 'ninjaB', weapon: 'nunchucks' },
+  ];
+
+  getNinjas(weapon?: 'stars' | 'nunchucks') {
+    if (weapon) {
+      return this.ninjas.filter((ninja) => ninja.weapon === weapon);
+    }
+    return this.ninjas;
+  }
+
+  getNinja(id: number) {
+    const ninja = this.ninjas.find((ninja) => ninja.id === id);
+
+    if (!ninja) {
+      throw new Error('Ninja not found');
+    }
+
+    return ninja;
+  }
+
+  createNinja(createNinjaDto: CreateNinjaDto) {
+    const newNinja = {
+      ...createNinjaDto,
+      id: Date.now(),
+    };
+    this.ninjas.push(newNinja);
+
+    return newNinja;
+  }
+
+  updateNinja(id: number, updateNinjaDto: UpdateNinjaDto) {
+    this.ninjas = this.ninjas.map((ninja) => {
+      if (ninja.id === id) {
+        return {
+          ...ninja,
+          ...updateNinjaDto,
+        };
+      }
+      return ninja;
+    });
+    return this.getNinja(id);
+  }
+
+  removeNinja(id: number) {
+    const toBeRemoved = this.getNinja(id);
+    this.ninjas = this.ninjas.filter((ninja) => ninja.id !== id);
+    return toBeRemoved;
+  }
+}
+```
+
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {23,28,33,38,43}
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { CreateNinjaDto } from './dto/create-ninja.dto';
+import { UpdateNinjaDto } from './dto/update-ninja.dto';
+import { NinjasService } from './ninjas.service';
+
+@Controller('ninjas')
+export class NinjasController {
+  // since our service is an injectable, we are telling nest to automatically inject and instantiate the service into the controller
+  constructor(private readonly ninjaServices: NinjasService) {}
+
+  // GET /ninjas?weapon=... - returns all ninjas
+  @Get()
+  getNinjas(@Query('weapon') weapon: 'stars' | 'nunchucks') {
+    return this.ninjaServices.getNinjas(weapon);
+  }
+  // GET /ninjas/:id - returns a single ninja
+  @Get(':id')
+  getOneNinja(@Param('id') id: string) {
+    return this.ninjaServices.getNinja(+id);
+  }
+  // POST /ninjas - creates a new ninja
+  @Post()
+  createNinja(@Body() createNinjaDto: CreateNinjaDto) {
+    return this.ninjaServices.createNinja(createNinjaDto);
+  }
+  // PUT /ninjas/:id - updates a ninja
+  @Put(':id')
+  updateNinja(@Param('id') id: string, @Body() updateNinjaDto: UpdateNinjaDto) {
+    return this.ninjaServices.updateNinja(+id, updateNinjaDto);
+  }
+  // DELETE /ninjas/:id - deletes a ninja
+  @Delete(':id')
+  deleteNinja(@Param('id') id: string) {
+    return this.ninjaServices.removeNinja(+id);
+  }
+}
+```
+## Exception Handling
+Recall that we are throwing an error when a ninja is not found in the `getNinja` method. We can handle this error in our controller by using a try catch block, then throw a `NotFoundException` (a 404 error) from the `@nestjs/common` package. There are also other built-in HTTP exceptions found [here](https://docs.nestjs.com/exception-filters#built-in-http-exceptions). Thus in our `getOneNinja` method, we can do:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy
+// ...
+// GET /ninjas/:id - returns a single ninja
+@Get(':id')
+getOneNinja(@Param('id') id: string) {
+  try {
+    return this.ninjaServices.getNinja(+id);
+  } catch (error) {
+    throw new NotFoundException();
+  }
+}
+// ...
+```
+## Pipes
+Pipes have two typical use cases:
+- **Transformation**: transform input data to the desired form (e.g. from string to integer).
+- **Validation**: evaluate input data and if valid, simply pass it through unchanged; otherwise throw an exception.
+
+In our code, notice that we are constantly transforming the `id` parameter from a string to a number. We can create a pipe to handle this transformation. So we can change our methods in our controller:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {29, 31, 44, 47, 51-52}
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { CreateNinjaDto } from './dto/create-ninja.dto';
+import { UpdateNinjaDto } from './dto/update-ninja.dto';
+import { NinjasService } from './ninjas.service';
+
+@Controller('ninjas')
+export class NinjasController {
+  // since our service is an injectable, we are telling nest to automatically inject and instantiate the service into the controller
+  constructor(private readonly ninjaServices: NinjasService) {}
+
+  // GET /ninjas?weapon=... - returns all ninjas
+  @Get()
+  getNinjas(@Query('weapon') weapon: 'stars' | 'nunchucks') {
+    return this.ninjaServices.getNinjas(weapon);
+  }
+  // GET /ninjas/:id - returns a single ninja
+  @Get(':id')
+  getOneNinja(@Param('id', ParseIntPipe) id: number) {
+    try {
+      return this.ninjaServices.getNinja(id);
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
+  // POST /ninjas - creates a new ninja
+  @Post()
+  createNinja(@Body() createNinjaDto: CreateNinjaDto) {
+    return this.ninjaServices.createNinja(createNinjaDto);
+  }
+  // PUT /ninjas/:id - updates a ninja
+  @Put(':id')
+  updateNinja(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateNinjaDto: UpdateNinjaDto,
+  ) {
+    return this.ninjaServices.updateNinja(id, updateNinjaDto);
+  }
+  // DELETE /ninjas/:id - deletes a ninja
+  @Delete(':id')
+  deleteNinja(@Param('id', ParseIntPipe) id: number) {
+    return this.ninjaServices.removeNinja(id);
+  }
+}
+```
+Pipes can also be used for validation. For example, when we create a ninja, it can only have weapons of type `stars` or `nunchucks`. We can create a custom pipe to validate this. Let's first install some required packages:
+```bash copy
+npm install --save class-validator class-transformer
+```
+Then in `create-ninja.dto.ts`, we can add some validation decorators:
+```typescript filename="src/ninjas/dto/create-ninja.dto.ts" showLineNumbers copy {1,4, 7-9}
+import { IsEnum, MinLength } from 'class-validator';
+
+export class CreateNinjaDto {
+  @MinLength(3)
+  name: string;
+
+  @IsEnum(['stars', 'nunchucks'], {
+    message: 'weapon must be either stars or nunchucks',
+  })
+  weapon: 'stars' | 'nunchucks';
+}
+
+```
+And in `createNinja` method in the controller, we can add a `ValidationPipe`:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {4}
+// ...
+// POST /ninjas - creates a new ninja
+@Post()
+createNinja(@Body(new ValidationPipe()) createNinjaDto: CreateNinjaDto) {
+  return this.ninjaServices.createNinja(createNinjaDto);
+}
+// ...
+```
+And when we send a POST request with a name less than 3 characters, or with a weapon that is not nunchucks or stars, we will get a 400 error with a message `name must be longer than or equal to 3 characters` or `weapon must be either stars or nunchucks` respectively.
+
+## Guards
+Guards are used to protect routes. They can be used for authentication, authorization, etc. In our example, suppose that only users with black belts are allowed to create a ninja. We can create a guard to check if the user has a black belt. Let's first create a guard:
+```bash copy
+nest generate guard belt
+```
+THen, in the generated `belt.guard.ts`, we can see that it implements the `CanActivate` interface, which has a `canActivate` method that returns a boolean. Then, we can 
+
