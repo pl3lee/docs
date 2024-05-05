@@ -513,5 +513,51 @@ Guards are used to protect routes. They can be used for authentication, authoriz
 ```bash copy
 nest generate guard belt
 ```
-THen, in the generated `belt.guard.ts`, we can see that it implements the `CanActivate` interface, which has a `canActivate` method that returns a boolean. Then, we can 
+THen, in the generated `belt.guard.ts`, we can see that it implements the `CanActivate` interface, which has a `canActivate` method that returns a boolean. Then, we can attach a guard either to an entire controller or individual methods in that controller. To attach a guard to a whole controller, we can do
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {3}
+// ...
+@Controller('ninjas')
+@UseGuards(BeltGuard)
+export class NinjasController {
+  // ...
+}
+```
+Or we could move this to individual routes. Let's apply this to the `createNinja` method:
+```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {4}
+// ...
+// POST /ninjas - creates a new ninja
+@Post()
+@UseGuards(BeltGuard)
+createNinja(@Body(new ValidationPipe()) createNinjaDto: CreateNinjaDto) {
+  return this.ninjaServices.createNinja(createNinjaDto);
+}
+// ...
+```
+Then in the guard itself, we will parse the request from the context and check if the user has a black belt. 
+```typescript filename="src/ninjas/belt.guard.ts" showLineNumbers copy
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Observable } from 'rxjs';
+
+@Injectable()
+export class BeltGuard implements CanActivate {
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    // parse the request object from the context
+    const request = context.switchToHttp().getRequest();
+
+    // validate request
+    // const hasBlackBelt = request.headers['x-black-belt'] === 'true';
+
+    // return hasBlackBelt;
+    return true;
+  }
+}
+```
+<Callout type="info" emoji="ℹ️">
+  This is just pseudocode, as we have not actually implemented this. 
+</Callout>
+This is useful for authentication, authorization, etc, by checking the cookies on the request object.
+
+
 
