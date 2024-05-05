@@ -515,7 +515,7 @@ Guards are used to protect routes. They can be used for authentication, authoriz
 ```bash copy
 nest generate guard belt
 ```
-THen, in the generated `belt.guard.ts`, we can see that it implements the `CanActivate` interface, which has a `canActivate` method that returns a boolean. Then, we can attach a guard either to an entire controller or individual methods in that controller. To attach a guard to a whole controller, we can do
+Then, in the generated `belt.guard.ts`, we can see that it implements the `CanActivate` interface, which has a `canActivate` method that returns a boolean. Then, we can attach a guard either to an entire controller or individual methods in that controller. To attach a guard to a whole controller, we can do
 ```typescript filename="src/ninjas/ninjas.controller.ts" showLineNumbers copy {3}
 // ...
 @Controller('ninjas')
