@@ -1,0 +1,37 @@
+$box-general-border-radius: 1rem;
+$box-general-padding: 1rem;
+
+// Adjusted color definitions for various boxes with lighter shades
+// Muted and less vibrant color definitions for various boxes
+$definition-base: lighten(desaturate(#7fbbfa, 30%), 10%); // A muted blue
+$definition-dark: darken($definition-base, 10%);
+$definition-light: lighten($definition-base, 10%);
+
+$theorem-base: lighten(desaturate(#28a745, 30%), 10%); // A muted green
+$theorem-dark: darken($theorem-base, 10%);
+$theorem-light: lighten($theorem-base, 10%);
+
+$remark-base: lighten(desaturate(#ffc107, 30%), 10%); // A muted amber
+$remark-dark: darken($remark-base, 10%);
+$remark-light: lighten($remark-base, 10%);
+
+$proposition-base: lighten(desaturate(#17a2b8, 30%), 10%); // A muted blue-green
+$proposition-dark: darken($proposition-base, 10%);
+$proposition-light: lighten($proposition-base, 10%);
+
+$problem-base: lighten(desaturate(#dc3545, 30%), 10%); // A muted red
+$problem-dark: darken($problem-base, 10%);
+$problem-light: lighten($problem-base, 10%);
+
+$corollary-base: lighten(desaturate(#fd7e14, 30%), 10%); // A muted orange
+$corollary-dark: darken($corollary-base, 10%);
+$corollary-light: lighten($corollary-base, 10%);
+
+$example-base: lighten(desaturate(#6f42c1, 30%), 10%); // A muted violet
+$example-dark: darken($example-base, 10%);
+$example-light: lighten($example-base, 10%);
+
+$lemma-base: lighten(desaturate(#20c997, 30%), 10%); // A muted teal
+$lemma-dark: darken($lemma-base, 10%);
+$lemma-light: lighten($lemma-base, 10%);
+

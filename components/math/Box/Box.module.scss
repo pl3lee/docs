@@ -1,0 +1,40 @@
+@import "/components/variables";
+
+
+
+.root {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0px;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    box-sizing: border-box;
+    -webkit-backface-visibility: hidden;
+    color: black;
+    * {
+        box-sizing: border-box;
+    }
+}
+
+ // dark mode
+:is(html[class~="dark"] .root) {
+    color: black;
+}
+
+.root > div {
+    padding: $box-general-padding;
+    margin: 0px;
+}
+
+.root > :first-child {
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: $box-general-border-radius $box-general-border-radius 0px 0px;
+}
+
+.root > :last-child {
+    font-size: 1rem;
+    border-radius: 0px 0px $box-general-border-radius $box-general-border-radius;
+}
