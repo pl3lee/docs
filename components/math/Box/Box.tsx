@@ -1,8 +1,8 @@
 import styles from './Box.module.scss'
 
-export function Box({ children }: { children: React.ReactNode }) {
+export function Box({ id, children }: { id?: string, children: React.ReactNode }) {
     return (
-        <div className={styles.root}>
+        <div className={styles.root} id={id ?? id}>
             {children}
         </div>
     )

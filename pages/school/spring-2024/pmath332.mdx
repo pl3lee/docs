@@ -1,22 +1,78 @@
-import { Definition } from "../../../components/math/Definition/Definition";
+import { Definition, Corollary, Example, Problem, Proposition, Theorem, Lemma } from "/components/math";
+import { Steps, Callout } from 'nextra/components'
+
+$\gdef\Im{\text{Im}}$
 
 # PMATH 332: Applied Complex Analysis
 This is mainly a calculus course, which will extend the concepts of calculus to complex numbers.
 
 ## Lecture 1 (May 6, 2024)
-<Definition name="Example definition blah balhs dlfjha sdfj slkjd flksjd flkjs da sdf asdf asdf asdf asdf awsd f">
-This is some example definition. Display mode works:
+### Fundamentals
+First consider $\sqrt{-1} \sqrt{-1}$. We can interpret it in 2 ways:
+1. $\sqrt{-1} \sqrt{-1} = \sqrt{(-1)(-1)} = \sqrt{1} = 1$
+2. $\sqrt{-1} \sqrt{-1} = (\sqrt{-1})^2 = -1$
+
+The problem is the notation. So we need to define complex numbers without using the $\sqrt{\cdot}$ symbol. 
+<Definition name="Imaginary Unit" id="defn-imaginary-unit">
+    The imaginary unit $i$ is defined by the property $i^2 = -1$.
+</Definition>
+We can now define a complex number as an ordered pair with a special notation.
+<Definition name="Complex Number" id="defn-complex-number">
+    A complex number is an expression 
+    $$
+    z = a + ib, \quad a, b \in \mathbb{R}
+    $$
+    where $\def\Re{\operatorname{Re}} a = \Re(z)$ is the real part and $\def\Im{\operatorname{Im}}b = \Im(z)$ is the imaginary part.
+</Definition>
+<Callout type="info" emoji="ℹ️">
+  The imaginary part is real.
+</Callout>
+Now, the set of all complex numbers is $\mathbb C$, and $\mathbb R$ is a subset of $\mathbb C$: $\mathbb R \subset \mathbb C$. The laws of commutativity, associativity, and distributivity hold in $\mathbb C$, and we have the following rules of arithmetic.
+<Definition name="Rules of Arithmetic" id="defn-rules-of-arithmetic">
+Let $z = a + bi$ and $w = c + di$.
+1. Then $z = w$ iff $a = c$ and $b = d$.
+2. $z + w = (a + c) + (b + d)i$.
+3. $z - w = z + (-w) = (a - c) + (b - d)i$.
+4. $zw = (a + bi)(c + di) = (ac - bd) + (ad + bc)i$.
+5. $\frac{z}{w} = \frac{a + bi}{c + di} = \left( \frac{a + bi}{c + di}\right)\left( \frac{c - di}{c - di}\right) = \frac{(ac + bd) + (bc - ad)i}{c^2 + d^2} = \frac{ac + bd}{c^2 + d^2} + \left( \frac{bc - ad}{c^2 + d^2}\right)i$
+</Definition>
+As an example, we have
+<Example>
 $$
-f(z) = z^2
+\frac{2 + i}{1 + 2i} = \frac{2 + i}{1 + 2i} \frac{1 - 2i}{1 - 2i} = \frac{4 - 3i}{5}
 $$
-Now i will try align mode:
+</Example>
+We also have the following useful result.
+<Lemma>
+We have
+$$
+\frac{1}{i} = \frac{1}{i} \frac{i}{i} = \frac{i}{i^2} = \frac{i}{-1} = -i
+$$
+That is,
+$$
+\frac{1}{i} = -i
+$$
+</Lemma>
+<Callout type="info" emoji="ℹ️">
+  Complex numbers cannot be described as positive or negative, and they cannot be ordered ($z < w$ is nonsensical).
+</Callout>
+<Definition name="Complex Conjugate">
+The complex conjugate of $z = a + bi$ is $\overline{z} = a - bi$. An alternative notation is $z^*$.
+</Definition>
+The following properties hold for the complex conjugate.
+<Lemma name="Properties of Conjugate">
+1. $\overline{\overline{z}} = z$.
+2. $\overline{z \pm w} = \overline{z} \pm \overline{w}$.
+3. $\overline{zw} = \overline{z} \overline{w}$.
+4. $\overline{\left( \frac{z}{w}\right)} = \frac{\overline{z}}{\overline{w}}$.
+5. $z + \overline{z} = (a + bi) + (a - bi) = 2a$
+6. $z - \overline{z} = (a + bi) - (a - bi) = 2bi$
+7. $z\overline{z} = (a + bi)(a - bi) = a^2 + b^2$
+</Lemma>
+And thus a useful identity is
 $$
 \begin{align*}
-f(z) &= z^2 \\
-    &= z \cdot z
+    \mathrm{Re}(z) &= \frac{1}{2} (z + \overline{z}) \\
+    \mathrm{Im}(z) &= \frac{1}{2i} (z - \overline{z})
 \end{align*}
 $$
-- item 1
-- item 2
-- item 3
-</Definition>

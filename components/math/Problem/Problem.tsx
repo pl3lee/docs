@@ -1,10 +1,10 @@
 import styles from './Problem.module.scss'
 import { Box } from '../Box/Box'
 
-export function Problem({ name, children }: { name: string, children: React.ReactNode }) {
+export function Problem({ id, name, children }: { id?: string, name: string, children: React.ReactNode }) {
     return (
-        <Box>
-            <div className={styles.name}>Problem: {name}</div>
+        <Box id={id ?? id}>
+            <div className={styles.name}>Problem{name ? ":" : ""} {name}</div>
             <div className={styles.content}>
                 {children}
             </div>

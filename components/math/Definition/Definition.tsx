@@ -1,10 +1,10 @@
 import styles from './Definition.module.scss'
 import { Box } from '../Box/Box'
 
-export function Definition({ name, children }: { name: string, children: React.ReactNode }) {
+export function Definition({ id, name, children }: { id?: string, name: string, children: React.ReactNode }) {
     return (
-        <Box>
-            <div className={styles.name}>Definition: {name}</div>
+        <Box id={id ?? id}>
+            <div className={styles.name}>Definition{name ? ":" : ""} {name}</div>
             <div className={styles.content}>
                 {children}
             </div>

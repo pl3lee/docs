@@ -7,7 +7,7 @@
     flex-direction: column;
     justify-content: flex-start;
     gap: 0px;
-    padding: 0px;
+    padding: 1rem 0px;
     margin: 0px;
     border: 0px;
     box-sizing: border-box;
@@ -29,7 +29,6 @@
 }
 
 .root > :first-child {
-    font-size: 1.2rem;
     font-weight: bold;
     border-radius: $box-general-border-radius $box-general-border-radius 0px 0px;
 }
