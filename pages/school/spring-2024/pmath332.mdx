@@ -76,3 +76,120 @@ $$
     \mathrm{Im}(z) &= \frac{1}{2i} (z - \overline{z})
 \end{align*}
 $$
+
+## Lecture 2 (May 6, 2024)
+### Complex Plane
+We can associate complex numbers with points in a plane.
+
+![Complex Plane](/images/school/spring-2024/pmath332/2-1.png)
+
+The complex number $z$ can be treated as a vector, and the length of the vector is called the modulus of $z$.
+<Definition name="Modulus" id="defn-modulus">
+The modulus of $z = a + bi$ is $|z| = \sqrt{a^2 + b^2}$. This is the distance of $z$ from the origin. The distance between two numbers $z$ and $w$ is $|z - w|$
+</Definition>
+So, even though we cannot write $z_1 < z_2$, we can write $|z_1| < |z_2|$.
+
+We can imagine graphs of $|z|$, $\mathrm{Re}(z)$, and $\mathrm{Im}(z)$ as surfaces above the complex plane. These are functions that have 2 inputs and 1 output. More generally though, our functions will be complex valued (meaning that graphs would require 4 dimensions).
+
+So, the equation $|z - z_0| = r$ represents a circle of radius $r$ centered at $z_0$.
+
+<Example>
+Sketch the sets
+- $|z| < 3$
+
+This is a circle of radius 3 centered at the origin.
+
+![Circle](/images/school/spring-2024/pmath332/2-2.png)
+
+- $|z| = \mathrm{Im}(z)$
+
+We have $z = x + yi$, so we have the equation
+$$
+\begin{align*}
+    \sqrt{x^2 + y^2} &= y \\
+    x^2 + y^2 &= y^2 \\
+    x^2 &= 0 \\
+    x &= 0 
+\end{align*}
+$$
+with $y$ non-negative. So, we have the positive $y$-axis.
+
+![Positive Y-Axis](/images/school/spring-2024/pmath332/2-3.png)
+
+- $|z - 1| = |z + i|$
+
+We have $z = x + yi$, then 
+$$
+\begin{align*}
+    |z - 1| &= |(x - 1) + yi| = \sqrt{(x - 1)^2 + y^2} \\
+    |z + i| &= |x + (y + 1)i| = \sqrt{x^2 + (y + 1)^2}
+\end{align*}
+$$
+So we have the equation
+$$
+\begin{align*}
+    \sqrt{(x - 1)^2 + y^2} &= \sqrt{x^2 + (y + 1)^2} \\
+    (x - 1)^2 + y^2 &= x^2 + (y + 1)^2 \\
+    x^2 - 2x + 1 + y^2 &= x^2 + y^2 + 2y + 1 \\
+    -2x &= 2y \\
+    y &= -x
+\end{align*}
+$$
+Alternatively, we can think of this as the set of points $z$, where the distance from $z$ to 1 is equal to the distance from $z$ to $-i$. 
+
+![Line](/images/school/spring-2024/pmath332/2-4.png)
+</Example>
+
+### Triangle Inequality
+We have
+1. $|z_1 + z_2| \leq |z_1| + |z_2|$, and the extended version
+
+    $|z_1 + z_2 + \cdots + z_n| \leq |z_1| + |z_2| + \cdots + |z_n|$
+2. $|z_1 + z_2| \geq |z_1| - |z_2|$
+
+### Polar Form
+Since $z = x + yi$ can be viewed as a point in a plane, we can describe its location in polar coordinates.
+
+![Polar Coordinates](/images/school/spring-2024/pmath332/2-5.png)
+
+By trigonometry, we have $x = r \cos \theta$ and $y = r \sin \theta$ and thus
+$$
+\begin{align*}
+    z &= x + yi \\
+    &= r \cos \theta + r \sin \theta i \\
+    &= r(\cos \theta + i \sin \theta) \\
+    &= r \mathrm{cis}( \theta)
+\end{align*}
+$$
+Of course, $r = |z| = \sqrt{x^2 + y^2}$ and $\tan \theta = \frac{y}{x}$. We call $\theta$ the argument of $z$ and write $\theta = \arg(z)$.
+
+Note that $\theta = \tan^{-1}\left(\frac{y}{x}\right) \pm 2 \pi k$ for any $k \in \mathbb Z_{\neq 0}$ if $x > 0$. If $x < 0$, then we must add or subtract $\pi$. We illustrate this on an example:
+
+![example](/images/school/spring-2024/pmath332/2-6.png)
+
+We have $\tan^{-1}\left(\frac{1}{1}\right) = \tan^{-1}\left(\frac{-1}{-1}\right)$, so this gives the wrong angle. Thus, we must fix it by adding or subtracting $\pi$ to get the correct $\theta$.
+#### Why use polar form?
+Watch what happens with multiplication
+$$
+\begin{align*}
+    z_1 z_2 &= r_1(\cos \theta_1 + i \sin\theta_1) r_2(\cos \theta_2 + i \sin\theta_2) \\
+    &= r_1r_2 \left[\cos\theta_1 \theta_2 - \sin\theta_1\theta_2 + i(\sin\theta_1 \cos\theta_2 + \cos\theta_1 \sin\theta_2)\right] \\
+    &= r_1r_2 \left[\cos(\theta_1 + \theta_2) + i \sin(\theta_1 + \theta_2)\right] \\
+    &= r_1r_2 \mathrm{cis}(\theta_1 + \theta_2)
+\end{align*}
+$$
+where we used the trigonometric identities $\cos(a + b) = \cos a \cos b - \sin a \sin b$ and $\sin(a + b) = \sin a \cos b + \cos a \sin b$.
+
+That is, $|z_1 z_2| = |z_1||z_2|$ and $\arg(z_1 z_2) = \arg(z_1) + \arg(z_2)$. So multiplying $z_1$ by $z_2$ magnifies $z_1$ by $|z_2|$ and rotates it by $\arg(z_2)$.
+
+Similarly, 
+$$
+\frac{z_1}{z_2} = \frac{r_1}{r_2} \mathrm{cis}(\theta_1 - \theta_2)
+$$
+Euler noticed this behaviour is similar to multiplying exponentials, $(a_1e^{b_1}) (a_2e^{b_2}) = a_1a_2 e^{b_1 + b_2}$, so we define the Euler's formula
+<Definition name="Euler's Formula">
+$$
+e^{i\theta} = \cos \theta + i \sin \theta
+$$
+</Definition>
+Then we can use properties of $e^x$ instead of trigonometric identities!
