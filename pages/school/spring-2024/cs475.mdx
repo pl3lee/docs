@@ -2,3 +2,98 @@ import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName
 import { Steps, Callout } from 'nextra/components'
 
 # CS 475: Computational Linear Algebra
+## Lecture 1 (May 7, 2024)
+### What is Numerical Linear Algebra?
+Briefly, it is developing **efficient** algorithms to **accurately** solve linear algebra problems on a computer (with finite precision arithmetic). We will focus on the following topics:
+- solving linear systems of equations.
+- solving linear least squares problems.
+- solving eigenvalue problems.
+- performing singular value decompositions.
+
+### Types of Algorithms
+There are two types of algorithms:
+- **Direct**: These algorithms compute the final solution with a finite sequence of arithmetic operations. For example, Gaussian elimination (LU factorization)
+- **Iterative**: These algorithms start with an initial guess, and iteratively apply the same operation to get closer to the solution, until it is good enough. For example, Jacobi, Gauss-Seidel, Conjugate Gradient, and PageRank.
+
+### Matrix Structure
+There are two types of matrices:
+- **Dense**: Most of the entries are non-zero. These are stored in $N \times N$ arrays, which we can manipulate normally.
+- **Sparse**: Most entries are zero. Non-zero locations may exhibit patterns.
+
+It is possible to exploit sparsity patterns/structure to save memory and/or flops. However, just because a matrix is sparse, it does not mean that it will be faster to solve. It depends on the sparsity pattern and the algorithm used. For example, even if we input a sparse matrix into a Gaussian elimination algorithm, it will still take the same amount of time.
+
+### Factorization
+A common theme is that we can express a given matrix as a product of other matrices. For example,
+$$
+A = BCD
+$$
+Some common factorizations are:
+- LU factorization: $A = LU$
+- QR factorization: $A = QR$
+- Cholesky factorization: $A = LL^T$
+- Singular Value Decomposition: $A = U \Sigma V^T$
+- etc.
+
+These factorizations have properties that we can exploit in algorithm design.
+
+### Orthogonality
+Notions of orthogonality will arise repeatedly in designing algorithms. Recall the following definitions for orthogonality.
+<Definition withName={true}>
+    <DefinitionName>Orthogonal Vectors</DefinitionName>
+    <DefinitionContent>
+        Two vectors $x$ and $y$ are orthogonal if $x^T y = 0$.
+    </DefinitionContent>
+</Definition>
+<Definition withName={true}>
+    <DefinitionName>Orthogonal Matrices</DefinitionName>
+    <DefinitionContent>
+        A real square matrix $Q$ is orthogonal if $Q^T Q = I$, or $Q^T = Q^{-1}$.
+    </DefinitionContent>
+</Definition>
+
+### Linear Systems
+This is the problem of solving $Ax = b$ for $x$ where $A \in \mathbb R^{n \times n}, x \in \mathbb R^n, b \in \mathbb R^n$. Doing it efficiently and accurately on large problems (in floating point arithmetic) can take substantial effort to get right.
+
+For example, if we have the system $Ax = b$, then we could rearrange it to get $x = A^{-1}b$. However, computing the inverse of $A$ is potentially expensive and numerically unstable.
+
+### Least Squares Problem
+This is used for solving more general problems which may have
+- Too many equations/constraints (over-determined).
+
+    For example, $A \in \mathbb R^{30 \times 2}, b \in \mathbb R^{30}$, i.e. the matrix $A$ is tall and skinny.
+
+- Too few equations/constraints (under-determined).
+
+    For example, $A \in \mathbb R^{2 \times 30}, b \in \mathbb R^2$, i.e. the matrix $A$ is short and fat.
+
+We aim to find an answer that is as good as possible. This is often done on data-fitting or regression problems.
+
+If we want to solve $Ax = b$, rearranging gives $Ax - b = 0$. Therefore, we can minimize the norm $||Ax - b||_2$, where the two norm is defined as $||x||_2 = \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}$. Notice that this is equivalent to minimizing $||Ax - b||_2^2$.
+
+In regression problems, we may have $n$ datapoints $(x_1,y_1),\ldots,(x_n,y_n)$, and we want to find a line that is closest to these points. In the best case, a line is able to pass through all the points. In this case, we have the system of equations
+$$
+\begin{align*}
+    y_1 &= ax_1 + c \\
+    y_2 &= ax_2 + c \\
+    &\vdots \\
+    y_n &= ax_n + c
+\end{align*}
+$$
+which can be written as $Ax = b$ where
+$$
+\underbrace{\begin{pmatrix}
+    x_1 & 1 \\
+    x_2 & 1 \\
+    \vdots & \vdots \\
+    x_n & 1
+\end{pmatrix}}_{A} \underbrace{\begin{pmatrix}
+    a \\
+    c
+\end{pmatrix}}_{x} = \underbrace{\begin{pmatrix}
+    y_1 \\
+    y_2 \\
+    \vdots \\
+    y_n
+\end{pmatrix}}_{b}
+$$
+So again, we can minimize $||Ax - b||_2^2$ to find the best line.
