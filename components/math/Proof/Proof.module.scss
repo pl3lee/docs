@@ -1,0 +1,23 @@
+@import "/components/variables";
+
+.name {
+    background-color: $proof-dark;
+}
+
+.content {
+    background-color: $proof-light; 
+}
+
+.qedContainer {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 0.5rem;
+}
+
+.qed {
+    background-color: white;
+    width: 15px;
+    height: 15px;
+    border: 1px solid black;
+}

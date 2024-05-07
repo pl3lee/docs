@@ -35,3 +35,7 @@ $lemma-base: lighten(desaturate(#20c997, 30%), 10%); // A muted teal
 $lemma-dark: darken($lemma-base, 10%);
 $lemma-light: lighten($lemma-base, 10%);
 
+$proof-base: #f8f9fa; // Very light gray, almost white
+$proof-dark: darken($proof-base, 5%); // Slightly darker for the title
+$proof-light: $proof-base; // Even lighter, though nearly white
+
