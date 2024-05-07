@@ -2,6 +2,14 @@
 
 .name {
     background-color: $proof-dark;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.5rem;
+}
+
+.name > :first-child {
+    font-weight: bold;
 }
 
 .content {

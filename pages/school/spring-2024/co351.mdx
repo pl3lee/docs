@@ -1,53 +1,87 @@
-import { Definition, Corollary, Example, Problem, Proposition, Theorem, Lemma, Proof } from "/components/math";
+import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName, CorollaryContent, Example, ExampleName, ExampleContent, Problem, ProblemName, ProblemContent, Proposition, PropositionName, PropositionContent, Theorem, TheoremName, TheoremContent, Lemma, LemmaName, LemmaContent, Proof, ProofName, ProofContent } from "/components/math";
 import { Steps, Callout } from 'nextra/components'
 
 # CO 351: Network Flow Theory
 ## Lecture 1 (May 7 2024)
-### Graphs
+### Fundamentals
 Let's start with basic definitions of graphs.
-<Definition name="Graph">
-A graph $G$ is a pair $(V, E)$ where $V$ is a finite set and $E$ is a set of unordered pairs of distinct elements of $V$.
+<Definition withName={true}>
+    <DefinitionName>Graph</DefinitionName>
+    <DefinitionContent>
+        A graph $G$ is a pair $(V, E)$ where $V$ is a finite set and $E$ is a set of unordered pairs of distinct elements of $V$.
+    </DefinitionContent>
 </Definition>
-<Definition name="Adjacent, Endpoints, and Incident">
-Consider the edge $ij$. Then 
-- $i$ and $j$ are adjacent vertices
-- $i$ and $j$ are the endpoints of the edge
-- Edge $ij$ is said to be incident to vertices $i$ and $j$
+<Definition withName={true}>
+    <DefinitionName>Adjacent, Endpoints, and Incident</DefinitionName>
+    <DefinitionContent>
+        Consider the edge $ij$. Then 
+        - $i$ and $j$ are adjacent vertices
+        - $i$ and $j$ are the endpoints of the edge
+        - Edge $ij$ is said to be incident to vertices $i$ and $j$
+    </DefinitionContent>
 </Definition>
-<Definition name="Degree">
-The degree of a vertex $v$ is the number of edges incident to $v$. We use the notation $d_G(v)$ or $d(v)$ to denote the degree of $v$ in graph $G$.
+<Definition withName={true}>
+    <DefinitionName>Degree</DefinitionName>
+    <DefinitionContent>
+        The degree of a vertex $v$ is the number of edges incident to $v$. We use the notation $d_G(v)$ or $d(v)$ to denote the degree of $v$ in graph $G$.
+    </DefinitionContent>
 </Definition>
-<Definition name="Walk">
-A walk $Q$ is a non-empty sequence of edges. For example, $v_1v_2,v_2v_3,\ldots,v_{k-1}v_k$. We can abbreviate this by only writing the vertices: $v_1v_2\ldots v_k$.
+<Definition withName={true}>
+    <DefinitionName>Walk</DefinitionName>
+    <DefinitionContent>
+        A walk $Q$ is a non-empty sequence of edges. For example, $v_1v_2,v_2v_3,\ldots,v_{k-1}v_k$. We can abbreviate this by only writing the vertices: $v_1,v_2,\ldots, v_k$.
 
-Note that an edge may appear several times in a walk.
+        Note that an edge may appear several times in a walk.
+    </DefinitionContent>
 </Definition>
-<Definition name="Path">
-A path $P$ is a walk such that $v_1,\ldots,v_k$ are distinct vertices, meaning that we visit a new node at each step.
+<Definition withName={true}>
+    <DefinitionName>Path</DefinitionName>
+    <DefinitionContent>
+        A path $P$ is a walk such that $v_1,\ldots,v_k$ are distinct vertices, meaning that we visit a new node at each step.
+    </DefinitionContent>
 </Definition>
-<Definition name="Cycle">
-A cycle $C = v_1,\ldots,v_k$ is a walk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
+<Definition withName={true}>
+    <DefinitionName>Cycle</DefinitionName>
+    <DefinitionContent>
+        A cycle $C = v_1,\ldots,v_k$ is a walk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
+    </DefinitionContent>
 </Definition>
-<Definition name="st-walk">
-An $st$-walk is a walk that starts at $s$ and ends at $t$.
+<Definition withName={true}>
+    <DefinitionName>$st$-walk</DefinitionName>
+    <DefinitionContent>
+        An $st$-walk is a walk that starts at $s$ and ends at $t$.
+    </DefinitionContent>
 </Definition>
-<Definition name="st-path">
-An $st$-path is a path that starts at $s$ and ends at $t$, with $s \neq t$.
+<Definition withName={true}>
+    <DefinitionName>$st$-path</DefinitionName>
+    <DefinitionContent>
+        An $st$-path is a path that starts at $s$ and ends at $t$, with $s \neq t$.
+    </DefinitionContent>
 </Definition>
-<Definition name="Cut">
-For a subset of vertices $S \subseteq V$, the cut with shore $S$ is the set of edges with exactly one endpoint in $S$. We use the notation
-$$
-\delta(S) = \{ij \in E : i \in S, j \notin S\}
-$$
+<Definition withName={true}>
+    <DefinitionName>Cut</DefinitionName>
+    <DefinitionContent>
+        For a subset of vertices $S \subseteq V$, the cut with shore $S$ is the set of edges with exactly one endpoint in $S$. We use the notation
+        $$
+        \delta(S) = \{ij \in E : i \in S, j \notin S\}
+        $$
+    </DefinitionContent>
 </Definition>
-<Definition name="st-Cut">
-For vertices $s$ and $t$ with $s \neq t$ of $G$, and $st$-cut of $G$ is a cut $\delta(S)$ where $S \subset V$, with $s \in S$ and $t \notin S$.
+<Definition withName={true}>
+    <DefinitionName>$st$-Cut</DefinitionName>
+    <DefinitionContent>
+        For vertices $s$ and $t$ with $s \neq t$ of $G$, and $st$-cut of $G$ is a cut $\delta(S)$ where $S \subset V$, with $s \in S$ and $t \notin S$.
+    </DefinitionContent>
 </Definition>
 Now, we have our first theorem.
 <Theorem>
-Let $G = (V, E)$ be a graph, and let $s, t$ be vertices of $G$. Then there exists an $st$-path if and only if every $st$-cut is non-empty.
+    <TheoremContent>
+        Let $G = (V, E)$ be a graph, and let $s, t$ be vertices of $G$. Then there exists an $st$-path if and only if every $st$-cut is non-empty.
+    </TheoremContent>
 </Theorem>
 <Proof>
-$(\Rightarrow)$ Suppose that there exists an $st$-path $P = v_1,\ldots,v_k$ where $s = v_1$, and $t = v_k$. We prove that every $st$-cut is non-empty. Let $\delta(\hat S)$ be any $st$-cut, where $s \in \hat S$ and $t \notin \hat S$. Let $\ell$ be the largest index such that $v_\ell \in \hat S$, and note that $\ell \neq k$ since $v_k = t$ is not in $\hat S$. So, we have that $v_{\ell + 1}$ is not in $\hat S$. Thus, the edge $v_\ell v_{\ell + 1}$ is in $\delta(\hat S)$, hence $\delta(\hat S) \neq \emptyset$. GRAPH NEEDED TO BE ADDED HERE.
+    <ProofContent>
+        $(\Rightarrow)$ Suppose that there exists an $st$-path $P = v_1,\ldots,v_k$ where $s = v_1$, and $t = v_k$. We prove that every $st$-cut is non-empty. Let $\delta(\hat S)$ be any $st$-cut, where $s \in \hat S$ and $t \notin \hat S$. Let $\ell$ be the largest index such that $v_\ell \in \hat S$, and note that $\ell \neq k$ since $v_k = t$ is not in $\hat S$. So, we have that $v_{\ell + 1}$ is not in $\hat S$. Thus, the edge $v_\ell v_{\ell + 1}$ is in $\delta(\hat S)$, hence $\delta(\hat S) \neq \emptyset$. GRAPH NEEDED TO BE ADDED HERE.
+    </ProofContent>
 </Proof>
 

@@ -1,4 +1,4 @@
-import { Definition, Corollary, Example, Problem, Proposition, Theorem, Lemma } from "/components/math";
+import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName, CorollaryContent, Example, ExampleName, ExampleContent, Problem, ProblemName, ProblemContent, Proposition, PropositionName, PropositionContent, Theorem, TheoremName, TheoremContent, Lemma, LemmaName, LemmaContent, Proof, ProofName, ProofContent } from "/components/math";
 import { Steps, Callout } from 'nextra/components'
 
 # PMATH 340: Elementary Number Theory
@@ -16,31 +16,39 @@ The Gaussian integers are a subset of the complex numbers where both real and im
 ### Diophantine Equation
 A Diophantine equation is a polynomial equation where the solutions are required to be integers. 
 <Example>
-1. $2x = 5$ is a diophantine equation. There are solutions in $\mathbb R$ and $\mathbb Q$, however there are no solutions in $\mathbb Z$ since 2 does not **divide** 5.
-2. $x^2 + y^2 = z^2$. The solutions $(x, y, z) \in \mathbb Z^3$ are called Pythagorean triples. For example, $(3, 4, 5), (5, 12, 13)$ are Pythagorean triples. In addition, we can get the solution $(6, 8, 10)$ by multiplying $(3, 4, 5)$ by 2.
+    <ExampleContent>
+      1. $2x = 5$ is a diophantine equation. There are solutions in $\mathbb R$ and $\mathbb Q$, however there are no solutions in $\mathbb Z$ since 2 does not **divide** 5.
+      2. $x^2 + y^2 = z^2$. The solutions $(x, y, z) \in \mathbb Z^3$ are called Pythagorean triples. For example, $(3, 4, 5), (5, 12, 13)$ are Pythagorean triples. In addition, we can get the solution $(6, 8, 10)$ by multiplying $(3, 4, 5)$ by 2.
 
-    So, once we have one solution, we have infinite solutions by scaling by a constant $c$. Note that solutions $x, y, z$ that have no common factors are called **primitive** pythagorean triples. Here is a question: Are there infinitely many primitive pythagorean triples? The answer is yes, and we will prove it later.
+          So, once we have one solution, we have infinite solutions by scaling by a constant $c$. Note that solutions $x, y, z$ that have no common factors are called **primitive** pythagorean triples. Here is a question: Are there infinitely many primitive pythagorean triples? The answer is yes, and we will prove it later.
 
-3. $x^n + y^n = z^n$ for $n \geq 3$. This is Fermat's Last Theorem. Are there any solutions in $\mathbb Z_{>0}$? It turns out the answer is no.
-4. $x^2 - ny^2 = 1$ for $n$ not perfect square. This is Pell's equation. Let's suppose that $n = 2$. Then $x^2 - 2y^2 = 1$. Rearranging gives
-    $$
-    2 = \left(\frac{x}{y}\right)^2 - \frac{1}{y}
-    $$
-    Now for large $y$, we have $\frac{1}{y} \approx 0$, so $2 \approx \left(\frac{x}{y}\right)^2$. This means that $\frac{x}{y} \approx \sqrt{2}$.
+      3. $x^n + y^n = z^n$ for $n \geq 3$. This is Fermat's Last Theorem. Are there any solutions in $\mathbb Z_{>0}$? It turns out the answer is no.
+      4. $x^2 - ny^2 = 1$ for $n$ not perfect square. This is Pell's equation. Let's suppose that $n = 2$. Then $x^2 - 2y^2 = 1$. Rearranging gives
+          $$
+          2 = \left(\frac{x}{y}\right)^2 - \frac{1}{y}
+          $$
+          Now for large $y$, we have $\frac{1}{y} \approx 0$, so $2 \approx \left(\frac{x}{y}\right)^2$. This means that $\frac{x}{y} \approx \sqrt{2}$.
 
-    Here is a fact: for $n = 2$, if $(x, y) = (a, b)$ is a solution, then $(x, y) = (3a + 4b, 2a + 3b)$ is also a solution. We can see that $(3, 2)$ is a solution, and after applying the transformation iteratively, we get $(22619537, 1599428)$, which is a very close approximation to $\sqrt{2}$ when we do $\frac{x}{y}$.
+          Here is a fact: for $n = 2$, if $(x, y) = (a, b)$ is a solution, then $(x, y) = (3a + 4b, 2a + 3b)$ is also a solution. We can see that $(3, 2)$ is a solution, and after applying the transformation iteratively, we get $(22619537, 1599428)$, which is a very close approximation to $\sqrt{2}$ when we do $\frac{x}{y}$.
+    </ExampleContent>
 </Example>
 
 ### How do we solve Diophantine Equations?
 In general, the lower the power, and the lesser variables, the easier it is to solve. So, $x^2 + x = 1$ is easier to solve than $x^2 - 2y^2 = 1$, which is easier to solve than $x^3 + y^3 = z^3$. The equation $x^2 + x = 1$ is called a **univariate diophantine equation**.
 
 It turns out that if $f(x) = 0$ is a univariate diophantine equation, then we have an algorithm for solving it.
-<Definition name="Divides">
+<Definition withName={true}>
+<DefinitionName>Divides</DefinitionName>
+<DefinitionContent>
 If $a, b \in \Z$, we say $a$ **divides** $b$ if there exists $c \in \Z$ such that $b = ac$. We write $a \mid b$.
 
 If $a$ does not divide $b$, then we write $a \nmid b$.
+</DefinitionContent>
 </Definition>
-<Theorem name="Solution to Univariate Diophantine Equations">
+<Theorem withName={true}>
+<TheoremName>Solution to Univariate Diophantine Equations</TheoremName>
+<TheoremContent>
 If the equation $a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n = 0$ has a solution $x = s \in \Z$, then $s \mid a_0$.
+</TheoremContent>
 </Theorem>
 We will give a proof of this theorem later. But as an example, if we have a equation $x^2 + x - 1 = 0$, then we just need to check the divisors of $-1$ to find the solutions.

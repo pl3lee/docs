@@ -1,4 +1,4 @@
-import { Definition, Corollary, Example, Problem, Proposition, Theorem, Lemma } from "/components/math";
+import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName, CorollaryContent, Example, ExampleName, ExampleContent, Problem, ProblemName, ProblemContent, Proposition, PropositionName, PropositionContent, Theorem, TheoremName, TheoremContent, Lemma, LemmaName, LemmaContent, Proof, ProofName, ProofContent } from "/components/math";
 import { Steps, Callout } from 'nextra/components'
 
 # PMATH 332: Applied Complex Analysis
@@ -11,37 +11,49 @@ First consider $\sqrt{-1} \sqrt{-1}$. We can interpret it in 2 ways:
 2. $\sqrt{-1} \sqrt{-1} = (\sqrt{-1})^2 = -1$
 
 The problem is the notation. So we need to define complex numbers without using the $\sqrt{\cdot}$ symbol. 
-<Definition name="Imaginary Unit" id="defn-imaginary-unit">
-    The imaginary unit $i$ is defined by the property $i^2 = -1$.
+<Definition withName={true} id="defn-imaginary-unit">
+    <DefinitionName>Imaginary Unit</DefinitionName>
+    <DefinitionContent>
+        The imaginary unit $i$ is defined by the property $i^2 = -1$.
+    </DefinitionContent>
 </Definition>
 We can now define a complex number as an ordered pair with a special notation.
-<Definition name="Complex Number" id="defn-complex-number">
-    A complex number is an expression 
-    $$
-    z = a + ib, \quad a, b \in \mathbb{R}
-    $$
-    where $\def\Re{\operatorname{Re}} a = \Re(z)$ is the real part and $\def\Im{\operatorname{Im}}b = \Im(z)$ is the imaginary part.
+<Definition withName={true} id="defn-complex-number">
+    <DefinitionName>Complex Number</DefinitionName>
+    <DefinitionContent>
+        A complex number is an expression 
+        $$
+        z = a + ib, \quad a, b \in \mathbb{R}
+        $$
+        where $\def\Re{\operatorname{Re}} a = \Re(z)$ is the real part and $\def\Im{\operatorname{Im}}b = \Im(z)$ is the imaginary part.
+    </DefinitionContent>
 </Definition>
 <Callout type="info" emoji="ℹ️">
   The imaginary part is real.
 </Callout>
 Now, the set of all complex numbers is $\mathbb C$, and $\mathbb R$ is a subset of $\mathbb C$: $\mathbb R \subset \mathbb C$. The laws of commutativity, associativity, and distributivity hold in $\mathbb C$, and we have the following rules of arithmetic.
-<Definition name="Rules of Arithmetic" id="defn-rules-of-arithmetic">
+<Definition withName={true} id="defn-rules-of-arithmetic">
+<DefinitionName>Rules of Arithmetic</DefinitionName>
+<DefinitionContent>
 Let $z = a + bi$ and $w = c + di$.
 1. Then $z = w$ iff $a = c$ and $b = d$.
 2. $z + w = (a + c) + (b + d)i$.
 3. $z - w = z + (-w) = (a - c) + (b - d)i$.
 4. $zw = (a + bi)(c + di) = (ac - bd) + (ad + bc)i$.
 5. $\frac{z}{w} = \frac{a + bi}{c + di} = \left( \frac{a + bi}{c + di}\right)\left( \frac{c - di}{c - di}\right) = \frac{(ac + bd) + (bc - ad)i}{c^2 + d^2} = \frac{ac + bd}{c^2 + d^2} + \left( \frac{bc - ad}{c^2 + d^2}\right)i$
+</DefinitionContent>
 </Definition>
 As an example, we have
 <Example>
+<ExampleContent>
 $$
 \frac{2 + i}{1 + 2i} = \frac{2 + i}{1 + 2i} \frac{1 - 2i}{1 - 2i} = \frac{4 - 3i}{5}
 $$
+</ExampleContent>
 </Example>
 We also have the following useful result.
 <Lemma>
+<LemmaContent>
 We have
 $$
 \frac{1}{i} = \frac{1}{i} \frac{i}{i} = \frac{i}{i^2} = \frac{i}{-1} = -i
@@ -50,15 +62,21 @@ That is,
 $$
 \frac{1}{i} = -i
 $$
+</LemmaContent>
 </Lemma>
 <Callout type="info" emoji="ℹ️">
   Complex numbers cannot be described as positive or negative, and they cannot be ordered ($z < w$ is nonsensical).
 </Callout>
-<Definition name="Complex Conjugate">
+<Definition withName={true}>
+<DefinitionName>Complex Conjugate</DefinitionName>
+<DefinitionContent>
 The complex conjugate of $z = a + bi$ is $\overline{z} = a - bi$. An alternative notation is $z^*$.
+</DefinitionContent>
 </Definition>
 The following properties hold for the complex conjugate.
-<Lemma name="Properties of Conjugate">
+<Lemma withName={true}>
+<LemmaName>Properties of Conjugate</LemmaName>
+<LemmaContent>
 1. $\overline{\overline{z}} = z$.
 2. $\overline{z \pm w} = \overline{z} \pm \overline{w}$.
 3. $\overline{zw} = \overline{z} \overline{w}$.
@@ -66,6 +84,7 @@ The following properties hold for the complex conjugate.
 5. $z + \overline{z} = (a + bi) + (a - bi) = 2a$
 6. $z - \overline{z} = (a + bi) - (a - bi) = 2bi$
 7. $z\overline{z} = (a + bi)(a - bi) = a^2 + b^2$
+</LemmaContent>
 </Lemma>
 And thus a useful identity is
 $$
@@ -82,8 +101,11 @@ We can associate complex numbers with points in a plane.
 ![Complex Plane](/images/school/spring-2024/pmath332/2-1.png)
 
 The complex number $z$ can be treated as a vector, and the length of the vector is called the modulus of $z$.
-<Definition name="Modulus" id="defn-modulus">
+<Definition withName={true} id="defn-modulus">
+<DefinitionName>Modulus</DefinitionName>
+<DefinitionContent>
 The modulus of $z = a + bi$ is $|z| = \sqrt{a^2 + b^2}$. This is the distance of $z$ from the origin. The distance between two numbers $z$ and $w$ is $|z - w|$
+</DefinitionContent>
 </Definition>
 So, even though we cannot write $z_1 < z_2$, we can write $|z_1| < |z_2|$.
 
@@ -92,6 +114,7 @@ We can imagine graphs of $|z|$, $\mathrm{Re}(z)$, and $\mathrm{Im}(z)$ as surfac
 So, the equation $|z - z_0| = r$ represents a circle of radius $r$ centered at $z_0$.
 
 <Example>
+<ExampleContent>
 Sketch the sets
 - $|z| < 3$
 
@@ -136,6 +159,7 @@ $$
 Alternatively, we can think of this as the set of points $z$, where the distance from $z$ to 1 is equal to the distance from $z$ to $-i$. 
 
 ![Line](/images/school/spring-2024/pmath332/2-4.png)
+</ExampleContent>
 </Example>
 
 ### Triangle Inequality
@@ -185,9 +209,12 @@ $$
 \frac{z_1}{z_2} = \frac{r_1}{r_2} \mathrm{cis}(\theta_1 - \theta_2)
 $$
 Euler noticed this behaviour is similar to multiplying exponentials, $(a_1e^{b_1}) (a_2e^{b_2}) = a_1a_2 e^{b_1 + b_2}$, so we define the Euler's formula
-<Definition name="Euler's Formula">
+<Definition withName={true}>
+<DefinitionName>Euler's Formula</DefinitionName>
+<DefinitionContent>
 $$
 e^{i\theta} = \cos \theta + i \sin \theta
 $$
+</DefinitionContent>
 </Definition>
 Then we can use properties of $e^x$ instead of trigonometric identities!

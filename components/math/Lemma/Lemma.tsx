@@ -1,13 +1,26 @@
 import styles from './Lemma.module.scss'
 import { Box } from '../Box/Box'
 
-export function Lemma({ id, name, children }: { id?: string, name?: string, children: React.ReactNode }) {
+export function Lemma({ id, withName = false, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
     return (
         <Box id={id ?? id}>
-            <div className={styles.name}>Lemma{name ? `: ${name}` : ""}</div>
-            <div className={styles.content}>
-                {children}
-            </div>
+            {!withName && <LemmaName />}
+            {children}
         </Box>
+    )
+}
+
+export function LemmaName({ children }: { children?: React.ReactNode }) {
+    return (
+        <div className={styles.name}>
+            <div>Lemma{children && ":"}</div>
+            <div>{children}</div>
+        </div>
+    )
+}
+
+export function LemmaContent({ children }: { children: React.ReactNode }) {
+    return (
+        <div className={styles.content}>{children}</div>
     )
 }

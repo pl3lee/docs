@@ -11,7 +11,6 @@
     margin: 0px;
     border: 0px;
     box-sizing: border-box;
-    -webkit-backface-visibility: hidden;
     color: black;
     * {
         box-sizing: border-box;
@@ -29,11 +28,9 @@
 }
 
 .root > :first-child {
-    font-weight: bold;
     border-radius: $box-general-border-radius $box-general-border-radius 0px 0px;
 }
 
 .root > :last-child {
-    font-size: 1rem;
     border-radius: 0px 0px $box-general-border-radius $box-general-border-radius;
 }

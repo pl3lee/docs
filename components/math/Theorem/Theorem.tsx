@@ -1,13 +1,26 @@
 import styles from './Theorem.module.scss'
 import { Box } from '../Box/Box'
 
-export function Theorem({ id, name, children }: { id?: string, name?: string, children: React.ReactNode }) {
+export function Theorem({ id, withName = false, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
     return (
         <Box id={id ?? id}>
-            <div className={styles.name}>Theorem{name ? `: ${name}` : ""}</div>
-            <div className={styles.content}>
-                {children}
-            </div>
+            {!withName && <TheoremName />}
+            {children}
         </Box>
+    )
+}
+
+export function TheoremName({ children }: { children?: React.ReactNode }) {
+    return (
+        <div className={styles.name}>
+            <div>Theorem{children && ":"}</div>
+            <div>{children}</div>
+        </div>
+    )
+}
+
+export function TheoremContent({ children }: { children: React.ReactNode }) {
+    return (
+        <div className={styles.content}>{children}</div>
     )
 }
