@@ -2,7 +2,8 @@ import { Definition, Corollary, Example, Problem, Proposition, Theorem, Lemma } 
 import { Steps, Callout } from 'nextra/components'
 
 # PMATH 340: Elementary Number Theory
-## What is Number Theory
+## Lecture 1 (May 6, 2024)
+### What is Number Theory
 First let's define what is a number. There are several number systems
 - **Positive integers**: $\mathbb Z_{> 0} = \{1, 2, 3, \ldots\}$
 - **Integers**: $\mathbb Z = \{0, \pm 1, \pm 2, \ldots\}$
@@ -12,7 +13,7 @@ First let's define what is a number. There are several number systems
 
 The Gaussian integers are a subset of the complex numbers where both real and imaginary parts are integers. Geometrically, we can think of it as a lattice in the complex plane.
 
-## Diophantine Equation
+### Diophantine Equation
 A Diophantine equation is a polynomial equation where the solutions are required to be integers. 
 <Example>
 1. $2x = 5$ is a diophantine equation. There are solutions in $\mathbb R$ and $\mathbb Q$, however there are no solutions in $\mathbb Z$ since 2 does not **divide** 5.
@@ -30,7 +31,7 @@ A Diophantine equation is a polynomial equation where the solutions are required
     Here is a fact: for $n = 2$, if $(x, y) = (a, b)$ is a solution, then $(x, y) = (3a + 4b, 2a + 3b)$ is also a solution. We can see that $(3, 2)$ is a solution, and after applying the transformation iteratively, we get $(22619537, 1599428)$, which is a very close approximation to $\sqrt{2}$ when we do $\frac{x}{y}$.
 </Example>
 
-## How do we solve Diophantine Equations?
+### How do we solve Diophantine Equations?
 In general, the lower the power, and the lesser variables, the easier it is to solve. So, $x^2 + x = 1$ is easier to solve than $x^2 - 2y^2 = 1$, which is easier to solve than $x^3 + y^3 = z^3$. The equation $x^2 + x = 1$ is called a **univariate diophantine equation**.
 
 It turns out that if $f(x) = 0$ is a univariate diophantine equation, then we have an algorithm for solving it.
