@@ -116,3 +116,33 @@ The **out-degree** of a node $v$ is the number of arcs with tail $v$, we write $
 The **in-degree** of a node $v$ is the number of arcs with head $v$, we write $\bar d(v)$.
 </DefinitionContent>
 </Definition>
+<Definition withName={true}>
+<DefinitionName>Node-arc Incidence Matrix</DefinitionName>
+<DefinitionContent>
+The node-arc incidence matrix of a digraph $D = (N, A)$ is an $|N| \times |A|$ matrix $M$ such that
+- its rows are the nodes of $D$
+- its columns are the arcs of $D$
+- the entry for node $v$ and arc $ij$, $m_{v, ij}$ is given by
+    $$
+    m_{v, ij} = \begin{cases}
+        0 & \text{if $v \neq i$ and $v \neq j$} \\
+        1 & \text{if $v = j$} \\
+        -1 & \text{if $v = i$}
+    \end{cases}
+    $$
+</DefinitionContent>
+</Definition>
+Let's illustrate this on an example. Suppose that we have the digraph
+
+![Digraph Example](/images/school/spring-2024/co351/1-4.png)
+
+Then the node-arc incidence matrix $M$ is
+| $v$ \\ $e$ | 12 | 14 | 24 | 31 | 35 | 43 | 45 | 51 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | -1 | -1 | 0 | 1 | 0 | 0 | 0 | 1 |
+| 2 | 1 | 0 | -1 | 0 | 0 | 0 | 0 | 0 |
+| 3 | 0 | 0 | 0 | -1 | 1 | 1 | 0 | 0 |
+| 4 | 0 | 1 | 1 | 0 | 0 | -1 | -1 | 0 |
+| 5 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | -1 |
+
+Notice that each column has exactly one 1 and one -1, and the rest are 0s. This is because each arc has exactly one tail and one head.
