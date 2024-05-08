@@ -45,10 +45,197 @@ If $a, b \in \Z$, we say $a$ **divides** $b$ if there exists $c \in \Z$ such tha
 If $a$ does not divide $b$, then we write $a \nmid b$.
 </DefinitionContent>
 </Definition>
-<Theorem withName={true}>
-<TheoremName>Solution to Univariate Diophantine Equations</TheoremName>
-<TheoremContent>
+<Proposition withName={true}>
+<PropositionName>Solution to Univariate Diophantine Equations</PropositionName>
+<PropositionContent>
 If the equation $a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n = 0$ has a solution $x = s \in \Z$, then $s \mid a_0$.
+</PropositionContent>
+</Proposition>
+We will give a proof of this theorem later. But as an example, if we have a equation $x^2 + x - 1 = 0$, then we just need to check the divisors of $-1$ to find the solutions.
+
+## Lecture 2 (May 8, 2024)
+Recall our proposition from last time:
+<Proposition withName={true}>
+<PropositionName>Solution to Univariate Diophantine Equations</PropositionName>
+<PropositionContent>
+If the equation $a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n = 0$ has a solution $x = s \in \Z$, then $s \mid a_0$.
+</PropositionContent>
+</Proposition>
+Let's give a proof of this proposition.
+<Proof>
+<ProofContent>
+We have $a_0 + a_1x + \cdots + a_nx^n = 0$. Suppose that $s$ is a solution, so we can plug in $x = s$ and earranging it gives
+$$
+a_0 = s(-a_1 - a_2s - \cdots - a_ns^{n-1})
+$$
+Note that $-a_1 - a_2s - \cdots - a_ns^{n-1}$ is an integer, so by definition of divisibility, $s \mid a_0$.
+</ProofContent>
+</Proof>
+So, in order to solve $a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n = 0$, we can simply determine all divisors of $a_0$, then plug in to the equation to find which are roots.
+
+In general, when we encounter an equation, we ask ourselves 3 questions:
+1. Are there any solutions?
+2. If there are, how many are there?
+3. Can we find all of them?
+
+Unfortunately, determining all divisors is hard since factoring is hard. Moreover, even if we can determine all factors, we might have to check a lot of divisors to see if they are roots. Thus, we need a better algorithm.
+### Better Algorithm to Solve Univariate Diophantine Equations
+We will illustrate this with an example. Suppose we have the equation
+$$
+x^2 + x - 2^{1000} = 0
+$$
+We can rearrange this to get
+$$
+x(x+1) = 2^{1000}
+$$
+So we have $x \mid 2^{1000}$ and $x+1 \mid 2^{1000}$. Since $x$ and $x + 1$ are consecutive integers, one of them must be odd. The only odd integer that divides $2^{1000}$ is $\pm 1$. So, there are several cases to consider:
+- Suppose $x = 1$, then $x + 1 = 2$. But $x(x + 1) = 2 \neq 2^{1000}$. So $x = 1$ is not a solution.
+- Suppose $x = -1$, then $x + 1 = 0$. But $x(x + 1) = 0 \neq 2^{1000}$. So $x = -1$ is not a solution.
+- Suppose $x + 1 = 1$, then $x = 0$. But $x(x + 1) = 0 \neq 2^{1000}$. So $x = 0$ is not a solution.
+- Suppose $x + 1 = -1$, then $x = -2$. But $x(x + 1) = 2 \neq 2^{1000}$. So $x = -2$ is not a solution.
+
+This is a contradiction, so there are no solutions to the equation $x^2 + x - 2^{1000} = 0$.
+
+### Divisibility
+Let's first give some basic properties of divisibility.
+<Proposition withName={true}>
+<PropositionName>Basic Properties of Divisibility</PropositionName>
+<PropositionContent>
+Let $a, b, c \in \Z$.
+1. If $a \mid b$ and $b \mid c$, then $a \mid c$.
+2. If $a \mid b$ and $a \mid c$, then $a \mid xb + yc$ for all $x, y \in \Z$.
+3. If $a \mid b$ and if $b \neq 0$, then $|a| \leq |b|$.
+</PropositionContent>
+</Proposition>
+The third property above also implies that if $|a| > |b|$, and $a | b$, then $b = 0$. Let's give a proof of properties 2 and 3.
+<Proof withName={true}>
+<ProofName>Property 2</ProofName>
+<ProofContent>
+We have $a \mid b$ and $a \mid c$. This implies that $b = na$ and $c = ma$ for some $n, m \in \Z$. So, we have
+$$
+\begin{align*}
+    xb + yc &= x(na) + y(ma) \\
+    &= (xn + ym) a
+\end{align*}
+$$
+So $a \mid xb + yc$.
+</ProofContent>
+</Proof>
+<Proof withName={true}>
+<ProofName>Property 3</ProofName>
+<ProofContent>
+If $a \mid b$, then $b = na$ for some $n \in \Z$. Then
+$$
+\begin{align*}
+    |b| &= |na| \\
+    &= |n||a| 
+\end{align*}
+$$
+There are 2 cases to consider:
+1. If $n = 0$, then $b = 0$, but we assumed that $b \neq 0$, so $n \neq 0$.
+2. If $n \neq 0$, then $|n| \geq 1$. Thus $|b| = |n||a| \geq |a|$.
+</ProofContent>
+</Proof>
+And we can give more properties of divisibility, without giving a proof.
+<Proposition withName={true}>
+<PropositionName>More Properties of Divisibility</PropositionName>
+<PropositionContent>
+Let $a, b \in \Z$.
+1. $1 \mid a$ for all $a \in \Z$.
+2. $a \mid 0$ for all $a \in \Z$.
+3. $0 \mid a$ if and only if $a = 0$.
+4. If $a \mid b$ and $b \mid a$, then $a = \pm b$.
+</PropositionContent>
+</Proposition>
+
+### Remainder Theorem
+Now we get to the key result of this lecture.
+<Theorem withName={true}>
+<TheoremName>Remainder Theorem (or Division Algorithm)</TheoremName>
+<TheoremContent>
+Let $a, b \in \Z_{> 0}$ with $b \neq 0$. Then there exists unique integers $q, r \in \Z$ such that
+$$
+a = qb + r, \quad 0 \leq r < b
+$$
+where $q$ is called the quotient and $r$ is called the remainder.
+
+This theorem also implies that $b \mid a$ if and only if $r = 0$.
 </TheoremContent>
 </Theorem>
-We will give a proof of this theorem later. But as an example, if we have a equation $x^2 + x - 1 = 0$, then we just need to check the divisors of $-1$ to find the solutions.
+Before we give the proof, we first define the floor function.
+<Definition withName={true}>
+<DefinitionName>Floor Function</DefinitionName>
+<DefinitionContent>
+Given $x \in \mathbb R$, define $\lfloor x \rfloor$ to be the largest integer $\leq x$.
+</DefinitionContent>
+</Definition>
+<Callout type="info" emoji="ℹ️">
+  For negative numbers, we have $\lfloor -2.71 \rfloor = -3$, since $-3$ is the largest integer less than or equal to $-2.71$. 
+</Callout>
+<Callout type="info" emoji="ℹ️">
+  Observe that 
+  $$
+  x - 1 < \lfloor x \rfloor \leq x
+  $$
+
+</Callout>
+Now we can give our proof of the Remainder Theorem.
+<Proof withName={true}>
+<ProofName>Remainder Theorem</ProofName>
+<ProofContent>
+We let $q = \lfloor \frac{a}{b} \rfloor$ and $r = a - bq$. Then $qb + r = b\lfloor \frac{a}{b} \rfloor + a - b\lfloor \frac{a}{b} \rfloor = a$. So we need to show that $0 \leq r < b$. Observe that
+$$
+\begin{align*}
+    \frac{a}{b} - 1 &< q \leq \frac{a}{b} \\
+    a - b &< qb \leq a \\
+    -b &< qb - a \leq 0 \\
+    b &> a - qb \geq 0
+\end{align*}
+$$
+So we have proved existence. Now we need to show uniqueness. For contradiction suppose that there exists $q, r, q', r'$ such that
+$$
+a = qb + r, \quad 0 \leq r < b
+$$
+and
+$$
+a = q'b + r', \quad 0 \leq r' < b
+$$
+So we have
+$$
+\begin{align*}
+    qb + r &= q'b + r' \\
+    (q - q') b &= r' - r 
+\end{align*}
+$$
+Since $q - q'$ is an integer, we have that $b \mid r' - r$. But, we also have
+$$
+-b \leq r' - r \leq b
+$$
+Thus by property of divisibility, we have $r' - r = 0$, so $r = r'$. Then $(q - q')b = 0$, so $q = q'$.
+</ProofContent>
+</Proof>
+So for example, if we have $a = 100, b = 14$. We can write
+$$
+a = 7b + 2
+$$
+so $q = 7, r = 2$. However, note that there are many other $q, r$ such that $100 = 14q + r$. For example, we can also write
+$$
+100 = 14 \cdot 2 + 72
+$$
+but $72$ is not a remainder since we need $0 < r \leq b$.
+
+Now, from the Remainder Theorem, we can **classify** integers into remainders by $b$.
+1. Suppose that $b = 2$. Then for all $a \in \Z$, we can write $a = 2q + r$ with $0 \leq r < 2$. So $r = 0$ or $r = 1$.
+2. Suppose that $b = 10$. Then for all $a \in \Z$, we can write $a = 10q + r$ with $0 \leq r < 10$. So $r = 0, 1, 2, \ldots, 9$.
+
+<Problem>
+<ProblemContent>
+Show that $x^2 + y^2 = 3$ has no solutions in $\Z$.
+
+An intuitive way to look at this is that $x^2 + y^2 \geq 0$, and consider possible values of $x, y$. Since we need RHS to be $3$, if we have either $x = 2$ or $y = 2$, then we have $x^2 + y^2 \geq 4$. So we only need to consider $x, y \in \{0,1\}$. We do not need to consider negatives since squaring them will make them positive.
+
+For both $x = 0, 1$, $y$ has no solutions. Also for both $y = 0, 1$, $x$ has no solutions. So there are no solutions in $\Z$.
+
+However, we can think about this problem in a different way. We can consider the remainders of $x^2$ and $y^2$ when divided by $b = 4$.
+</ProblemContent>
+</Problem>
