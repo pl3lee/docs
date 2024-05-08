@@ -1,0 +1,193 @@
+import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName, CorollaryContent, Example, ExampleName, ExampleContent, Problem, ProblemName, ProblemContent, Proposition, PropositionName, PropositionContent, Theorem, TheoremName, TheoremContent, Lemma, LemmaName, LemmaContent, Proof, ProofName, ProofContent } from "/components/math";
+import { Steps, Callout } from 'nextra/components'
+
+# CO 250 Review
+This is a review of the material covered in CO 250. It is not meant to be comprehensive, but rather a summary of the key concepts.
+
+## Linear Programs
+First let's define some terms.
+<Definition>
+<DefinitionName>Feasible Solution</DefinitionName>
+<DefinitionContent>
+A solution is feasible if it has the property that all constraints are satisfied.
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Optimal Solution</DefinitionName>
+<DefinitionContent>
+An optimal solution to a formulation is a feasible solution that maximizes the objective function (or minimizes it, depending on the problem).
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Affine Function</DefinitionName>
+<DefinitionContent>
+A function $f$ is affine if it is of the form $f(x) = a^T x + b$, where $x$ and $a$ are vectors and $b$ is a real number. If $b = 0$, then $f$ is linear.
+
+Note that every linear function is affine, but not every affine function is linear.
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Linear Constraint</DefinitionName>
+<DefinitionContent>
+A constraint is linear if it is of the following form:
+- $f(x) \leq b$
+- $f(x) \geq b$
+- $f(x) = b$
+
+where $f$ is a linear function and $b$ is a real number.
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Linear Program</DefinitionName>
+<DefinitionContent>
+A linear program (LP) is the problem of maximizing/minimizing an affine function subject to a finite number of linear constraints.
+</DefinitionContent>
+</Definition>
+
+## Solving Linear Programs
+<Definition>
+<DefinitionName>Infeasible Linear Program</DefinitionName>
+<DefinitionContent>
+A linear program is infeasible if there does not exist a solution that satisfies all constraints simultaneously.
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Unbounded Linear Program</DefinitionName>
+<DefinitionContent>
+A linear program is unbounded if the objective function can be made arbitrarily large (in the case of maximization) or arbitrarily small (in the case of minimization) without violating any constraints. That is, given objective function $f(x)$, for every $\alpha \in \mathbb R$, there exists a feasible solution $x$ such that $f(x) \geq \alpha$ (for maximization problems) or $f(x) \leq \alpha$ (for minimization problems).
+</DefinitionContent>
+</Definition>
+<Theorem withName={true}>
+<TheoremName>Fundamental Theorem of Linear Programming</TheoremName>
+<TheoremContent>
+Every linear program is exactly one of the following:
+- has an optimal solution,
+- is infeasible
+- is unbounded.
+</TheoremContent>
+</Theorem>
+<Definition>
+<DefinitionName>Standard Equality Form (SEF)</DefinitionName>
+<DefinitionContent>
+An LP is in SEF if
+- it is a maximization problem
+- all constraints are equality constraints except for variable non-negativity constraints (i.e. $x_i \geq 0$ for all $i$).
+- all variables are non-negative.
+
+For example, the following is in SEF:
+$$
+\begin{align*}
+\text{max } & 2x_1 + 3x_2 \\
+\text{s.t } & x_1 + x_2 = 4 \\
+& x_1, x_2 \geq 0
+\end{align*}
+$$
+</DefinitionContent>
+</Definition>
+
+### Transforming LP to SEF
+When we are given a minimization problem, we can multiply the objective function by $-1$ to get a maximization problem. For example, if we have the minimization problem
+$$
+\min{2x_1 - 3x_2 + 7}
+$$
+we can transform it into the maximization problem
+$$
+\max{-2x_1 + 3x_2 - 7}
+$$
+For $\geq$ constraints, we can subtract a slack variable to transform it into an equality constraint. For $\leq$ constraints, we can add a slack variable to transform it into an equality constraint.
+
+Then for each variable $x_i$ that does not have a non-negativity constraint, we can write it as the difference of two non-negative variables:
+$$
+x_i = x_i^+ - x_i^-
+$$
+and set $x_i^+, x_i^- \geq 0$.
+
+<Example withName={true}>
+<ExampleName>Transforming to SEF</ExampleName>
+<ExampleContent>
+Suppose we are given
+$$
+\begin{align*}
+\text{min } &2x_1 - 3x_2 + 7 \\
+\text{s.t } &x_1 + x_2 \geq 3 \\
+&-3x_1 + x_2 \leq 5 \\
+& x_2 \geq 0
+\end{align*}
+$$
+We can transform it into SEF as follows:
+$$
+\begin{align*}
+\text{max } &-2(x_1^+ - x_1^-) + 3x_2 - 7 \\
+\text{s.t } &x_1^+ - x_1^- + x_2 - x_3 = 3 \\
+&-3(x_1^+ - x_1^-) + x_2 + x_4 = 5 \\
+& x_1^+, x_1^-, x_2, x_3, x_4 \geq 0
+\end{align*}
+$$
+</ExampleContent>
+</Example>
+
+### Basis and Basic Solutions
+<Definition>
+<DefinitionName>Column Sub-matrix</DefinitionName>
+<DefinitionContent>
+Suppose that $B$ is a subset of the column indices of the matrix $A$. Then $A_B$ is a column sub-matrix of $A$ that consists of the columns of $A$ indexed by $B$.
+
+For example, if 
+$$
+A = \begin{bmatrix}
+1 & 2 & 3 & 4 & 5 \\
+6 & 7 & 8 & 9 & 10 \\
+11 & 12 & 13 & 14 & 15
+\end{bmatrix}, \quad B = \{1, 3, 5\}
+$$
+then
+$$
+A_B = \begin{bmatrix}
+1 & 3 & 5 \\
+6 & 8 & 10 \\
+11 & 13 & 15
+\end{bmatrix}
+$$
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Basis</DefinitionName>
+<DefinitionContent>
+Let $B$ be a subset of column indices of $A$. Then $B$ is a basis if
+1. $A_B$ is a square matrix
+2. $A_B$ is invertible (i.e. columns are independent)
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Basic Variables</DefinitionName>
+<DefinitionContent>
+Let $B$ be a basis for $A$
+- if $j \in B$ then $x_j$ is a basic variable
+- if $j \not \in B$ then $x_j$ is a non-basic variable
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Basic Solution</DefinitionName>
+<DefinitionContent>
+For an LP with system $Ax = b$, $\bar x$ is a basic solution for basis $B$ if
+- $A\bar x = b$
+- $x_j = 0$ for all $j \not \in B$
+
+For example, if we have
+$$
+A = \begin{bmatrix}
+1 & 2 & -1 & 1 & -1 \\
+0 & 1 & 0 & 1 & -1 \\
+0 & 0 & 1 & 1 & -1 
+\end{bmatrix}, \quad b = \begin{bmatrix}
+2 \\ 1 \\ 1
+\end{bmatrix}
+$$
+Then $x = \begin{bmatrix} 1 & 1 & 1 & 0 & 0 \end{bmatrix}^T$ is a basic solution for basis $B = \{1, 2, 3\}$.
+</DefinitionContent>
+</Definition>
+<Theorem>
+<TheoremContent>
+Consider $Ax = b$ and a basis $B$ of $A$. Then there exists a unique basic solution $\bar x$ for basis $B$.
+</TheoremContent>
+</Theorem>
