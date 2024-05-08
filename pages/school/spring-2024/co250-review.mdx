@@ -191,3 +191,33 @@ Then $x = \begin{bmatrix} 1 & 1 & 1 & 0 & 0 \end{bmatrix}^T$ is a basic solution
 Consider $Ax = b$ and a basis $B$ of $A$. Then there exists a unique basic solution $\bar x$ for basis $B$.
 </TheoremContent>
 </Theorem>
+<Definition>
+<DefinitionName>Canonical Form</DefinitionName>
+<DefinitionContent>
+Consider the problem $P$:
+$$
+\max\{c^T x: Ax = b, x \geq 0\}
+$$
+Let $B$ be a basis of $A$. Then the problem $P$ is in canonical form for $B$ if
+1. $A_B = I$, and
+2. $c_j = 0$ for all $j \in B$ (the coefficient of $x_j$ in the objective function is 0)
+</DefinitionContent>
+</Definition>
+And now we have the Simplex Algorithm which solves an LP.
+<Definition>
+<DefinitionName>Simplex Algorithm</DefinitionName>
+<DefinitionContent>
+Suppose we have a basic solution to the LP problem in canonical form with basis $B$. We can find a better feasible solution by
+1. Pick $k \not \in B$ such that $c_k > 0$
+2. Set $x_k = t \geq 0$ as large as possible
+3. Keep all other non-basic variables at $0$
+4. Choose basic variables such that $Ax = b$ holds.
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Bland's Rule</DefinitionName>
+<DefinitionContent>
+- If we have a choice for the element entering the basis, pick the one with the smallest index.
+- If we have a choice for the element leaving the basis, pick the one with the smallest index.
+<DefinitionContent>
+</Definition>
