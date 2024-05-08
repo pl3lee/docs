@@ -1,7 +1,7 @@
 import styles from './Definition.module.scss'
 import { Box } from '../Box/Box'
 
-export function Definition({ id, withName = false, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
+export function Definition({ id, withName = true, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
     return (
         <Box id={id ?? id}>
             {!withName && <DefinitionName />}

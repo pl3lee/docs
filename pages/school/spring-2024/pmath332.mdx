@@ -218,3 +218,150 @@ $$
 </DefinitionContent>
 </Definition>
 Then we can use properties of $e^x$ instead of trigonometric identities!
+
+## Lecture 3 (May 8, 2024)
+### Polar and Exponential Form (Continued)
+From last lecture, we wrote $z = x + iy = re^{i\theta}$, where $r = |z|$.
+<Callout type="info" emoji="ℹ️">
+  $|e^{i\theta}| = 1$ for all $\theta$. This is because
+  $$
+  |e^{i\theta}| = |\cos \theta + i \sin \theta| = \sqrt{\cos^2 \theta + \sin^2 \theta} = 1
+  $$
+
+</Callout>
+We extend the definition of $\arg$ and we define $\arg(z)$ to be the **set** of all possible values of $\theta$ which can be used to describe $z$, instead of just a single value $\theta$.
+
+From Lecture 2, we wrote
+$$
+\arg(z_1z_2) = \arg(z_1) + \arg(z_2)
+$$
+because $z_1z_2 = r_1r_2 e^{i(\theta_1 + \theta_2)}$. However, this is problematic.
+
+Let's consider $z_1 = z_2 = i$. Then $\arg(z_1z_2) = \arg(-1) = \pi + 2\pi k$. For RHS, we get
+$$
+\begin{align*}
+    \arg(z_1) + \arg(z_2) &= \arg(i) + \arg(i) \\
+    &= \left(\frac{\pi}{2} + 2 \pi k_1\right) + \left(\frac{\pi}{2} + 2 \pi k_2\right) \\
+    &= \pi + 2\pi(k_1 + k_2)
+\end{align*}
+$$
+That is, we have
+$$
+\arg(z_1z_2) = \pi + 2\pi(k_1 + k_2)
+$$
+However, we also have
+$$
+2 \arg(i) = 2 \left(\frac{\pi}{2} + 2\pi k\right) = \pi + 4 \pi k
+$$
+Thus we have
+$$
+\arg(i) + \arg(i) \neq 2 \arg(i)
+$$
+We wish to identify a specific value of $\arg(z)$, so we have these definition.
+<Definition>
+<DefinitionName>Principle Value</DefinitionName>
+<DefinitionContent>
+$\mathrm{Arg}(z)$ is the principle value, by which we mean the one in $(-\pi, \pi)$.
+</DefinitionContent>
+</Definition>
+<Definition>
+<DefinitionName>Branch</DefinitionName>
+<DefinitionContent>
+$\arg_{z_0}(z)$ is a branch of $\arg(z)$, which is the angle in the interval $[z_0, z_0 + 2\pi)$.
+</DefinitionContent>
+</Definition>
+For example, we have $\arg_0(z)$ has range $[0, 2\pi)$.
+<Definition>
+<DefinitionName>Branch Cut</DefinitionName>
+<DefinitionContent>
+A branch cut is the angle at the endpoints of the interval.
+</DefinitionContent>
+</Definition>
+<Example>
+<ExampleContent>
+Consider $\arg_{\pi / 4}(z)$. Then $\theta = \frac{\pi}{4}$ is a branch cut. We also have $\theta = \frac{9\pi}{4}$ as a branch cut, but it is in a different branch.
+</ExampleContent>
+</Example>
+
+### Converting from Standard Form to Exponential Form
+Suppose we have $z = 1 - i$. Then we have the graph
+
+![Graph](/images/school/spring-2024/pmath332/3-1.png)
+
+We can see that $\theta = -\frac{\pi}{4}$, and the modulus is $r = \sqrt{1 + 1} = \sqrt 2$. Thus, we have
+$$
+z = 1 - i = \sqrt 2 e^{-i\pi/4}
+$$
+or
+$ \sqrt 2 e^{(\frac{\pi}{4} + 2\pi k)i}$ since the angles are equivalent.
+
+Now suppose that we have $z = -1 + \sqrt 3 i$. This is hard to graph, so let's solve this algebraically. We have
+$r = |z| = \sqrt{1 + 3} = 2$. And from before,
+$$
+\tan \theta = \frac{y}{x} = - \sqrt 3
+$$
+so $\theta = \frac{2\pi}{3} + 2\pi k$. So
+$$
+z = -1 + \sqrt 3 i = 2 e^{i\frac{2\pi}{3}}
+$$
+
+### Converting from Exponential Form to Standard Form
+The trick is to think about the unit circle.
+
+Suppose we have $e^{\frac{\pi}{2}i}$. This is a point on the unit circle, with $\theta = \frac{\pi}{2}$. So clearly the point lies on the imaginary axis, and thus $z = i$.
+
+Now suppose that $e^{-\frac{\pi}{2}i}$. This is the same case, but in the opposite direction, so $z = -i$.
+
+Now for $e^{i\pi}$. This is a point on the unit circle, with $\theta = \pi$. So the point lies on the negative real axis, and thus $z = -1$.
+
+Then for $e^{\frac{\pi}{4}i}$, this point lies in the first quadrant, with equal distance from the real and imaginary axes. So we can normalize $1 + i$ to get $z = \frac{1}{\sqrt 2} + \frac{1}{\sqrt 2}i$.
+
+Similarly for $e^{i\frac{3\pi}{4}}$, this point lies in the second quadrant, with equal distance from the real and imaginary axes. So we can normalize $-1 + i$ to get $z = -\frac{1}{\sqrt 2} + \frac{1}{\sqrt 2}i$.
+
+### Advantage of Exponential Form
+An advantage of exponential form is that multiplication and division **can** be easier when compared to standard form. However, addition and subtraction are easier in standard form.
+
+An example of division being easier is to consider $z_1 = 1 + i$ and $z_2 = 1 - i$. Then we have
+$$
+\begin{align*}
+    \frac{1 + i}{1 - i} &= \frac{\sqrt 2 e^{\frac{\pi}{4}i}}{\sqrt 2 e^{-\frac{\pi}{4}i}} \\
+    &= e^{\frac{\pi}{2}i} = i
+\end{align*}
+$$
+But it does not always become easier. Consider 
+$$
+\begin{align*}
+    \left(\frac{2 + i}{-3 + 2i}\right)(3 - i) &= \frac{\sqrt 5 e^{i \tan^{-1}(\frac{1}{2})}}{\sqrt{13} e^{i(\tan^{-1}(- \frac{2}{3}) + \pi)}} (\sqrt{10} e^{i \tan^{-1}(- \frac{1}{3})}) \\
+    &= \frac{\sqrt{50}}{\sqrt{13}} e^{i(\tan^{-1}(\frac{1}{2}) - \tan^{-1}(- \frac{2}{3}) - \pi + \tan^{-1}(- \frac{1}{3}) + \pi)}
+\end{align*}
+$$
+However, the advantage is clearer when we raise to a power.
+<Theorem withName={true}>
+<TheoremName>Demoivre's Formula</TheoremName>
+<TheoremContent>
+If $z = re^{i\theta}$, then
+$$
+z^n = r^n e^{in\theta} = r^n \left[\cos(n\theta) + i \sin(n\theta)\right]
+$$
+</TheoremContent>
+</Theorem>
+Here are some examples.
+<Example withName={true}>
+<ExampleName> Example of using Demoivre's Formula</ExampleName>
+<ExampleContent>
+We have 3 examples:
+$$
+\begin{align*}
+    (2 + 2i)^3 &= (2 \sqrt 2 e^{\frac{\pi}{4}i})^3 \\
+    &= 16 \sqrt 2 e^{\frac{3\pi}{4}i} \\
+    &= 16(-1 + i) \\
+    (2i)^{-3} &= (2e^{\frac{\pi}{2}i})^{-3} \\
+    &= \frac{1}{8} e^{-\frac{3\pi}{2}i} \\
+    &= \frac{-i}{8} \\
+    (\sqrt 3 + i)^5 &= (2e^{\frac{\pi}{6}i})^5 \\
+    &= 32 e^{\frac{5\pi}{6}i} \\
+    &= 16(- \sqrt 3 + i)
+\end{align*}
+$$
+</ExampleContent>
+</Example>
