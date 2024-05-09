@@ -214,10 +214,230 @@ Suppose we have a basic solution to the LP problem in canonical form with basis 
 4. Choose basic variables such that $Ax = b$ holds.
 </DefinitionContent>
 </Definition>
+
 <Definition>
 <DefinitionName>Bland's Rule</DefinitionName>
 <DefinitionContent>
 - If we have a choice for the element entering the basis, pick the one with the smallest index.
 - If we have a choice for the element leaving the basis, pick the one with the smallest index.
-<DefinitionContent>
+</DefinitionContent>
 </Definition>
+Then, we will demonstrate the tableau method for Simplex Algorithm.
+
+<Example withName={true}>
+<ExampleName>Simplex Algorithm with Tableau</ExampleName>
+<ExampleContent>
+Suppose that we have the following LP in SEF and initial basis $B = \{3, 4\}$:
+$$
+\begin{align*}
+\text{max } & \begin{pmatrix}2 & 3 & 0 & 0\end{pmatrix}x \\
+\text{s.t } & \begin{pmatrix}
+1 & 2 & 1 & 0 \\
+5 & 5 & 0 & 1
+\end{pmatrix}x = \begin{pmatrix} 20 \\ 60 \end{pmatrix} \\
+&x \geq 0
+\end{align*}
+$$
+Then we have the initial Tableau
+
+$$
+\begin{array}{c|cccc|c}
+1 & -2 & -3 & 0 & 0 & 0 \\
+\hline
+0 & 1 & 2 & 1 & 0 & 20 \\
+0 & 5 & 5 & 0 & 1 & 60\\
+\end{array}, \quad B = \{3, 4\}
+$$
+Since there are two choices for the variable entering the basis, we choose the smaller index, so $x_1$ enters the basis. Then we do the ratio test. Since $\frac{60}{5} = 12 < 20 = \frac{20}{1}$, the leaving variable is $x_4$. So we perform row operations so that we get a canonical form with respect to basis $B = \{1, 3\}$:
+$$
+\begin{array}{c|cccc|c}
+1 & 0 & -1 & 0 & \frac{2}{5} & 24 \\
+\hline
+0 & 1 & 1 & 0 & \frac{1}{5} & 12 \\
+0 & 0 & 1 & 1 & -\frac{1}{5} & 8\\
+\end{array}, \quad B = \{1, 3\}
+$$
+Now, we can only choose $x_2$ as the entering variable. Since $\frac{8}{1} = 8 < 12 = \frac{12}{1}$ we choose $x_3$ to be the leaving variable. So we perform row operations so that we get a canonical form with respect to basis $B = \{1, 2\}$:
+$$
+\begin{array}{c|cccc|c}
+1 & 0 & 0 & 1 & \frac{1}{5} & 32 \\
+\hline
+0 & 1 & 0 & -1 & \frac{2}{5} & 4 \\
+0 & 0 & 1 & 1 & -\frac{1}{5} & 8\\
+\end{array}, \quad B = \{1, 2\}
+$$
+Since there are no more negative coefficients in the first row, we stop. So $B = \{1,2\}$ is the optimal basis. We read off the right hand side to get the optimal solution $x = \begin{pmatrix} 4 & 8 & 0 & 0 \end{pmatrix}^T$.
+
+This is equivalent to the LP
+$$
+\begin{align*}
+\text{max } & \begin{pmatrix} 0 & 0 & -1 & -\frac{1}{5} \end{pmatrix}x + 32 \\
+\text{s.t } & \begin{pmatrix}
+1 & 0 & -1 & \frac{2}{5} \\
+0 & 1 & 1 & -\frac{1}{5}
+\end{pmatrix}x = \begin{pmatrix} 4 \\ 8 \end{pmatrix} \\
+&x \geq 0
+\end{align*}
+$$
+Since our optimal solution is $x = \begin{pmatrix} 4 & 8 & 0 & 0 \end{pmatrix}^T$, the optimal value is $32$.
+</ExampleContent>
+</Example>
+
+## Duality
+<Definition>
+<DefinitionName>Primal-dual Pair</DefinitionName>
+<DefinitionContent>
+Given a LP $(P)$ in SEF 
+$$
+\max\{c^Tx: Ax = b, x \geq 0\}
+$$
+its dual LP $(D)$ is
+$$
+\min\{b^Ty: A^Ty \geq c\}
+$$
+Note that there is a correspondence between constraints and dual variables.
+- A constraint (row) in the primal corresponds to a variable in the dual (column).
+- A variable in the primal (column) corresponds to a constraint in the dual (row).
+
+and vice versa
+</DefinitionContent>
+</Definition>
+<Theorem withName={true}>
+<TheoremName>Weak Duality Theorem</TheoremName>
+<TheoremContent>
+Any feasible solution to the dual gives an upper bound on the objective values of **all** feasible primal solutions. In particular, the objective values of dual feasible solutions must be greater than or equal to the objective values of primal feasible solutions.
+
+Therefore, if there exists a dual and a primal feasible solution with the same objective value, then they must be optimal solutions.
+</TheoremContent>
+</Theorem>
+
+<Theorem withName={true}>
+<TheoremName>Strong Duality Theorem</TheoremName>
+<TheoremContent>
+Let $(P)$ and $(D)$ be the primal and dual LPs. If $(P)$ has an optimal solution, then $(D)$ has an optimal solution and the optimal values are equal.
+</TheoremContent>
+</Theorem>
+So, we have the following outcomes of primal-dual pairs.
+| Dual $\downarrow$ Primal $\rightarrow$ | Optimal | Unbounded | Infeasible |
+|---------------------------------------|---------|-----------|------------|
+| Optimal | Possible (S) | Impossible (S) | Impossible (S) |
+| Unbounded | Impossible (S & W) | Impossible (W) | Possible (W) |
+| Infeasible | Impossible (S) | Possible (W) | Possible |
+
+### Finding the Dual for any LP
+Here is a table that summarizes how to convert different types of variables and constraints:
+| max LP | min LP |
+|--------|--------|
+| $\leq$ constraints | $\geq 0$ variables |
+| $=$ constraints | free variables |
+| $\geq$ constraints | $\leq 0$ variables |
+| $\geq 0$ variables | $\geq$ constraints |
+| $\leq 0$ variables | $\leq$ constraints |
+| free variables | $=$ constraints |
+
+<Example>
+<ExampleContent>
+Suppose that we have $(P)$:
+$$
+\begin{align*}
+\text{max } & \begin{pmatrix} 3 & 1 & 4 & 1 \end{pmatrix}x \\
+\text{s.t } & \begin{pmatrix}
+1 & 2 & 3 & 4 \\
+4 & 3 & 2 & 1 \\
+2 & 2 & 2 & 2
+\end{pmatrix}x \begin{array}{c} \geq \\ \leq \\ = \end{array} \begin{pmatrix} 3 \\ 4 \\ 5 \end{pmatrix} \\
+&x_1, x_2 \geq 0, x_3 \leq 0, x_4 \text{ free}
+\end{align*}
+$$
+Then its dual $(D)$ is
+$$
+\begin{align*}
+\text{min } & \begin{pmatrix} 3 & 4 & 5 \end{pmatrix}y \\
+\text{s.t } & \begin{pmatrix}
+1 & 4 & 2 \\
+2 & 3 & 2 \\
+3 & 2 & 2 \\
+4 & 1 & 2
+\end{pmatrix}y \begin{array}{c} \geq \\ \geq \\ \leq \\ = \end{array} \begin{pmatrix} 3 \\ 1 \\ 4 \\ 1 \end{pmatrix} \\
+&y_1 \leq 0, y_2 \geq 0, y_3 \text{ free}
+\end{align*}
+$$
+</ExampleContent>
+</Example>
+
+### Complementary Slackness
+The complementary slackness conditions are as follows. Given any primal-dual pair $(P),(D)$:
+- $x_i = 0$ or the corresponding dual constraint is tight, and
+- $y_j = 0$ or the corresponding primal constraint is tight.
+
+And we have a theorem:
+<Theorem withName={true}>
+<TheoremName>Complementary Slackness Theorem</TheoremName>
+<TheoremContent>
+Let $(P), (D)$ be a primal-dual pair. Let $\bar x, \bar y$ be feasible solutions for $(P), (D)$ respectively. Then $\bar x$ and $\bar y$ are optimal for $(P), (D)$ if and only if $\bar x, \bar y$ satisfy all complementary slackness conditions.
+</TheoremContent>
+</Theorem>
+
+<Example withName={true}>
+<ExampleName>Using Complementary Slackness to Certify Optimality</ExampleName>
+<ExampleContent>
+Suppose we have $(P)$:
+$$
+\begin{align*}
+\text{max } & \begin{pmatrix} 1 & -2 \end{pmatrix}x \\
+\text{s.t } & \begin{pmatrix}
+1 & -1 \\
+2 & 1 \\
+0 & 1
+\end{pmatrix}x \begin{array}{c} = \\ \geq \\ \leq \end{array} \begin{pmatrix} 2 \\ 1 \\ 4 \end{pmatrix} \\
+&x_1\geq 0, x_2 \text{ free}
+\end{align*}
+$$
+Then its dual $(D)$ is
+$$
+\begin{align*}
+\text{min } & \begin{pmatrix} 2 & 1 & 4 \end{pmatrix}y \\
+\text{s.t } & \begin{pmatrix}
+1 & 2 & 0 \\
+-1 & 1 & 1
+\end{pmatrix}y \begin{array}{c} \geq \\ = \end{array} \begin{pmatrix} 1 \\ -2 \end{pmatrix} \\
+&y_1 \text{ free}, y_2 \leq 0, y_3 \geq 0
+\end{align*}
+$$
+Suppose we think that $\bar x = (1, -1)^T$ is optimal for $(P)$. We want to derive an optimal $\bar y$ for $(D)$. So we can check our CS conditions:
+1. $ x_1 = 0$ or $y_1 + 2y_2 + 0y_3 = 1$.
+    
+    Since we have $\bar x_1 = 1 \neq 0$, we must have $y_1 + 2y_2 + 0y_3 = 1$.
+2. $ x_2 = 0$ or $-y_1 + y_2 + y_3 = -2$
+
+    In the dual, this constraint is an equality constraint, so we must have $-y_1 + y_2 + y_3 = -2$.
+3. $y_1 = 0$ or $x_1 - x_2 = 2$
+
+    In the primal, this constraint is an equality constraint, so this does not help us deduce $y_1$.
+4. $y_2 = 0$ or $2x_1 + x_2 = 1$
+
+    Since $2\bar x_1 + \bar x_2 = 1$, we cannot deduce anything about $y_2$.
+5. $y_3 = 0$ or $0x_1 + x_2 = 4$
+
+    Since $\bar x_2 \neq 4$, we must have $y_3 = 0$.
+
+So we have the following system of equations:
+$$
+\begin{align}
+y_1 + 2y_2 &= 1 \\
+-y_1 + y_2 + y_3 &= -2 \\
+y_3 &= 0
+\end{align}
+$$
+Adding (2) to (1), and taking into account (3), we get
+$$
+3y_2 = -1 \implies y_2 = - \frac{1}{3}
+$$
+Substituting this into (1), we get
+$$
+y_1 - \frac{2}{3} = 1 \implies y_1 = \frac{5}{3}
+$$
+So we have optimal solution $\bar y = \begin{pmatrix} \frac{5}{3} & -\frac{1}{3} & 0 \end{pmatrix}^T$.
+</ExampleContent>
+</Example>
+
