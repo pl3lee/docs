@@ -24,6 +24,9 @@
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
+			"settings": {
+                "extensions.verifySignature": false
+            },
 			"extensions": ["streetsidesoftware.code-spell-checker", "eamodio.gitlens", "unifiedjs.vscode-mdx", "rvest.vs-code-prettier-eslint", "bradlc.vscode-tailwindcss", "github.copilot", "github.copilot-chat", "mathematic.vscode-latex", "jeffersonqin.latex-snippets-jeff", "tecosaur.latex-utilities", "james-yu.latex-workshop", "yzhang.markdown-all-in-one"]
 		}
 	},
