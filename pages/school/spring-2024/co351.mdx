@@ -151,6 +151,7 @@ Notice that each column has exactly one 1 and one -1, and the rest are 0s. This 
 ## Lecture 2 (May 9 2024)
 ### Fundamentals (Continued)
 Let's continue with some more definitions.
+#### Basic Definitions for Digraphs
 <Definition>
 <DefinitionName>Diwalk</DefinitionName>
 <DefinitionContent>
@@ -160,3 +161,72 @@ We can abbreviate this by only writing the nodes: $Q = v_1,v_2,\ldots,v_k$. Note
 </DefinitionContent>
 </Definition>
 
+<Definition>
+    <DefinitionName>Dipath</DefinitionName>
+    <DefinitionContent>
+        A dipath $P$ is a diwalk such that $v_1,\ldots,v_k$ are distinct nodes.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>Dicycle</DefinitionName>
+    <DefinitionContent>
+        A dicycle $C$ is a diwalk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>$st$-diwalk</DefinitionName>
+    <DefinitionContent>
+        An $st$-diwalk is a diwalk that starts at $s$ and ends at $t$.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>$st$-dipath</DefinitionName>
+    <DefinitionContent>
+        An $st$-dipath is a dipath that starts at $s$ and ends at $t$, with $s \neq t$.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>Acyclic</DefinitionName>
+    <DefinitionContent>
+        A digraph $D$ that contains no dicycle is acyclic.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>Reach</DefinitionName>
+    <DefinitionContent>
+        For nodes $s,v$ of digraph $D$, $v$ can be reached from $s$ if $D$ has an $sv$-diwalk.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>Subdigraph</DefinitionName>
+    <DefinitionContent>
+        $D' = (N', A')$ is called a subdigraph of $D = (N, A)$ if $N' \subseteq N$ and $A \subseteq A$.
+    </DefinitionContent>
+</Definition>
+
+<Definition>
+    <DefinitionName>Spanning Subdigraph</DefinitionName>
+    <DefinitionContent>
+        $D' = (N', A')$ is called a spanning subdigraph of $D = (N, A)$ if $N' = N$ and $A' \subseteq A$. In other words, $D'$ contains all the nodes of $D$, but only contains a subset of the arcs.
+    </DefinitionContent>
+</Definition>
+
+#### Cuts
+Suppose we have a digraph $D = (N, A)$
+<Definition>
+    <DefinitionName>Cut</DefinitionName>
+    <DefinitionContent>
+        For $S \subseteq N$, the cut with shore $S$ is the set of arcs with **tails in** $S$ and **heads not in** $S$.
+
+        We use the notation 
+        $$
+        \delta_D(S) = \delta(S) = \{uv \in A: u \in S, v \not \in S\}
+        $$
+    </DefinitionContent>
+</Definition>
