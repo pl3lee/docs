@@ -11,6 +11,7 @@ All the IPs below are local IPs.
 | IP | Description |
 | --- | --- |
 | 10.10.1.1 | Unraid Server |
+| 10.10.1.2 | VM Ubuntu-Jumphost |
 | 10.10.1.3 | VM Ubuntu-Dev-1 |
 | 10.10.1.4 | VM Ubuntu-School-1 |
 | 10.10.1.5 | VM Ubuntu-Taiko |
