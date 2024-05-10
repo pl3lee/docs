@@ -239,3 +239,183 @@ For both $x = 0, 1$, $y$ has no solutions. Also for both $y = 0, 1$, $x$ has no 
 However, we can think about this problem in a different way. We can consider the remainders of $x^2$ and $y^2$ when divided by $b = 4$.
 </ProblemContent>
 </Problem>
+
+## Lecture 3 (May 10, 2024)
+### Problem from Last Time
+Recall our program from last time, which is to show that $x^2 + y^2 = 3$ has no solutions in $\mathbb Z$. There are 2 solutions to this.
+
+#### Solution 1
+Since $x, y \in \mathbb Z$, we have
+$$
+\begin{align*}
+    x^2 &\leq x^2 + y^2 \\
+    x^2 &\leq 3 \\
+    |x| &\leq \sqrt 3 \approx 1.7
+\end{align*}
+$$
+Thus, if $x \in \mathbb Z$ then we must have $x = 0, \pm 1$. By symmetry, we also have $y = 0, \pm 1$. If we try all possible solutions, there are no solutions.
+
+#### Solution 2
+We use the Remainder Theorem. We have the following observations.
+
+**Observation 1**: If $x \in \mathbb Z$ then possible remainders of $x^2$ by $4$ are $0$ and $1$.
+
+<Proof withName={true}>
+    <ProofName>Observation 1</ProofName>
+    <ProofContent>
+        For an integer $x$, we can write it as $4q + r$ for $r = 0, 1, 2, 3$. So
+        - If $x = 4q + 0$, then $x^2 = 16q^2 = 4(4q^2) + 0$.
+        - If $x = 4q + 1$, then $x^2 = 16q^2 + 8q + 1 = 4(4q^2 + 2q) + 1$.
+        - If $x = 4q + 2$, then $x^2 = 16q^2 + 16q + 4 = 4(4q^2 + 4q + 1) + 0$.
+        - If $x = 4q + 3$, then $x^2 = 16q^2 + 24q + 9 = 4(4q^2 + 6q + 2) + 1$.
+        
+        In particular, the above remainders are unique by Remainder Theorem. Thus, all possible remainders of $x^2$ by $4$ are $0$ and $1$.
+    </ProofContent>
+</Proof>
+Similarly, possible remainders of $y^2$ by $4$ are $0$ and $1$ as well.
+
+This brings us to our second observation.
+
+**Observation 2**: The possible remainders of $x^2 + y^2$ by 4 are $0, 1, 2$.
+<Proof withName={true}>
+    <ProofName>Observation 2</ProofName>
+    <ProofContent>
+        By observation 1, the remainders of $x^2$ and $y^2$ are $0, 1$. So for $x^2 + y^2$, we can add them together to get that the remainders are $0, 1, 2$.
+    </ProofContent>
+</Proof>
+
+Thus, using observation 2, we can see that $x^2 + y^2$ has remainder $0, 1, 2$, but 3 by 4 has remainder 3. Thus, there are no solutions in $\Z$.
+
+### Euclidean Algorithm
+Our main goal is to prove that for every integer, there is a unique factorization into primes.
+
+The factorization part is easy to prove: for an integer, if it is prime, then we are done. If it is not prime, then there are factors and thus can be factored. If the factors are prime, then we are done, otherwise, we use the same argument and continue to factor them. Eventually, we will reach a prime factorization.
+
+The tricky part is the uniqueness. We will need a tool for this, which is the Euclidean Algorithm. But first let's give some definitions.
+<Definition>
+    <DefinitionName>Divisor and Greatest Common Divisor</DefinitionName>
+    <DefinitionContent>
+        Let $a, b \in \Z$, not both 0. A common divisor of $a, b$ is $d \in \Z$ such that $d \mid a$ and $d \mid b$.
+
+        The greatest common divisor of $a, b$ is the largest common divisor of $a, b$.
+
+        We define $\gcd(0,0) = 0$.
+    </DefinitionContent>
+</Definition>
+<Proposition withName={true}>
+    <PropositionName>Easy Properties of GCD</PropositionName>
+    <PropositionContent>
+        1. $\gcd(a,b) = \gcd(b, a)$
+        2. $\gcd(a, b) = \gcd(|a|, |b|)$
+        3. $\gcd(a, 0) = \gcd(0, a) = |a|$
+        4. $\gcd(a,a) = |a|$
+    </PropositionContent>
+</Proposition>
+Now, how do we compute $\gcd(a,b)$? We use the Euclidean Algorithm. This is best illustrated using an example. Given $a, b \in \Z$, we can assume that $a > b > 0$ using the properties from above.
+<Example withName={true}>
+    <ExampleName>Euclidean Algorithm: $\gcd(693, 105)$</ExampleName>
+    <ExampleContent>
+        We first divide $693 = 6 \cdot 105 + 63$. Now, observe that for $d \in \Z$, if $d \mid 105$ and $d \mid 63$, then $d \mid 693$.
+
+        We can also rearrange to get the equation $693 - 6 \cdot 105 = 63$. By the same logic, if $d \mid 693$ and $d \mid 105$, then $d \mid 63$.
+
+        Combining the above 2 statements, 693 and 105 share common divisors as 63 and 105. Thus, they share common divisors and thus share the greatest common divisor. So we must have
+        $$
+        \gcd(693, 105) = \gcd(105, 63)
+        $$
+        Then we can repeat the above step. We write $105 = 1 \cdot 63 + 42$, and we have
+        $$
+        \gcd(105, 63) = \gcd(63, 42)
+        $$
+        Repeat again, we write $63 = 1 \cdot 42 + 21$, and we have
+        $$
+        \gcd(63, 42) = \gcd(42, 21)
+        $$
+        Now, $21 \mid 42$, so we write $42 = 2 \cdot 21 + 0$, so
+        $$
+        \gcd(42, 21) = \gcd(21, 0) = 21
+        $$
+    </ExampleContent>
+</Example> 
+Let's do another example.
+<Example withName={true}>
+    <ExampleName>Euclidean Algorithm: $\gcd(124, -608)$</ExampleName>
+    <ExampleContent>
+        First note that
+        $$
+        \gcd(124, -608) = \gcd(608, 124)
+        $$
+        Then we can write the following series of equations.
+        $$
+        \begin{align*}
+            608 &= 4 \cdot 124 + 112 \\
+            124 &= 1 \cdot 112 + 12 \\
+            112 &= 9 \cdot 12 + 4 \\
+            12 &= 3 \cdot 4 + 0
+        \end{align*}
+        $$
+        And thus
+        $$
+        \begin{align*}
+            \gcd(608, 124) &= \gcd(124, 112) \\
+            &= \gcd(112, 12) \\
+            &= \gcd(12, 4) \\
+            &= \gcd(4, 0) \\
+            &= 4
+        \end{align*}
+        $$
+    </ExampleContent>
+</Example>
+From the Euclidean Algorithm, we have the following lemma.
+<Lemma>
+    <LemmaContent>
+        $\gcd(a, b) = \gcd(a - qb, b)$
+    </LemmaContent>
+</Lemma>
+<Proof>
+    <ProofContent>
+        First, we divide $a$ by $b$ to get
+        $$
+        a = qb + r
+        $$
+        For a common divisor $d$, if $d \mid b$ and $d | r$, then $d | a$. Rearranging, we have
+        $$
+        a - qb = r
+        $$
+        If $d \mid a$ and $d \mid b$, then $d \mid r$. So $a, b$ and $a - qb, b$ share common divisors, and thus share the greatest common divisor. That is,
+        $$
+        \gcd(a, b) = \gcd(a - qb, b)
+        $$ 
+    </ProofContent>
+</Proof>
+How do we know that the Euclidean Algorithm terminates? Observe that the remainder is always smaller than the divisor. So at each step, we replace the larger number by the remainder, and thus we are reducing the complexity of the problem at each step. Eventually, this terminates when we hit 0, which is the base case.
+
+Note that we can reverse the steps and recover $x, y$ such that $\gcd(a, b) = ax + by$. Using the last example, if we rearrange the equations to isolate the remainders, we get
+$$
+\begin{align*}
+    112 &= 608 - 4 \cdot 124 \\
+    12 &= 124 - 1 \cdot 112 \\
+    4 &= 112 - 9 \cdot 12 
+\end{align*}
+$$
+Thus, starting from the bottom, we can substitute the remainders into the equation above to get
+$$
+\begin{align*}
+    4 &= 112 - 9 \cdot 12 \\
+    &= 112 - 9 (124 - 112) \\
+    &= 112 - 9 \cdot 124 + 9 \cdot 112 \\
+    &= 112(1 + 9) - 9 \cdot 124 \\
+    &= 10 \cdot 112 - 9 \cdot 124 \\
+    &= 10 (608 - 4 \cdot 124) - 9 \cdot 124 \\
+    &= 10 \cdot 608 - 40 \cdot 124 - 9 \cdot 124 \\
+    &= 10 \cdot 608 - 124(40 + 9) \\
+    &= 10 \cdot 608 - 49 \cdot 124 
+\end{align*}
+$$
+This is Bezout's Lemma.
+<Lemma withName={true}>
+    <LemmaName>Bezout's Lemma</LemmaName>
+    <LemmaContent>
+        We can always write $\gcd(a, b) = ax + by$ for some $x, y \in \Z$. However, $x, y$ is not unique.
+    </LemmaContent>
+</Lemma>
