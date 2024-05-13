@@ -506,3 +506,201 @@ $$
     &= i(t)
 \end{align*}
 $$
+
+## Lecture 5 (May 13, 2024)
+### Applications to Circuit Analysis Impedance (Continued)
+From last lecture, we are given a current $i(t) = I\sin(\omega t)$, and we had the following laws.
+- For a resistor, $v_R(t) = IR\sin(\omega t)$ (Ohm's Law).
+- For a capacitor, $v_C(t) = \frac{I}{\omega C}\sin(\omega t - \frac{\pi}{2})$.
+- For an inductor, $v_L(t) = \omega L I \sin(\omega t + \frac{\pi}{2})$.
+
+To find the steady state relationship between $i(t)$ and $v(t)$ in a circuit with multiple such components, we introduce a complex current $\hat i(t) = I e^{j\omega t}$, so
+$$
+i(t) = \mathrm{Im}(\hat i(t))
+$$
+and a complex voltage $\hat v(t)$.
+
+What $\hat i(t)$ is doing is that imagine we had a circle on the complex plane with radius $I$. As time progresses, the point on the circle moves around the circle at a rate of $\omega$ radians per second. The projection of this point onto the imaginary axis gives us the actual current $i(t)$, this is why we take the imaginary part of $\hat i(t)$. Turns out that if our current is cosine, then we would take the real part of $\hat i(t)$ to be the actual current. We will demonstrate this in an example later.
+
+Considering the three laws, how can we write them in complex form? We can just replace $\sin \theta$ with $e^{j\theta}$, so we have
+- For a resistor, $\hat v_R(t) = I R e^{j\omega t}$.
+- For a capacitor, $\hat v_C(t) = \frac{I}{j\omega C} e^{j(\omega t - \frac{\pi}{2})} = \frac{I}{j\omega C} e^{j\omega t}e^{-j\frac{\pi}{2}} = -\frac{jI}{\omega C} e^{j\omega t} = \frac{I}{j\omega C} e^{j \omega t}$.
+- For an inductor, $\hat v_L(t) = \omega L I e^{j(\omega t + \frac{\pi}{2})} = \omega L I e^{j\omega t} e^{j \frac{\pi}{2}} = j \omega L I e^{j\omega t}$.
+
+So we can write
+$$
+\hat v = Z i, \quad \text{where } Z = \begin{cases}
+    R & \text{for a resistor} \\
+    \frac{1}{j\omega C} & \text{for a capacitor} \\
+    j\omega L & \text{for an inductor}
+\end{cases}
+$$
+$Z$ is called the **impedance**.
+#### Examples
+Suppose we are working with a current $i(t) = I \sin t$ (so $\omega = 1$) and it passes through the following circuit:
+
+![](/images/school/spring-2024/pmath332/5-1.png)
+
+We want to find $v(t)$.
+
+We let $\hat i(t) = I e^{jt}$.
+- The impedance of the resistor is $Z_R = R = 5$.
+- The impedance of the capacitor is $Z_C = \frac{1}{j\omega C} = \frac{1}{0.1j} = \frac{10}{j} = -10j$.
+
+Since they are connected in series, the total impedance is
+$$
+Z = Z_R + Z_C = 5 - 10j
+$$
+Therefore
+$$
+\hat v = Z \hat i = (5 - 10j)Ie^{jt}
+$$
+Then to get the actual voltage, there are two ways to proceed: using standard form or exponential form.
+
+Using standard form, we have
+$$
+\begin{align*}
+    \hat v &= I(5 - 10j)(\cos t + j \sin t) \\
+    &= I[(5 \cos t + 10 \sin t) + j(5 \sin t - 10 \cos t)]
+\end{align*}
+$$
+and the actual voltage is the imaginary part of $\hat v$, which is
+$$
+v(t) = \mathrm{Im}(\hat v(t)) = I(5 \sin t - 10 \cos t)
+$$
+
+If we use exponential form, we have
+$$
+\begin{align*}
+    \hat v &= I \sqrt{125} e^{-j \tan^{-1}(2)} e^{jt} \\
+    &= 5 \sqrt 5 I e^{j(t - \tan^{-1}(2))}
+\end{align*}
+$$
+Then $v(t) = 5 \sqrt 5 I \sin(t - \tan^{-1}(2))$.
+
+Now, suppose we are working with the following circuit:
+
+![](/images/school/spring-2024/pmath332/5-2.png)
+
+with current $i(t) = 2 \cos(5t)$. Find $v(t)$.
+
+We let $\hat i(t) = 2 e^{j5t}$. Since we are using cosine, the actual current is the real part $i(t) = \mathrm{Re}(\hat i(t))$.
+
+We have
+- $Z_R = 25$
+- $Z_L = j \omega L = j5(10) = 50j$
+- $Z_C = \frac{1}{j \omega C} = \frac{1}{0.1j} = \frac{10}{j} = -10j$
+
+For the parallel section, we have
+$$
+\begin{align*}
+    \frac{1}{Z_{RL}} &= \frac{1}{Z_R} + \frac{1}{Z_L} \\
+    &= \frac{1}{25} + \frac{1}{50j} \\
+    &= \frac{2j + 1}{50j}
+\end{align*}
+$$
+So
+$$
+\begin{align*}
+    Z_{RL} &= \frac{50j}{2j + 1} \frac{1 - 2j}{1 - 2j} \\
+    &= \frac{100 + 50j}{5} \\
+    &= 20 + 10j
+\end{align*}
+$$
+Finally, we have
+$$
+Z = Z_{RL} + Z_C = (20 + 10j) - 10j = 20
+$$
+So
+$$
+\hat v(t) = Z \hat i = 20 \hat i = 40 e^{j5t}
+$$
+This implies that $v(t) = 40 \cos(5t)$.
+### Sets in the Complex Plane
+WIP
+## Lecture 6 (May 13, 2024)
+### Extended Complex Plane ($\mathbb C \cup \{\infty\}$)
+We can define a neighborhood of infinity as
+$$
+N_\epsilon(\infty) = \{z \in \mathbb C : |z| > \frac{1}{\epsilon}\}
+$$
+for some $\epsilon \in \mathbb R$. The concept of Riemann Sphere can help.
+
+Consider the $x_1x_2$ plane, with a third axis $x_3$, and a unit sphere centered at the origin. If we draw a line from $(0, 0, 1)$ (the north pole) to a point $(x, y, 0)$ on the plane, the line intersects the sphere at two points, one of which is the north pole, and one on the surface of the sphere. Therefore, we get a one-to-one mapping from the plane to the sphere, except for the north pole.
+
+![](/images/school/spring-2024/pmath332/6-1.jpg)
+
+Here are some key realizations:
+- The north pole corresponds to $\infty$ (in every direction).
+- The south pole corresponds to $z = 0$.
+- The equator corresponds to the unit circle $x^2 + y^2 = 1$ ($e^{i\theta} = 1$)
+- The domain $|z| > 1$ maps to the northern hemisphere.
+- The domain $|z| < 1$ maps to the southern hemisphere.
+- Circles and lines in the plane all map to circles on the sphere.
+
+![](/images/school/spring-2024/pmath332/6-2.jpg)
+![](/images/school/spring-2024/pmath332/6-3.jpg)
+
+### Functions from $\mathbb C$ to $\mathbb C$
+Given a mapping $f: \mathbb C \to \mathbb C$, we will write $w = f(z)$. Since both $z$ and $w$ have real and imaginary parts, we can also write
+$$
+w = f(x + iy) = u(x, y) + iv(x, y)
+$$
+#### Examples
+Let $f(z) = z^2$. Find the image of
+1. the 1st quadrant.
+
+    We know that squaring a number scales the modulus, and doubles the argument. So the image is the 1st and 2nd quadrant. Observe that in the 1st quadrant, $x \geq 0$ and $y \geq 0$. Then, since
+    $$
+    w = z^2 = (x + iy)^2 = \underbrace{(x^2 - y^2)}_{u(x, y)} + i \underbrace{2xy}_{v(x, y)}
+    $$
+    We get that $v \geq 0$ (since $x, y \geq 0$), with no restriction on $u$. Thus, the image is the 1st and 2nd quadrant.
+
+    ![](/images/school/spring-2024/pmath332/6-4.png)
+2. the strip $1 \leq \mathrm{Re}(z) \leq 2$.
+
+    For a vertical line $x = x_0$, the image is 
+    $$
+    w = \underbrace{(x_0^2 - y^2)}_{u(x, y)} + i \underbrace{2x_0 y}_{v(x, y)}
+    $$
+    Rearranging $v = 2x_0 y$, we get $y = \frac{v}{2x_0}$. Substituting this equation into $u = x_0^2 - y^2$, we get
+    $$
+    u = x_0^2 - \left(\frac{v}{2x_0}\right)^2
+    $$
+    These are parabolas, so with $x_0 = 1$, we get $u = 1 - \frac{1}{4} v^2$. With $x_0 = 2$, we get $u = 4 - \frac{1}{16} v^2$.
+
+    ![](/images/school/spring-2024/pmath332/6-5.png)
+
+Another example. What does $f(z) = |z|$ do? It maps the whole plane to the positive real axis. That is, it maps domains to intervals on the positive real axis.
+
+Now, what does $f(z) = z - z_0$ do?
+
+This gives 
+$$
+\begin{align*}
+    w &= (x + iy) - (x_0 + iy_0) \\
+    &= (x - x_0) + i(y - y_0)
+\end{align*}
+$$
+which is a translation.
+
+How about the mapping $f(z) = iz + i$? The image of the half-space $\mathrm{Re}(z) \geq 1$ under this mapping is 
+
+![](/images/school/spring-2024/pmath332/6-6.png)
+
+How about $f(z) = \bar z$? This is a reflection across the real axis.
+
+The inverse mapping $f(z) = \frac{1}{z}$ is particularly important. Observe that $w = \frac{1}{z} = \frac{1}{re^{i\theta}} = \frac{1}{r} e^{-i\theta}$. That is, if $|z| = r$ and $\text{Arg}(z) = \theta$, then $|w| = \frac{1}{r}$ and $\text{Arg}(w) = -\theta$. 
+
+What is the image of the circle $|z - 1| = 1$ under $f(z) = \frac{1}{z}$?
+
+We can convert to polar form:
+$$
+\begin{align*}
+    |z - 1| &= 1 \\
+    (x - 1)^2 + y^2 &= 1 \\
+    x^2 + y^2 = 2x \\
+    r^2 = 2r \cos \theta
+\end{align*}
+$$
+Then, under the mapping, we replace $r$ with $\frac{1}{r}$ and $\theta$ with $-\theta$. So we get $r = 2 \cos \theta$, $x = \frac{1}{2}$, which is a vertical line.
