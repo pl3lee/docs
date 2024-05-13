@@ -230,3 +230,100 @@ Suppose we have a digraph $D = (N, A)$
         $$
     </DefinitionContent>
 </Definition>
+<Definition>
+    <DefinitionName>$st$-Cut</DefinitionName>
+    <DefinitionContent>
+        For nodes $s, t$ where $s \neq t$ of $D$, an $st$-cut of $D$ is a cut $\delta(S)$ where $S \subset N$, with $s \in S$ and $t \not \in S$.
+    </DefinitionContent>
+</Definition>
+<Theorem>
+    <TheoremContent>
+        Let $D = (N, A)$ be a digraph, and let $s, t$ be distinct nodes of $D$. There exists an $st$-dipath if and only if every $st$-cut is non-empty.
+    </TheoremContent>
+</Theorem>
+
+#### Trees
+<Definition>
+    <DefinitionName>Tree</DefinitionName>
+    <DefinitionContent>
+        A tree is a connected digraph that contains no cycles.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Spanning Tree</DefinitionName>
+    <DefinitionContent>
+        A spanning tree of a graph $G$ is a subgraph $T$ of $H$ such that $V(T) = V(G)$ and $T$ is a tree.
+    </DefinitionContent>
+</Definition>
+<Lemma>
+    <LemmaContent>
+        For a tree $T$ and any two vertices $i$ and $j$ of $T$, there is a unique $ij$-path in $T$.
+    </LemmaContent>
+</Lemma>
+<Theorem withName={true}>
+    <TheoremName>1.7</TheoremName>
+    <TheoremContent>
+        Let $T = (U, F)$ be a tree. Then
+        1. For any edge $e \not \in F$, graph $T + e = (U, F \cup \{e\})$ has exactly one cycle $C$.
+        2. For any edge $e' \in C$, where $C$ is the cycle from 1, the graph $T + e - e' = (U, F \cup \{e\} \setminus \{e'\})$ is a tree.
+    </TheoremContent>
+</Theorem>
+Note that the cycle from the first part of the theorem is called the **fundamental cycle** of the edge $e$.
+<Definition>
+    <DefinitionName>Fundamental Cycle</DefinitionName>
+    <DefinitionContent>
+        The fundamental cycle of a given tree $T$ is the unique cycle of $T + e$, where $e$ is an edge and $e \not \in E(T)$.
+    </DefinitionContent>
+</Definition>
+To prove the theorem above, we will need the following lemmas.
+<Lemma withName={true}>
+    <LemmaName>1.8</LemmaName>
+    <LemmaContent>
+        For any graph $G$, if there exists a $uv$-path and a $vw$-path, then there exists a $uw$-path.
+    </LemmaContent>
+</Lemma>
+<Proof withName={true}>
+    <ProofName>Sketch</ProofName>
+    <ProofContent>
+        Note that we cannot just take the union of the paths, as there might be overlaps. However, a union of the paths does give us a walk from $u$ to $w$. We can then use the fact that a walk can be converted to a path by removing cycles.
+    </ProofContent>
+</Proof>
+
+<Lemma withName={true}>
+    <LemmaName>1.9</LemmaName>
+    <LemmaContent>
+        Let $G$ be a connected graph with a cycle $C$, let $e$ be an edge of $C$. Then $G - e$ is connected.
+    </LemmaContent>
+</Lemma>
+<Proof>
+    <ProofContent>
+        Let $v_1,v_2$ be any pair of vertices of $G - e$. We want to show that there exists a $v_1v_2$-path $P'$ of $G - e$, and thus $G - e$ is connected.
+
+        Since $G$ is connected, there exists a $v_1v_2$-path $P$ of $G$. If $P$ does not contain $e$, then $P$ is also a $v_1v_2$-path of $G - e$, and we are done.
+
+        Otherwise, $P$ contains $e$. Let $e = uw$. Since $G$ is connected, there exists a $v_1u$-path $P_1$ and a $wv_2$-path $P_2$. Moreover, $C - e = C - uw$ is a $uw$-path. Thus, by the Lemma 1.8, since there exists a $v_1u$-path and a $uw$-path, there exists a $v_1w$-path. Then, since there exists a $v_1w$-path and a $wv_2$-path, there exists a $v_1v_2$-path. Thus, $G - e$ is connected.
+    </ProofContent>
+</Proof>
+
+<Lemma withName={true}>
+    <LemmaName>1.10</LemmaName>
+    <LemmaContent>
+        In a tree $T$, any 2 vertices are connected by a **unique** path.
+    </LemmaContent>
+</Lemma>
+<Proof>
+    <ProofContent>
+        Assume for contradiction that there exists two distinct $uv$-paths $P_1$ and $P_2$ in $T$. Then the parts of $P_1$ and $P_2$ can be joined together to form a cycle, which is a contradiction since trees do not have cycles. 
+    </ProofContent>
+</Proof>
+Now, we can finally prove Theorem 1.7.
+<Proof withName={true}>
+    <ProofName>Theorem 1.7</ProofName>
+    <ProofContent>
+        Since $T$ is acyclic, each cycle of $T + e$ contains $e = xy$. Moreover, $C$ is a cycle of $T + e$ if and only if $C - e$ is a $xy$-path of $T$.
+
+        By Lemma 1.10, $T$ contains a unique $xy$-path, therefore $T + e$ contains a unique cycle $C$. This proves the first part of the theorem.
+
+        Now we prove the second part. Since $T$ is a tree (which is connected), $T + e$ is connected as well. Moreover, $T + e$ contains a unique cycle $C$ from the first part of the theorem. Let $e' \in C$. Then $T + e - e'$ is connected by Lemma 1.9. Then by first part, since $C$ is unique, $T + e - e'$ is acyclic. Thus, $T + e - e'$ is a tree.
+    </ProofContent>
+</Proof>
