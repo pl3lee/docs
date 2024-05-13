@@ -3,26 +3,27 @@ import { Steps, Callout } from 'nextra/components'
 
 # CS 475: Computational Linear Algebra
 ## Lecture 1 (May 7, 2024)
-### What is Numerical Linear Algebra?
+### Introduction
+#### What is Numerical Linear Algebra?
 Briefly, it is developing **efficient** algorithms to **accurately** solve linear algebra problems on a computer (with finite precision arithmetic). We will focus on the following topics:
 - solving linear systems of equations.
 - solving linear least squares problems.
 - solving eigenvalue problems.
 - performing singular value decompositions.
 
-### Types of Algorithms
+#### Types of Algorithms
 There are two types of algorithms:
 - **Direct**: These algorithms compute the final solution with a finite sequence of arithmetic operations. For example, Gaussian elimination (LU factorization)
 - **Iterative**: These algorithms start with an initial guess, and iteratively apply the same operation to get closer to the solution, until it is good enough. For example, Jacobi, Gauss-Seidel, Conjugate Gradient, and PageRank.
 
-### Matrix Structure
+#### Matrix Structure
 There are two types of matrices:
 - **Dense**: Most of the entries are non-zero. These are stored in $N \times N$ arrays, which we can manipulate normally.
 - **Sparse**: Most entries are zero. Non-zero locations may exhibit patterns.
 
 It is possible to exploit sparsity patterns/structure to save memory and/or flops. However, just because a matrix is sparse, it does not mean that it will be faster to solve. It depends on the sparsity pattern and the algorithm used. For example, even if we input a sparse matrix into a Gaussian elimination algorithm, it will still take the same amount of time.
 
-### Factorization
+#### Factorization
 A common theme is that we can express a given matrix as a product of other matrices. For example,
 $$
 A = BCD
@@ -36,7 +37,7 @@ Some common factorizations are:
 
 These factorizations have properties that we can exploit in algorithm design.
 
-### Orthogonality
+#### Orthogonality
 Notions of orthogonality will arise repeatedly in designing algorithms. Recall the following definitions for orthogonality.
 <Definition withName={true}>
     <DefinitionName>Orthogonal Vectors</DefinitionName>
@@ -51,12 +52,12 @@ Notions of orthogonality will arise repeatedly in designing algorithms. Recall t
     </DefinitionContent>
 </Definition>
 
-### Linear Systems
+#### Linear Systems
 This is the problem of solving $Ax = b$ for $x$ where $A \in \mathbb R^{n \times n}, x \in \mathbb R^n, b \in \mathbb R^n$. Doing it efficiently and accurately on large problems (in floating point arithmetic) can take substantial effort to get right.
 
 For example, if we have the system $Ax = b$, then we could rearrange it to get $x = A^{-1}b$. However, computing the inverse of $A$ is potentially expensive and numerically unstable.
 
-### Least Squares Problem
+#### Least Squares Problem
 This is used for solving more general problems which may have
 - Too many equations/constraints (over-determined).
 
@@ -96,6 +97,224 @@ $$
     y_n
 \end{pmatrix}}_{b}
 $$
-So again, we can minimize $||Ax - b||_2^2$ to find the best line.
+If we minimize $||Ax - b||_2^2$, then in the best case, we will get a line that passes through all the points. Even if we are not in the best case, we still get a line that is as close as possible to the points.
 
 ## Lecture 2 (May 9 2024)
+### Introduction (Continued)
+#### Eigenvalue Problems
+Find the eigenvalues $\lambda$ and eigenvectors $v$ of a $n \times n$ matrix $A$ such that
+$$
+Av = \lambda v
+$$
+What does this mean geometrically? Recall that matrices are linear transformations and it maps vectors by stretching, rotating, or reflecting them. Then eigenvectors are vectors such that it only gets stretched by a scalar factor, and the direction remains the same.
+
+The eigenvalue problem is related to a factorization of $A$ into
+$$
+A = Q\LambdaQ^{-1}
+$$
+where $\Lambda$ is a diagonal matrix, and columns of $Q$ are eigenvectors of $A$.
+
+We also have the definition of invariant:
+<Definition>
+    <DefinitionName>Invariant</DefinitionName>
+    <DefinitionContent>
+        Something that does not change under a transformation. So in the eigenvalue problem, the span of an eigenvector is invariant under $A$.
+    </DefinitionContent>
+</Definition>
+
+#### Singular Value Decomposition (SVD)
+Given a general matrix $A$, how do we associate it with a square matrix? We can simply take $A^TA$ or $AA^T$, and they are square matrices. The SVD is a generalization of the eigenvalue problem that applies to all matrices. We solve for a factorization of a general $m \times n$ matrix $A$ such that
+$$
+A = U \Sigma V^T
+$$
+where
+- $U, V$ are orthogonal matrices
+- $\Sigma$ is diagonal with non-negative entries (called the singular values of $A$), which are found by taking the square root of the eigenvalues of $A^TA$ or $AA^T$.
+ 
+### Linear Algebra Background
+Here are some basic definitions.
+<Definition>
+    <DefinitionName>Vector Space</DefinitionName>
+    <DefinitionContent>
+        A vector space is a collection/set of vectors, together with addition and scalar multiplication.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Basis</DefinitionName>
+    <DefinitionContent>
+        A set of vectors $B$, is a basis for a vector space $V$ if
+        - $B$ is linearly independent.
+        - Every element of $V$ is a linear combination of elements of $B$.
+    
+    We can say that $B$ spans $V$.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Range</DefinitionName>
+    <DefinitionContent>
+        The range of a given matrix $A$ is defined by
+        $$
+        \mathrm{range}(A) = \{Ax : x \in \mathbb R^n\}
+        $$
+        which is the space of vectors that can be generated by left-multiplying some vector $x$ with the matrix $A$.
+    </DefinitionContent>
+</Definition>
+Note that we can view matrix-vector multiplication as taking a linear combination of $A$'s columns, where $x_i$'s gives the coefficients for each column:
+$$
+\begin{align*}
+    \begin{pmatrix}
+    y_1 \\ y_2 \\ \vdots \\ y_n
+    \end{pmatrix} &= \begin{pmatrix}
+    a_1 & a_2 & \cdots & a_n
+    \end{pmatrix} \begin{pmatrix}
+    x_1 \\ x_2 \\ \vdots \\ x_n
+    \end{pmatrix} \\
+    &= x_1a_1 + x_2a_2 + \cdots + x_na_n
+\end{align*}
+$$
+where each $a_1, a_2, \ldots, a_n$ are the columns of $A$. Thus, all vectors in the range of $A$ can be expressed as linear combinations of columns of $A$. Therefore, range is also called teh **column space**.
+<Definition>
+    <DefinitionName>Row Space</DefinitionName>
+    <DefinitionContent>
+        The row space is analogous to column space, which is the space of vectors that can be written as linear combinations of the rows of $A$. In terms of matrix multiplication, this is the space of vectors that can be generated by right-multiplying some vector $x$ with the matrix $A$.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Nullspace</DefinitionName>
+    <DefinitionContent>
+        The nullspace or kernet of a matrix $A$ is defined by
+        $$
+        \mathrm{null}(A) = \{x : Ax = 0\}
+        $$
+        intuitively, it is the part of the vector space that gets mapped to the zero vector by $A$.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Dimension of a Vector Space</DefinitionName>
+    <DefinitionContent>
+        If a vector space $V$ has a basis of $n$ elements, we say that the dimension of $V$, denoted by $\dim(V)$, is $n$. That is, $\dim(V)$ is the number of linearly independent vectors needed to span $V$.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Rank</DefinitionName>
+    <DefinitionContent>
+        The column rank is the dimension of the column space of a matrix $A$. The row rank is the dimension of the row space of a matrix $A$. 
+
+        It can be proven that column rank $=$ row rank. This is because $A$ can be factorized into $A = PEQ$, where $E = \begin{pmatrix} I & 0 \\ 0 & 0 \end{pmatrix}$, and $P, Q$ are invertible matrices. That is, $E$ is a diagonal matrix starting with $1$'s and ending with $0$'s. Then, the number of linearly independent columns of $A$ is the same as the number of linearly independent rows of $A$.
+
+        Since both column rank and row rank are equal, we can simply refer to it as the rank of $A$.
+    </DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Nullity</DefinitionName>
+    <DefinitionContent>
+        The dimension of the nullspace is the nullity of $A$. 
+    </DefinitionContent>
+</Definition>
+<Theorem withName={true}>
+    <TheoremName>Rank-Nullity Theorem</TheoremName>
+    <TheoremContent>
+        We have
+        $$
+        \mathrm{rank}(A) + \mathrm{nullity}(A) = n
+        $$
+        where $n$ is the number of columns of $A$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Let $r$ be the rank and $k$ be the nullity. Suppose that $A: V \to W$ where $V$ is $n$-dimensional and $W$ is $t$ dimensional. Suppose that the nullspace has basis $\{v_1,\ldots,v_k\}$, and suppose that $V$ has basis
+        $$
+        \{v_1,\ldots,v_k,v_{k+1},\ldots,v_n\}
+        $$
+        Then, applying $A$ to the basis vectors, we get the image of $A$:
+        $$
+        \{A(v_1),\ldots,A(v_k),A(v_{k+1}),\ldots,A(v_n)\} = \{Av_{k+1},\ldots,Av_n\}
+        $$
+        since $Av_i = 0$ for $i = 1,\ldots,k$. This set is linearly independent, and so the rank of $A$ is $n - k = r$. Therefore, we have
+        $$
+        r + k = n
+        $$
+    </ProofContent>
+</Proof>
+Note that a matrix is of full rank if the rank is equal to the minimum of the number of rows and columns. We have the following theorem:
+<Theorem>
+    <TheoremContent>
+        A full rank matrix defines a one-to-one map, that is $Av_1 \neq Av_2$ for any $v_1 \neq v_2$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Suppose that $v_1 \neq v_2$ and for contradiction we have $Av_1 = Av_2$. Then $A(v_1 - v_2) = 0$, which implies that $v_1 - v_2 \in \mathrm{null}(A)$. But, since $A$ is full rank, $\mathrm{null}(A) = \{0\}$, and so $v_1 - v_2 = 0$, which is a contradiction.
+    </ProofContent>
+</Proof>
+<Definition>
+    <DefinitionName>Invertible</DefinitionName>
+    <DefinitionContent>
+        A square matrix of full rank is called invertible or nonsingular. The inverse of $A$ is denoted by $A^{-1}$, and is a unique matrix that satisfies
+        $$
+        AA^{-1} = A^{-1}A = I
+        $$
+        where $I$ is the identity matrix.
+    </DefinitionContent>
+</Definition>
+We have the following useful properties of invertible matrices:
+<Theorem>
+    <TheoremContent>
+        For a real square matrix $A \in \mathbb R^{n \times n}$, the following are equivalent:
+        - $A$ is invertible.
+        - $A$ is full rank, so $\mathrm{rank}(A) = n$.
+        - $\mathrm{range}(A) = \mathbb R^n$.
+        - $\mathrm{null}(A) = \{0\}$.
+        - $A$ has no zero eigenvalues.
+        - $A$ has no zero singular values.
+        - $\det(A) \neq 0$.
+    </TheoremContent>
+</Theorem>
+And we have some identies:
+<Theorem withName={true}>
+    <TheoremName>Invertible Matrix Identities</TheoremName>
+    <TheoremContent>
+        For invertible matrices $A$ and $B$:
+        - $(AB)^{-1} = B^{-1}A^{-1}$
+        - $(A^T)^{-1} = (A^{-1})^T = A^{-T}$
+        - $B^{-1} = A^{-1} - B^{-1}(B - A)A^{-1}$
+    </TheoremContent>
+</Theorem>
+Given a matrix $A$, and say you have already found its inverse. If you want to change $A$ slightly by adding $uv^T$, how does $A^{-1}$ change? Turns out we have a formula for this:
+<Definition>
+    <DefinitionName>Sherman-Morrison</DefinitionName>
+    <DefinitionContent>
+        If $1 + v^TA^{-1}u \neq 0$, then
+        $$
+        (A + uv^T)^{-1} = A^{-1} - \frac{A^{-1}uv^TA^{-1}}{1 + v^TA^{-1}u}
+        $$
+        for $A \in \mathbb R^{n \times n}$, $u,v \in \mathbb R^n$.
+    </DefinitionContent>
+</Definition>
+Notice the denominator $1 + v^TA^{-1}u$. How is matrix division defined? Turns out that $v^T A^{-1} u \in \mathbb R$ is a scalar, and so we can divide by it. This formula allows us to update $A^{-1}$ without starting from scratch. This is called a rank-one update, since the matrix $uv^T$ has rank one. A generalization of this formula is the Sherman-Morrison-Woodbury formula. 
+<Definition>
+    <DefinitionName>Sherman-Morrison-Woodbury</DefinitionName>
+    <DefinitionContent>
+        If $A \in \mathbb R^{n \times n}$ is invertible, $U, V \in \mathbb R^{n \times k}$, then
+        $$
+        (A + UV^T)^{-1} = A^{-1} - A^{-1} - A^{-1}U(I + V^TA^{-1}U)^{-1}V^TA^{-1}
+        $$
+        That is, a rank $k$ modification to matrix $A$ yields a rank $k$ correction to $A^{-1}$.
+    </DefinitionContent>
+</Definition>
+
+### LU Factorization
+A lot of practical problems rely on solving systems of linear equations of the form $Ax = b$. We will start by looking at direct methods for $Ax = b$. We will strive to avoid constructing $A^{-1}$ itself, since this can be
+- less efficient (in terms of operation counts).
+- less accurate (incurs more round-off errors).
+- more costly in terms of storage (depending on matrix sparsity)
+
+We also define forward and backward errors. Suppose that we compute $y = f(x)$. We might get $\hat y = f(x)$. The forward error is $||\hat y - y||$. Then, we might also have that $\hat y$ is the exact solution for $\hat y = f(x + \Delta x)$. The backward error is $||\Delta x||$. 
+
+Now, we can interpret Gaussian elimination as follows:
+1. Factor matrix $A$ into $A = LU$, where $L$ and $U$ are triangular.
+2. Solve $Ly = b$ for intermediate vector $y$.
+3. Solve $Ux = y$ for $x$.
+
+This works because solving $Ax = b$ is equivalent to solving $LUx = b$, which is equivalent to solving $Ly = b$ by letting $y = Ux$.
