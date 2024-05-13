@@ -419,3 +419,154 @@ This is Bezout's Lemma.
         We can always write $\gcd(a, b) = ax + by$ for some $x, y \in \Z$. However, $x, y$ is not unique.
     </LemmaContent>
 </Lemma>
+
+## Lecture 4 (May 13, 2024)
+### Bezout's Lemma
+Let's have some warm up. Determine $\gcd(6, 22)$. We can write the following sequence of equations.
+$$
+\begin{align*}
+    22 &= 3 \cdot 6 + 4 \\
+    6 &= 1 \cdot 4 + 2 \\
+    4 &= 2 \cdot 2 + 0
+\end{align*}
+$$
+which corresponds to 
+$$
+\begin{align*}
+    \gcd(22, 6) &= \gcd(6, 4) \\
+    &= \gcd(4, 2) \\
+    &= \gcd(2, 0) \\
+    &= 2
+\end{align*}
+$$
+Reversing the algorithm, to express 2 as a linear combination of 6 and 22, we have
+$$
+\begin{align*}
+    2 &= 6 - 1 \cdot 4 \\
+    &= 6 - 1 \cdot (22 - 3 \cdot 6) \\
+    &= 4 \cdot 6 - 1 \cdot 22
+\end{align*}
+$$
+
+Now, recall Bezout's Lemma.
+<Lemma withName={true}>
+    <LemmaName>Bezout's Lemma</LemmaName>
+    <LemmaContent>
+        If $a, b \in \Z$, then there exists $x, y \in \Z$ (not unique) such that $\gcd(a, b) = ax + by$
+    </LemmaContent>
+</Lemma>
+Before we proceed with the proof, we will need the Well-ordering Principle.
+<Definition>
+    <DefinitionName>Well-Ordering Principle</DefinitionName>
+    <DefinitionContent>
+        Every non-empty subset of the positive integers has a smallest element.
+
+        Note that this is not true for the set of negative integers, nor the set of real integers.
+    </DefinitionContent>
+</Definition>
+
+Now, let's prove Bezout's Lemma.
+<Proof withName={true}>
+    <ProofName>Bezout's Lemma</ProofName>
+    <ProofContent>
+        W.L.O.G, assume $a > 0$, since if $a = 0$, then $\gcd(a, b) = |b|$, which is itself a linear combination of $a$ and $b$. If $a < 0$, then $\gcd(a, b) = \gcd(-a, b)$. So we only need to account for $a > 0$.
+
+        Now, let $S = \{ax + by: x, y \in \Z \}$. It turns out that the smallest positive $ax + by$ is the greatest common divisor of $a$ and $b$.
+
+        Note that $S \cap \Z_{> 0} \neq \emptyset$, since $a = a + 0b > 0$ by assumption, and thus $a \in S \cap \Z_{> 0}$. Thus, by the Well-Ordering Principle, $S \cap \Z_{> 0}$ has a smallest element, say $d = ax_0 + by_0$. We will show that $d = \gcd(a, b)$.
+
+        We claim that $d \mid a$ and $d \mid b$. Applying the remainder theorem, we have
+        $$
+        a = qd + r, \quad 0 \leq r < d
+        $$
+        and we will show that $r = 0$. For contradiction, suppose that $r > 0$. Then
+        $$
+        \begin{align*}
+            r &= a - qd \\
+            &= a - q(ax_0 + by_0) \\
+            &= a - qax_0 - qby_0 \\
+            &= a(1 - qx_0) + b(-qy_0) \\
+            &\in S \cap \Z_{> 0}
+        \end{align*}
+        $$
+        Since $r < d$ by construction, this is a contradiction by minimality of $d$ (we established that $d$ is the smallest element in $S \cap \Z_{> 0}$). Thus, $r = 0$, and thus $d \mid a$. Similarly, we can show that $d \mid b$.
+
+        Now, we show that $d$ is the **greatest** common divisor. Suppose $d'$ is another divisor, then $d' | a$ and $d' | b$. So, $d' | ax_0 + by_0 = d$. Therefore, $d' \leq d$. Thus, $d$ is the greatest common divisor.
+    </ProofContent>
+</Proof>
+
+From this proof, we have this corollary:
+<Corollary>
+    <CorollaryContent>
+        If $c \mid a$ and $c \mid b$, then $c \mid \gcd(a, b)$.
+    </CorollaryContent>
+</Corollary>
+
+### Coprimality
+<Definition>
+    <DefinitionName>Coprime</DefinitionName>
+    <DefinitionContent>
+        $a, b \in \Z$ are coprime if $\gcd(a, b) = 1$.
+    </DefinitionContent>
+</Definition>
+An example is that 4 and 15 are coprime, but 4 and 10 are not coprime.
+
+<Proposition>
+    <PropositionContent>
+        1. $a, b \in \Z$ are coprime iff there exists $x, y \in \Z$ such that $ax + by = 1$.
+        2. If $a \mid bc$ and $a, b$ are coprime, then $a \mid c$.
+        3. If $b \mid a$ and $c \mid a$ and if $b, c$ are coprime, then $bc \mid a$.
+    </PropositionContent>
+</Proposition>
+<Proof>
+    <ProofContent>
+        1. $(\Rightarrow)$ This follows from Bezout's Lemma. 
+
+           $(\Leftarrow)$ Suppose that $d$ is a common divisor of $a$ and $b$. Then $d \mid ax + by = 1$, so $d = 1$.
+        2. If $a$ and $b$ are coprime, then by Bezout's Lemma, we have
+            
+            $$
+            1 = \gcd(a, b) = ax + by
+            $$
+            Multiplying by $c$ gives
+            $$
+            c = cx a + bc y
+            $$
+            In particular, $a \mid cx a$ and $a \mid bc y$ since $a \mid a$ and $a \mid bc$ by assumption. Thus, $a \mid c$.
+        3. Exercise. Try to give 2 proofs, 1 with Bezout's Lemma and 1 without.
+    </ProofContent>
+</Proof>
+<Proposition>
+    <PropositionContent>
+        Let $a, b \in \Z_{> 0}$, and $g = \gcd(a, b)$. Then $\frac{a}{g}$ and $\frac{b}{g}$ are coprime.
+    </PropositionContent>
+</Proposition>
+<Proof>
+    <ProofContent>
+        By Bezout's Lemma, $g = ax + by$ for some $x, y \in \Z$. Then dividing both sides by $g$ gives
+        $$
+        1 = \frac{a}{g} x + \frac{b}{g} y
+        $$
+        By proposition above, $\frac{a}{g}$ and $\frac{b}{g}$ are coprime.
+    </ProofContent>
+</Proof>
+
+Now, we are ready to tackle to problem of solving
+$$
+a_1x_1 + \cdots + a_nx_n = c
+$$
+over $\Z$. However, the most important case is for $n = 2$, since if we have $n > 2$, we can reduce it to $n = 2$ by induction. So we will focus on solving
+$$
+ax + by = c
+$$
+which are called **linear Diophantine equations**.
+<Theorem>
+    <TheoremContent>
+        1. The equation $ax + by = c$ has a solution if and only if $\gcd(a, b) \mid c$.
+        2. If $x_0, y_0$ is a solution, then all solutions are given by
+            $$
+            (x, y) = (x_0, y_0) + n \left(\frac{-b}{\gcd(a, b)}, \frac{g}{\gcd(a, b)}\right)
+            $$
+            So if there exists a solution, there exists infinitely many solutions.
+    </TheoremContent>
+</Theorem>
