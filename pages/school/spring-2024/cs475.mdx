@@ -1,4 +1,4 @@
-import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName, CorollaryContent, Example, ExampleName, ExampleContent, Problem, ProblemName, ProblemContent, Proposition, PropositionName, PropositionContent, Theorem, TheoremName, TheoremContent, Lemma, LemmaName, LemmaContent, Proof, ProofName, ProofContent } from "/components/math";
+import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName, CorollaryContent, Example, ExampleName, ExampleContent, Problem, ProblemName, ProblemContent, Proposition, PropositionName, PropositionContent, Theorem, TheoremName, TheoremContent, Lemma, LemmaName, LemmaContent, Proof, ProofName, ProofContent, PseudoCode, PseudoCodeName, PseudoCodeInput, PseudoCodeOutput, PseudoCodeStatement, PseudoCodeIf, PseudoCodeCondition, PseudoCodeWhile, PseudoCodeElse, PseudoCodeFor } from "/components/math";
 import { Steps, Callout } from 'nextra/components'
 
 # CS 475: Computational Linear Algebra
@@ -318,3 +318,14 @@ Now, we can interpret Gaussian elimination as follows:
 3. Solve $Ux = y$ for $x$.
 
 This works because solving $Ax = b$ is equivalent to solving $LUx = b$, which is equivalent to solving $Ly = b$ by letting $y = Ux$.
+
+We have the following pseudocode for LU factorization
+- $k = 1,\ldots, n$ **do** (iterating over all rows)
+   - **for** $i = k+1,\ldots, n$ **do** (iterate over each row $i$ beneath row $k$)
+      - mult $= \frac{a_{ik}}{a_{kk}}$ (determine row $i$'s multiplicative factor)
+      - $a_{ik} = $ mult (store the multiplicative factor in the matrix)
+      - **for** $j = k+1,\ldots, n$ **do** (iterate over each column for current row)
+         - $a_{ij} = a_{ij} - $ mult $\times a_{kj}$ (update the matrix)
+      - **end for**
+   - **end for**
+- **end for**
