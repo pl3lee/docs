@@ -939,4 +939,111 @@ $$
 both bounds approach 0 as $\Delta z \to 0$, so by the Squeeze Theorem, the limit is 0.
 
 ### Analytic Functions
-Under what condition is $f$ differentiable? We need 
+Under what condition is $f$ differentiable?
+<Theorem>
+    <TheoremContent>
+        Let $f$ be defined in some neighborhood of $z_0$. If $u_x,u_y, v_x, v_y$ exist in the neighborhood, and satisfies the Cauchy-Riemann Equations at $z_0$, and $u_x,u_y,v_x,v_y$ are continuous at $z_0$, then $f$ is differentiable at $z_0$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        See textbook page 76-77.
+    </ProofContent>
+</Proof>
+Then, we have the following definition for analytic functions.
+<Definition>
+    <DefinitionName>Analytic Function</DefinitionName>
+    <DefinitionContent>
+        A function $f(z)$ is said to be analytic at $z_0$ if $f'(z)$ exists at every point in some neighborhood at $z_0$. If it is analytic everywhere in an open set $S$ then we say it is analytic in $S$.
+    </DefinitionContent>
+</Definition>
+Let's see some examples on determine analyticity. Where is $f(z) = x^2 + iy^2$ analytic? We have
+- $u(x,y) = x^2$, so $u_x = 2$ and $u_y = 0$
+- $v(x,y) = y^2$, so $v_x = 0$ and $v_y = 2$
+
+Thus we have $u_y = -v_x$ everywhere, and $u_x = v_y$ only if $y = x$. Since the partials are continuous, it is only differentiable at possibly on the line $y = x$. Thus, it is not analytic anywhere (since there is no neighborhood around the line $y = x$ where the function is differentiable).
+
+What about $f(z) = f(x + iy) = (x^3 - 3xy^2) + i(3x^2y - y^3)$ analytic? We have
+- $u(x,y) = x^3 - 3xy^2$, so $u_x = 3x^2 - 3y^2$ and $u_y = -6xy$
+- $v(x,y) = 3x^2y - y^3$, so $v_x = 6xy$ and $v_y = 3x^2 - 3y^2$
+
+The Cauchy-Riemann Equations are satisfied everywhere, and the partials are continuous everywhere, so it is analytic everywhere.
+
+Notice that
+$$
+\begin{align*}
+    f'(z) &= u_x + iv_x \\
+    &=(3x^2 - 3y^2) + i(6xy) \\
+    &= 3((x^2 - y^2) + 2xyi) \\
+    &= 3z^3
+\end{align*}
+$$
+So in fact, $f(z) = z^3$.
+
+What if $f$ is not given in component form? We know immediately that $f(z) = z^3$ is analytic, because of the following theorem:
+<Theorem>
+    <TheoremContent>
+        Sums, products, quotients, and compositions of analytic functions are analytic, provided that we are not dividing by zero.
+    </TheoremContent>
+</Theorem>
+As an example, $f(z) = \frac{z^3 + 2}{z^2 + 1}$ is analytic everywhere except at $\pm i$.
+
+<Definition>
+    <DefinitionName>Singular Point/Singularity</DefinitionName>
+    <DefinitionContent>
+        If $f$ is not analytic at $z_0$, but is analytic at every point in some **deleted** neighborhood of $z_0$, then $z_0$ is called a singular point, or a singularity, of $f$.
+    </DefinitionContent>
+</Definition>
+<Theorem>
+    <TheoremContent>
+        Suppose $f$ is analytic in a domain $D$ (an open, connected set). If $f'(z) = 0$ for all $z \in D$, then $f$ is constant in $D$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        We have 
+        $$
+        \begin{align*}
+            f'(z) &= u_x + iv_x \\
+            &= v_y - iu_y
+        \end{align*}
+        $$
+        by the Cauchy-Riemann Equations. So if $f'(z) = 0$, this implies that
+        $$
+        u_x = v_x = u_y = v_y = 0
+        $$
+        This implies that $u(x,y) = C_1$ and $v(x,y) = C_2$ for some constants $C_1$ and $C_2$. Thus $f(z) = C_1 + iC_2$.
+    </ProofContent>
+</Proof>
+<Theorem>
+    <TheoremContent>
+        Suppose $f$ is analytic in a domain $D$. If $|f(z) = M$ for a constant $M$ for all $z \in D$, then $f(z)$ is constant in $D$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Let $f(z) = u(x,y) + iv(x,y)$. Then $|f(z)| = \sqrt{u^2 + v^2} = M$, which means $u^2 + v^2 = M^2$. If we differentiate
+        - with respect to $x$, then $2u u_x + 2v v_x = 0$
+        - with respect to $y$, then $2u u_y + 2v v_y = 0$
+        
+        So we have the following equations:
+        $$
+        \begin{align}
+            uu_x + vv_x &= 0 \\
+            uu_y + vv_y &= 0
+        \end{align}
+        $$
+        If $f$ is analytic, (1) is equivalent to $uv_y - vu_y = 0$, and rearranging gives
+        $$
+        \begin{align*}
+            -vu_y + uv_y &= 0 \tag{3}
+        \end{align*}
+        $$
+        If we solve (3) for $u$, we get $u = \frac{vu_y}{v_y}$, and plugging this into (1) gives
+        $$
+        \begin{align*}
+            \left(\frac{vu_y}{v_y}\right) v_x + vv_x &= 0 \\
+        \end{align*}
+        $$
+    </ProofContent>
+</Proof>
