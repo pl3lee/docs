@@ -570,3 +570,250 @@ which are called **linear Diophantine equations**.
             So if there exists a solution, there exists infinitely many solutions.
     </TheoremContent>
 </Theorem>
+## Lecture 5 (May 15, 2024)
+Let's prove the theorem from last time.
+<Proof>
+    <ProofContent>
+        We will prove the first part of the theorem.
+
+        $(\Rightarrow)$ If $(x_0, y_0) is a solution, then we have $c = ax_0 + by_0$. Since $g = \gcd(a, b) \mid a$ and $g \mid b$. Then
+        $$
+        g \mid ax_0 + by_0 = c
+        $$
+        $(\Leftarrow)$ If $g \mid c$, then $c = kg$ for some $k$. By Bezout's Lemma, we have $g = an + bm$, so we have
+        $$
+        \begin{align*}
+            c &= kg \\
+            &= k(an + bm) \\
+            &= (kn)a + (km)b
+        \end{align*}
+        $$
+        So, $(kn, km)$ is a solution to $ax + by = c$.
+    </ProofContent>
+</Proof>
+Thus from our proof, we know how to get a solution to the equation. $(kn, km)$ is a solution where $k = \frac{c}{g}$, and $n, m$ are the coefficients from Bezout's Lemma, which can be obtained by the Euclidean Algorithm. This suggests the following algorithm for solving a linear Diophantine equation $ax + by = c$.
+
+1. Compute $g = \gcd(a, b)$ using Euclidean Algorithm.
+2. Check if $g \mid c$. If not, then it has no solution.
+3. If $g \mid c$, then reverse the Euclidean Algorithm to find $n, m$ such that $g = na + mb$.
+4. Multiply $g = na + mb$ by $\frac{c}{g}$ to get $c = \left(n \frac{c}{g}\right)a + \left(m \frac{c}{g}\right)b$.
+
+Let's see a couple of examples.
+<Example>
+    <ExampleContent>
+        Solve $6x + 22y = 10$. We first find $\gcd(6, 22)$. By inspection, $g = \gcd(6, 22) = 2$ and we have $2 \mid 10$, so there is a solution. We can find $n, m$ such that $2 = 6n + 22m$. By inspection, we have $n = 4, m = -1$, so we can multiply the equation by $5 = \frac{10}{2}$ to get
+        $$
+        10 = 6(20) + 22(-5)
+        $$
+        The general solution is
+        $$
+        (x, y) = (20, -5) + n(-11, 3)
+        $$
+        From this example, note that we can rearrange the equation $6x + 22y = 10$ and isolate $y$ to get $y = \frac{-6}{22}x + \frac{10}{22}$. This is the equation of a line. Geometrically, we have a line that passes through lattice points in the plane. Lattice points that are on the line are solutions to the equation.
+    </ExampleContent>
+</Example>
+<Example withName={true}>
+    <ExampleName>Frobenius Coin Problem/Chicken Nugget Problem</ExampleName>
+    <ExampleContent>
+        You can buy 5 cent or 7 cent stamps. Show that you cannot mail a 23 cent letter.
+
+        We want to solve $5x + 7y = 23$, but we want to solve this over $\mathbb Z_{\geq 0}$. Let's first solve this over $\mathbb Z$ and obtain a general solution. By inspection, we have $g = \gcd(5, 7) = 1$ and by Bezout's Lemma, we get
+        $$
+        \begin{align*}
+            1 &= 5(3) + 7(-2) \\
+            23 &= 5(69) + 7(-46)
+        \end{align*}
+        $$
+        Thus a general solution is
+        $$
+        (x, y) = (69, -46) + n(-7, 5)
+        $$
+        We want
+        - $x \geq 0 \iff 69 - 7n \geq 0 \iff n \leq \frac{69}{7} \approx 9.9$
+        - $y \geq 0 \iff -46 + 5n \geq 0 \iff n \geq \frac{46}{5} \approx 9.2$
+
+        There is no $n \in \Z$ with $92 \leq n \leq 9.9$. So there are no solutions with $x \geq 0, y \geq 0$.
+    </ExampleContent>
+</Example>
+It turns out that for the example above, for $c > 23$, $5x + 7y = c$ can always be solved in $\Z_{\geq 0}$.
+
+### Primes
+<Definition>
+    <DefinitionName>Prime</DefinitionName>
+    <DefinitionContent>
+        An integer $p \in \Z$ is said to be prime if $p > 1$ and the only positive divisors are $1$ and $p$.
+
+        If $n$ is not prime, then it is composite.
+    </DefinitionContent>
+</Definition>
+Note that we are not including 1 as a prime number. This is because if we include 1, then we can write
+$$
+1 = 1 \cdot 1 = 1 \cdot 1 \cdot 1 = \cdots
+$$
+which breaks unique factorization, which is the following theorem.
+<Theorem withName={true}>
+    <TheoremName>Fundamental Theorem of Arithmetic</TheoremName>
+    <TheoremContent>
+        If $n > 1$, then $n$ can be written as a product of primes in a unique way (up to ordering).
+    </TheoremContent>
+</Theorem>
+Before we proceed with the proof, we need the following lemma:
+<Lemma withName={true}>
+    <LemmaName>Euclid's Lemma</LemmaName>
+    <LemmaContent>
+        If $p$ is prime, and $p \mid ab$, then $p \mid a$ or $p \mid b$.
+    </LemmaContent>
+</Lemma>
+In fact, this can be considered as the definition of a prime number, i.e. for any integer $p \mid ab$, if $p \mid a$ or $p \mid b$, then $p$ is prime.
+<Proof withName={true}>
+    <ProofName>Euclid's Lemma</ProofName>
+    <ProofContent>
+        Assume $p \mid ab$ and $p \nmid a$. Then $p \mid b$ by result of proposition from Lecture 4 (If $a \mid bc$ and $a, b$ are coprime, then $a \mid c$).
+
+        Similarly, if $p \nmid b$, then $p \mid a$.
+    </ProofContent>
+</Proof>
+Now, we can prove the Fundamental Theorem of Arithmetic.
+<Proof withName={true}>
+    <ProofName>Fundamental Theorem of Arithmetic</ProofName>
+    <ProofContent>
+        **Existence**. Assume otherwise, then there exists a smallest $n_0$ such that the theorem is false (i.e. there is no factorization of primes). Note that $n_0$ is not prime, since if it is prime, then $n_0$ itself is a factorization of primes. Since $n_0$ is not prime, it is composite and thus can be factored into $n_0 = ab$, where $1 < a, b < n_0$.
+
+        Since $n_0$ is the smallest such integer, we have that $a$ and $b$ are product of primes. Thus, $ab$ is a product of primes, which is a contradiction.
+
+        **Uniqueness**. Suppose $n = p_1\ldots p_r = q_1 \ldots q_s$. Then
+        $$
+        \begin{align*}
+            p_1 \mid n &\implies p_1 \mid q_1 \ldots q_s \\
+            &\implies p_1 \mid q_i \text{ for some } i \\
+            &\implies p_1 = q_i
+        \end{align*}
+        $$
+        Note that the last implication is true since $p_1$ and $q_i$ are prime (and thus the only divisor of $q_i$ is $q_i$ itself or 1, which is not prime). Thus, we can cancel $p_1$ and $q_i$ from both sides and repeat the argument.
+
+        So, every $p_i$ occurs among $q_j$ and vice versa. So $r = s$ and $p_i = q_i$ after re-ordering.
+    </ProofContent>
+</Proof>
+## Lecture 6 (May 17, 2024)
+Recall from last time that we had the Fundamental Theorem of Arithmetic, which states that every integer greater than 1 can be written as a product of primes in a unique way (up to ordering). 
+
+By convention, given $n > 1$, if we write it as $n = p_1^{a_1} \cdots p_k^{a_k}$ where $p_1 < p_2 < \cdots < p_k$ are primes and $a_i > 0$, then we say that this is the **canonical factorization**.
+
+<Callout type="info" emoji="ℹ️">
+  If $n < -1$ then $-n > 1$ and so $-n$ has a factorization. This implies that $n  = (-1) (-n) = (-1) (p_1^{a_1}\cdots p_k^{a_k})$.
+
+  1 has the empty factorization where $a_i = 0$ for all $i$.
+</Callout>
+
+### $p$-adic Valuation
+<Definition>
+    <DefinitionName>$p$-adic Valuation</DefinitionName>
+    <DefinitionContent>
+        If we take $n \neq 0$, the $p$-adic valuation of $n$ is $v_p(n)$, which is the largest power of $p$ that occurs in the canonical factorization of $n$.
+
+        i.e. $p^a \mid n$ and $p^{a+1} \nmid n$.
+
+        By convention, we define $v_p(0) = -\infty$.
+    </DefinitionContent>
+</Definition>
+For example, $n = 18 = 2 \cdot 3^2$. Then $v_2(n) = 1$, and $v_3(n) = 2$, and $v_p(n) = 0$ for all $p \neq 2, 3$. Note that $v_p(n) = 0$ if and only if $p \nmid n$.
+
+Thus, we can say that $v_p(1) = 0$ for all $p$.
+
+Here is another example. Let's find $v_2(10!)$. We have
+$$
+\begin{align*}
+    10! &= (1)\underbrace{(2)}_{2^1} (3) \underbrace{(4)}_{2^2} (5) \underbrace{(6)}_{2 \cdot 3} (7) \underbrace{(8)}_{2^3} (9) \underbrace{(10)}_{2 \cdot 5}
+\end{align*}
+$$
+Then $v_2(10!)$ is the number of terms containing a factor of 2, plus the number of terms containing a factor of $2^2$, plus the number of terms containing a factor of $2^3$. Thus, $v_2(10!) = 5 + 2 + 1 = 8$. Alternatively, we can write
+$$
+v_2(10!) = \lfloor \frac{10}{2}\rfloor + \lfloor \frac{10}{4}\rfloor + \lfloor \frac{10}{8}\rfloor = 8
+$$
+Note that in general for $n!$, we have
+<Lemma withName={true}>
+    <LemmaName>Legendre's Formula</LemmaName>
+    <LemmaContent>
+        $v_p(n!) = \left\lfloor \frac{n}{p} \right\rfloor + \left\lfloor \frac{n}{p^2} \right\rfloor + \left\lfloor \frac{n}{p^3} \right\rfloor + \cdots$
+
+        This looke like an infinte sum, but actually as $p^k > n$, we get
+        $$
+        \lfloor \frac{n}{p^k} \rfloor = 0
+        $$
+    </LemmaContent>
+</Lemma>
+We also have the following results, which could be nice exercises.
+- $v_p(ab) = v_p(a) + v_p(b)$
+- $v_p(a^k) = kv_p(a)$
+- $v_p(1) = 0$
+
+### Distribution of Primes
+<Theorem>
+    <TheoremContent>
+        There are infinitely many primes.
+    </TheoremContent>
+</Theorem>
+This theorem has many different proofs. One of the most famous proofs is due to Euclid. We will introduce another proof later.
+<Proof withName={true}>
+    <ProofName>Euclid's Version</ProofName>
+    <ProofContent>
+        Suppose that there is finitely many primes, say $p_1, \ldots, p_k$. If we multiply them together and add 1, we get
+        $$
+        n = p_1 \cdots p_k + 1
+        $$
+        Note that if we divide $n$ by and $p_i$, we have remainder 1 since $p_i \mid p_1 \cdots p_k$ but $p_i \nmid 1$. 
+
+        By Fundamental Theorem of Arithmetic, $n$ has a prime divisor, but $p_1,\ldots, p_k$ are all primes that do not divide $n$. Thus, this is a contradiction.
+    </ProofContent>
+</Proof>
+We have the following comments for the proof above.
+1. A common misconception is that $p_1p_2\ldots p_k + 1$ is prime. This is false. An exercise is to find the first $k$ such that $p_1p_2\ldots p_{k} + 1$ is not prime.
+2. An open problem is: Are there infinitely many primes of the form $p_1\ldots p_k + 1$?
+3. Euclid's proof shows that $p_{k + 1} \leq p_1\ldots p_k + 1$. By induction, we can show that $p_n \leq 2^{2^{n - 1}}$. However, this is a very weak bound as $p_{10} = 29$ and $2^{2^9} = 2^{512}$.
+
+<Theorem>
+    <TheoremContent>
+        Given $N \geq 2$, we can find $N$ consecutive composite numbers.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Consider the following numbers
+        - $(N+1)! + 2$
+        - $(N+1)! + 3$
+        - $\cdots$
+        - $(N+1)! + N + 1$
+
+        Note that $2 \mid (N+1)! + 2$, $3 \mid (N+1)! + 3$, $\ldots$, $N+1 \mid (N+1)! + N + 1$. Thus, all of these numbers are composite. So we have a sequence of $N$ consecutive composite numbers.
+    </ProofContent>
+</Proof>
+In fact, it was proven that there are infinitely many primes with composite gaps of $\leq 246$ million.
+
+Now, let's get back to another proof of the infinitude of primes.
+<Proof withName={true}>
+    <ProofName>$\infinty$ many primes by Euler</ProofName>
+    <ProofContent>
+        The key to this proof is the following. Recall that by the geometric series,
+        $$
+        \frac{1}{1 - \frac{1}{p}} = \sum_{k \geq 0} \left(\frac{1}{p}\right)^k
+        $$
+        So
+        $$
+        \begin{align*}
+            \frac{1}{1 - \frac{1}{2}} \cdot \frac{1}{1 - \frac{1}{3}} &= \left(\sum_{k \geq 0} \left(\frac{1}{2}\right)^k\right)\left(\sum_{k \geq 0} \left(\frac{1}{3}\right)^k\right) \\
+            &= \sum_{a, b \geq 0} \frac{1}{2^a 3^b}
+        \end{align*}
+        $$
+        And similarly, we have
+        $$
+        \frac{1}{1 - \frac{1}{2}} \cdot \frac{1}{1 - \frac{1}{3}} \cdot \frac{1}{1 - \frac{1}{5}} = \sum_{a,b,c\geq 0} \frac{1}{2^a 3^b 5^c}
+        $$
+        and so on. Now, suppose $p_1,\ldots,p_k$ are all the primes. Then we have
+        \begin{align*}
+            \prod^k_{i=1} \frac{1}{1 - \frac{1}{p_i}} &= \sum_{a_1,\ldots,a_k \geq 0} \frac{1}{p_1^{a_1} \cdots p_k^{a_k}} \\
+            &= \sum_{n \geq 1} \frac{1}{n}
+        \end{align*}
+        $$
+        where the last equality is due to the Fundamental Theorem of Arithmetic (every integer can be written as a product of primes). However, the sum on the right diverges, while the product on the left is finite. This is a contradiction, so there must be infinitely many primes.
+    </ProofContent>
+</Proof>
