@@ -694,6 +694,7 @@ Now, we can prove the Fundamental Theorem of Arithmetic.
         So, every $p_i$ occurs among $q_j$ and vice versa. So $r = s$ and $p_i = q_i$ after re-ordering.
     </ProofContent>
 </Proof>
+
 ## Lecture 6 (May 17, 2024)
 Recall from last time that we had the Fundamental Theorem of Arithmetic, which states that every integer greater than 1 can be written as a product of primes in a unique way (up to ordering). 
 
@@ -818,3 +819,127 @@ Now, let's get back to another proof of the infinitude of primes.
         where the last equality is due to the Fundamental Theorem of Arithmetic (every integer can be written as a product of primes). However, the sum on the right diverges, while the product on the left is finite. This is a contradiction, so there must be infinitely many primes.
     </ProofContent>
 </Proof>
+
+## Lecture 7 (May 21, 2024)
+### Generating Primes
+We will present an algorithm for generating primes. The algorithm is called the **Sieve of Eratosthenes**. This is a slow algorithm, but it is simple to do by hand. Suppose that we want primes that are $\leq 40$. We can list out all integers from 2 to 40, then do the following:
+1. Cross out all multiples of 2, except for 2.
+2. Cross out all multiples of 3, except for 3.
+3. Cross out all multiples of 5, except for 5.
+
+We get the following list:
+$$
+\begin{array}{ccccccccccccc}
+\textcolor{green}{2} & \textcolor{green}{3} & \textcolor{red}{4} & \textcolor{green}{5} & \textcolor{red}{6} & 7 & \textcolor{red}{8} & \textcolor{red}{9} & \textcolor{red}{10} & 11 & \textcolor{red}{12} & 13 & \textcolor{red}{14} \\
+\textcolor{red}{15} & \textcolor{red}{16} & 17 & \textcolor{red}{18} & 19 & \textcolor{red}{20} & \textcolor{red}{21} & \textcolor{red}{22} & 23 & \textcolor{red}{24} & \textcolor{red}{25} & \textcolor{red}{26} & \textcolor{red}{27} \\
+\textcolor{red}{28} & 29 & \textcolor{red}{30} & 31 & \textcolor{red}{32} & \textcolor{red}{33} & \textcolor{red}{34} & \textcolor{red}{35} & \textcolor{red}{36} & 37 & \textcolor{red}{38} & \textcolor{red}{39} & \textcolor{red}{40}
+\end{array}
+$$
+Then the numbers that are black or green are primes.
+
+<Proposition>
+    <PropositionContent>
+        If $n > 1$ is composite, then it has prime divisors $p$ such that $p \leq \lfloor \sqrt{n} \rfloor$.
+    </PropositionContent>
+</Proposition>
+<Proof>
+    <ProofContent>
+        Suppose $n$ is composite, then we can write $n = ab$, where $a,b > 1$. Suppose for contradiction that both $a, b > \sqrt{n}$. Then $ab > \sqrt{n} \cdot \sqrt{n} = n$, so we have $n > n$, which is a contradiction. Therefore, at least one of $a$ and $b$ is $\leq \sqrt n$. Thus, a prime divisor of either $a$ or $b$ is $\leq \sqrt n$.
+    </ProofContent>
+</Proof>
+So, we have a primality test.
+<Corollary withName={true}>
+    <CorollaryName>Simple Primality Test</CorollaryName>
+    <CorollaryContent>
+        If $n$ is not divisible by any prime $p \leq \lfloor \sqrt n \rfloor$, then it must be prime.
+    </CorollaryContent>
+</Corollary>
+Thus, for our example, if $1 < n \leq 40$, then either $n$ is prime or else $n$ has divisor $p \leq \sqrt{40} \floor = 6$. So all composites $\leq 40$ have divisor $p$ with $p = 2, 3$ or $5$.
+
+Now, for a prime $p$, we can write it as
+- $p = 4q + 1$
+- $p = 4q + 2$ (only if $p = 2$, since if $p \neq 2$, then $p = 4q + 2$, which is even and thus is not prime)
+- $p = 4q + 3$
+
+Since there are infinitely many primes, do we have infinitely many primes of the form $4q + 1$ or $4q + 3$? Turns out that there are infintely many primes of both forms.
+<Theorem>
+    <TheoremContent>
+        There are infinitely many primes of the form $4q + 3$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Suppose there are only finitely many primes of the form $4q + 3$, say $\underbrace{p_1}_{3},\ldots, p_k$. Consider the number
+        $$
+        N = 4p_2p_3\ldots p_k + 3
+        $$
+        We have the following observations:
+        - $N$ is odd, so $2 \nmid N$.
+        - $p_2,\ldots,p_k \nmid N$, since it leaves a remainder of 3.
+        - $3 \nmid N$ since $3 \nmid 4p_2\ldots p_k$.
+
+        Then, since all integers are either $4q + 1, 4q + 2, 4q + 3$, and we have that all primes of the form $4q + 3$ does not divide $N$, and all primes of the form $4q + 2$ (which is only the number 2) does not divide $N$, then the only prime divisors that divide $N$ have the form $4q + 1$.
+
+        So, we can write $N = q_1^{a_1} \cdots q_r^{a_r}$, where $q_i = 4q + 1$. So $N$ is a product of numbers of the form $4q + 1$. However, the product of numbers of the form $4q + 1$ are also of the form $4q + 1$. This is because
+        $$
+        \begin{align*}
+            (4k + 1)(4 \ell + 1) &= 16k\ell + 4k + 4\ell + 1 \\
+            &= 4(4k\ell + k + \ell) + 1
+        \end{align*}
+        $$
+        So $N$ must be of the form $4q + 1$, but $N$ is of the form $4q + 3$. Contradiction.
+    </ProofContent>
+</Proof>
+<Theorem>
+    <TheoremContent>
+        There are infinitely many primes of the form $4q + 1$.
+    </TheoremContent>
+</Theorem>
+The proof of this is tricky, so we will come back to it later in the course.
+
+Turns out that we have the following theorem:
+<Theorem withName={true}>
+    <TheoremName>Dirichlet's Theorem on Primes in Arithmetic Progression</TheoremName>
+    <TheoremContent>
+        If $a, b$ are coprime, then there are infinitely many primes of the form $aq + b$.
+    </TheoremContent>
+</Theorem>
+
+Here is another question: how many primes are there which are $\leq x$? Let's first introduce some notation.
+<Definition>
+    <DefinitionName>Prime Counting</DefinitionName>
+    <DefinitionContent>
+        Let $x \in \mathbb R > 0$. Then $\pi(x)$ is the number of primes $\leq x$.
+    </DefinitionContent>
+</Definition>
+For example, $\pi(10) = \# \{2, 3, 5, 7\} = 4$ and $\pi(23.23) = \pi(23) = 9$.
+
+The graph of $\pi(x)$ is a step function, and since there are infinitely many primes, $\pi(x) \to \infty$ as $x \to \infty$.
+
+![Graph of $\pi(x)$](/images/school/spring-2024/pmath340/7-1.png)
+
+There is no nice formula for $\pi(x)$, but can we estimate it?
+<Proposition>
+    <PropositionContent>
+        $\pi(x) \geq \log(\log(x))$
+    </PropositionContent>
+</Proposition>
+<Callout type="info" emoji="ℹ️">
+  In this course $\log = \log_e = \ln$.
+</Callout>
+However, this is a pretty bad bound, since $x = 10^6$ gives $\pi(x) \geq \log(\log(10^6)) \approx 2.3$.
+
+Can we do better? Gauss and Legendre conjectured that
+$$
+\begin{align*}
+    \pi(x) &\sim \frac{x}{\log x} \\
+    \pi(x) &\sim L_i(x) := \int^x_2 \frac{dt}{\log t}
+\end{align*}
+$$
+In fact, these two equations are equivalent since $\frac{x}{\log x} \sim L_i(x)$.
+<Callout type="info" emoji="ℹ️">
+  $f(x) \sim g(x)$ means $\lim_{x \to \infty} \frac{f(x)}{g(x)} = 1$.
+</Callout>
+## Lecture 8 (May 22, 2024)
+
+## Lecture 9 (May 24, 2024)
