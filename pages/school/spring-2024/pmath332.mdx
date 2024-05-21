@@ -1015,35 +1015,139 @@ As an example, $f(z) = \frac{z^3 + 2}{z^2 + 1}$ is analytic everywhere except at
         This implies that $u(x,y) = C_1$ and $v(x,y) = C_2$ for some constants $C_1$ and $C_2$. Thus $f(z) = C_1 + iC_2$.
     </ProofContent>
 </Proof>
-<Theorem>
+
+
+## Lecture 9 (May 21, 2024)
+We start with a theorem that is a direct consequence of the Cauchy-Riemann Equations.
+<Theorem withName={true}>
+    <TheoremName>Example of Implications of the Cauchy-Riemann Equations</TheoremName>
     <TheoremContent>
         Suppose $f$ is analytic in a domain $D$. If $|f(z) = M$ for a constant $M$ for all $z \in D$, then $f(z)$ is constant in $D$.
     </TheoremContent>
 </Theorem>
 <Proof>
     <ProofContent>
-        Let $f(z) = u(x,y) + iv(x,y)$. Then $|f(z)| = \sqrt{u^2 + v^2} = M$, which means $u^2 + v^2 = M^2$. If we differentiate
-        - with respect to $x$, then $2u u_x + 2v v_x = 0$
-        - with respect to $y$, then $2u u_y + 2v v_y = 0$
-        
-        So we have the following equations:
+        We have $|f(z)| = M$ and we let $f(z) = f(x + iy) = u(x,y) + iv(x,y)$. Then we have $|f(z)|^2 = u^2 + v^2 = M^2$. Differentiating both sides w.r.t. $x$ using Chain rule, we get
+        $$
+        2u u_x + 2v v_x = 0
+        $$
+        and similarly differentiating w.r.t. $y$ gives
+        $$
+        2u u_y + 2v v_y = 0
+        $$
+        Thus we have the system of equations
         $$
         \begin{align}
             uu_x + vv_x &= 0 \\
             uu_y + vv_y &= 0
         \end{align}
         $$
-        If $f$ is analytic, (1) is equivalent to $uv_y - vu_y = 0$, and rearranging gives
+        If $f$ is analytic, then $v_y = u_x$ and $u_y = -v_x$ by the Cauchy-Riemann Equations. So (2) can be rewritten as
         $$
         \begin{align*}
-            -vu_y + uv_y &= 0 \tag{3}
+            -uv_x + vu_x &= 0 \tag{3}
         \end{align*}
         $$
-        If we solve (3) for $u$, we get $u = \frac{vu_y}{v_y}$, and plugging this into (1) gives
+        $v \times (1) - u \times (3)$ gives
         $$
         \begin{align*}
-            \left(\frac{vu_y}{v_y}\right) v_x + vv_x &= 0 \\
+            uvu_x + v^2 u_x + u^2 v_x - uvu_x &= 0 \\
+            (u^2 + v^2) v_x &= 0
         \end{align*}
         $$
+        So either $u^2 + v^2 = 0$ or $v_x = 0$. If $u^2 + v^2 = 0$, then we have $u = v = 0$, and thus $f = 0$, which is a constant function.
+
+        Otherwise, we have $v_x = 0$ and by the Cauchy-Riemann Equations, we have $u_y = 0$. Similarly, we can show that $u_x = v_y = 0$ by repeating the above procedure, and thus all four partials are zero. Thus $f$ is constant.
     </ProofContent>
 </Proof>
+### Harmonic Conjugates
+An example problem is this. Suppose $u(x, y) = e^{-2x} \cos(2y) + 2y$. Find $v(x,y)$ such that $f(z) = u + iv$ is analytic.
+
+We require that the Cauchy-Riemann Equations are satisfied, so we have
+$$
+v_y = u_x = -2e^{-2x} \cos(2y)
+$$
+Therefore we can integrate to find $v$:
+$$
+\begin{align*}
+    v(x, y) &= \int - 2e^{-2x} \cos(2y) \, dy \\
+    &= -e^{-2x} \sin(2y) + g(x)
+\end{align*}
+$$
+where $g(x)$ is a constant that depends on $x$. Using the other Cauchy-Riemann Equation, we have
+$$
+v_x = -u_y = 2e^{-2x} \sin(2y) - 2
+$$
+Using $v(x,y) = -e^{-2x} \sin(2y) + g(x)$, we can differentiate w.r.t. $x$ to get
+$$
+v_x = 2e^{-2x} \sin(2y) + g'(x)
+$$
+So comparing both equations, we get $g'(x) = -2$, and thus $g(x) = -2x + C$. Thus, we have found that
+$$
+v(x,y) = -e^{-2x} \sin(2y) - 2x + C
+$$
+So
+$$
+f(z) = (e^{-2x} \cos(2y) + 2y) + i(-e^{-2x} \sin(2y) - 2x + C)
+$$
+
+In particular, we call the functions $v(x,y)$ the **harmonic conjugate** of $u(x,y)$. Note that this is not quite a reciprocal relationship. If $v$ is a harmonic conjugate of $u$, then $-u$ is a harmonic conjugate of $v$. Let's consider an easy example.
+<Example>
+    <ExampleContent>
+        Consider $f_1(z) = z$. It is analytic, and $z = x + iy$. So, the harmonic conjugates of $x$ are $y + C$.
+
+        Meanwhile, $f_2(z) = -iz$, and $-iz = -i(x + iy) = y - ix$. So the harmonic conjugates of $y$ are $-x + C$.
+    </ExampleContent>
+</Example>
+A key result is that not every differentiable function $u(x,y)$ has harmonic conjugates. Consider $u(x,y) = x^3 y$. Setting $v_y = u_x$ raequires $v_y = 3x^2 y$. So $v(x,y) = \frac{3}{2}x^2 y^2 + g(x)$. Then we have $v_x = 3xy^2 + g'(x)$ but $u_y = x^3$. However, $-u_y = -x^3$ cannot equal $v_x = 3xy^2 + g'(x)$.
+
+Then, what kinds of functions will work?
+
+Suppose $f(z)$ is analytic in domain $D$. Let $f(z) = u(x,y) + iv(x,y)$. This means $u_x = v_y$ and $u_y = -v_x$. Differentiating w.r.t. $x$ and $y$ again gives
+$$
+u_{xx} = v_{yx}
+$$
+and
+$$
+u_{yy} = -v_{xy}
+$$
+Later in the course we may prove that if $f$ is analytic then the 2nd order partial derivatives are all continuous, so $v_{yx} = v_{xy}$. Therefore
+$$
+u_{xx} + u_{yy} = 0
+$$
+This is the **Laplace Equation**, often abbreviated as $\nabla^2 u = 0$. This is because
+$$
+\nabla \cdot \nabla u = \left( \frac{\partial}{\partial x}, \frac{\partial}{\partial y} \right) \cdot \left( \frac{\partial u}{\partial x}, \frac{\partial u}{\partial y} \right) = u_{xx} + u_{yy}
+$$
+And similarly $v_{xx} + v_{yy} = 0$.
+
+Solutions to Laplace's Equation are called harmonic functions.
+
+### Application to Dirichlet Problem: Preview
+<Definition>
+    <DefinitionName>Dirichlet Problem</DefinitionName>
+    <DefinitionContent>
+        Let $D$ be a domain with a piecewise-smooth boundary. A Dirichlet Problem is to find a function which is harmonic in $D$ and takes prescribed values on the boundary of $D$.
+    </DefinitionContent>
+</Definition>
+So, the solutions to the Dirichlet Problem are solutions to Laplace's Equation.
+<Example>
+    <ExampleContent>
+        Solve the Dirichlet Problem $\nabla u^2 = 0$, where $u= 1$ on $y = \frac{1}{x}$ and $u = 4$ on $y = \frac{4}{x}$. Note that $f(z) = z^2$ is analytic, and 
+        $$
+        \begin{align*}
+            z^2 &= (x + iy)^2 \\
+            &= (x^2 - y^2) + 2ixy
+        \end{align*}
+        $$
+        so $xy$ is harmonic. Then $u(x,y) = xy$ is the solution (conveniently), since
+        $$
+        \begin{align*}
+            u = xy = 4 &\implies y = \frac{4}{x} \\
+            u = xy = 1 &\implies y = \frac{1}{x}
+        \end{align*}
+        $$
+        ![](/images/school/spring-2024/pmath332/9-1.png)
+    </ExampleContent>
+</Example>
+## Lecture 10 (May 22, 2024)
