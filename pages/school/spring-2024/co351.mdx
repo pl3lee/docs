@@ -273,3 +273,72 @@ $$
 $$
 
 ## Dual LP for TP
+Recall the dual from [co250](/school/spring-2024/co250-review#finding-the-dual-for-any-lp). Suppose we have the following digraph and its LP:
+
+![Digraph Example](/images/school/spring-2024/co351/4-1.png)
+$$
+\begin{align*}
+    \min \quad &\begin{bmatrix}
+        100 & 30 & 50 & 80 & 40 & 30 & 20 & 40
+    \end{bmatrix} x \\
+    \text{s.t.} \quad &\begin{bmatrix}
+        -1 & -1 & -1 & 0 & 0 & 0 & 0 & 0 \\
+        1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & -1 & 0 & 1 & -1 & 0 \\
+        0 & 0 & 1 & 0 & 0 & -1 & 0 & -1 \\
+        0 & 0 & 0 & 0 & 1 & 0 & -1 & 1
+    \end{bmatrix} x = \begin{bmatrix}
+        -5 \\ 7 \\ 0 \\ -5 \\ 3
+    \end{bmatrix} \\
+    &x \geq 0
+\end{align*}
+$$
+where the columns of the node-incidence matrix correspond to the arcs in the order $ab, ac, ad, cb, eb, dc, ce, de$, and the rows correspond to the nodes in the order $a, b, c, d, e$. The dual LP is
+$$
+\begin{align*}
+    \max \quad &\begin{bmatrix}
+        -5 & 7 & 0 & -5 & 3
+    \end{bmatrix}y \\
+    \text{s.t.} \quad &\begin{bmatrix}
+        -1 & 1 & 0 & 0 & 0 \\
+        -1 & 0 & 1 & 0 & 0 \\
+        -1 & 0 & 0 & 1 & 0 \\
+        0 & 1 & -1 & 0 & 0 \\
+        0 & 1 & 0 & 0 & 1 \\
+        0 & 0 & 1 & -1 & 0 \\
+        0 & 0 & -1 & 0 & -1 \\
+        0 & 0 & 0 & -1 & 1
+    \end{bmatrix} y \leq \begin{bmatrix}
+        100 \\ 30 \\ 50 \\ 80 \\ 40 \\ 30 \\ 20 \\ 40
+    \end{bmatrix}
+\end{align*}
+$$
+So in general, for LP
+$$
+\begin{align*}
+    \min \quad &w^T x \\
+    \text{s.t.} &x(\delta(\overline v)) - x(\delta(v)) = b_v \quad \forall v \in N \\
+    &x \geq 0
+\end{align*}
+$$
+we have the dual LP
+$$
+\begin{align*}
+    \max \quad &b^T y \\
+    \text{s.t.} &-y_u + y_v \leq w_{uv} \quad \forall uv \in A
+\end{align*}
+$$
+### Complementary Slackness (CS) Conditions
+Recall that the CS conditions are
+- $x_i = 0$ or the corresponding dual constraint is tight, and
+- $y_j = 0$ or the corresponding primal constraint is tight.
+
+In the context of the TP, since the primal constraints are $x(\delta(\overline v)) - x(\delta(v)) = b_v$ (and thus are already tight), we only have to consider the first condition, i.e. $x_i = 0$ or the corresponding dual constraint is tight. This means that we have the CS conditions
+
+$x_{uv} = 0$ or $-y_u + y_v = w_{uv}$ for all $uv \in A$.
+
+If $-y_u + y_v = w_{uv}$, we call $uv$ a tight arc.
+
+Now, recall that if (P) and (D) is a primal-dual pair, then $x, y$ are optimal solutions to (P) and (D) if and only if
+- $x$ is feasible for (P), $y$ is feasible for (D), and 
+- $x$ and $y$ satisfy the CS conditions.
