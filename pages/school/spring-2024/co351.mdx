@@ -2,83 +2,41 @@ import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName
 import { Steps, Callout } from 'nextra/components'
 
 # CO 351: Network Flow Theory
-## Lecture 1 (May 7 2024)
-### Fundamentals
+Notes are taken from Martin Pei's [lecture videos](https://www.youtube.com/@uwco351networkflowtheory8/playlists) since I find them to be a lot more clear and organized compared to the in-class lectures.
+## Graphs
 Let's start with basic definitions of graphs.
 <Definition withName={true}>
-    <DefinitionName>Graph</DefinitionName>
+    <DefinitionName>Graph Definitions</DefinitionName>
     <DefinitionContent>
-        A graph $G$ is a pair $(V, E)$ where $V$ is a finite set and $E$ is a set of unordered pairs of distinct elements of $V$.
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>Adjacent, Endpoints, and Incident</DefinitionName>
-    <DefinitionContent>
-        Consider the edge $ij$. Then 
-        - $i$ and $j$ are adjacent vertices
-        - $i$ and $j$ are the endpoints of the edge
-        - Edge $ij$ is said to be incident to vertices $i$ and $j$
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>Degree</DefinitionName>
-    <DefinitionContent>
-        The degree of a vertex $v$ is the number of edges incident to $v$. We use the notation $d_G(v)$ or $d(v)$ to denote the degree of $v$ in graph $G$.
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>Walk</DefinitionName>
-    <DefinitionContent>
-        A walk $Q$ is a non-empty sequence of edges. For example, $v_1v_2,v_2v_3,\ldots,v_{k-1}v_k$. We can abbreviate this by only writing the vertices: $v_1,v_2,\ldots, v_k$.
+        - A **graph** $G$ is a pair $(V, E)$ where $V$ is a finite set and $E$ is a set of unordered pairs of distinct elements of $V$.
+        - The **degree** of a vertex $v$ is the number of edges incident to $v$. We use the notation $d_G(v)$ or $d(v)$ to denote the degree of $v$ in graph $G$.
+        - A **walk** $Q$ is a non-empty sequence of edges. For example, $v_1v_2,v_2v_3,\ldots,v_{k-1}v_k$. We can abbreviate this by only writing the vertices: $v_1,v_2,\ldots, v_k$.
 
-        Note that an edge may appear several times in a walk.
+            Note that an edge may appear several times in a walk.
+        - A **path** $P$ is a walk such that $v_1,\ldots,v_k$ are distinct vertices, meaning that we visit a new node at each step.
+        - A **cycle** $C = v_1,\ldots,v_k$ is a walk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
+        - An **$st$-walk** is a walk that starts at $s$ and ends at $t$.
+        - An **$st$-path** is a path that starts at $s$ and ends at $t$, with $s \neq t$.
+        - Consider an edge $ij$, then $i$ and $j$ are **adjacent vertices**, $i$ and $j$ are the **endpoints** of the edge, and the edge $ij$ is said to be **incident** to vertices $i$ and $j$.
     </DefinitionContent>
 </Definition>
 <Definition withName={true}>
-    <DefinitionName>Path</DefinitionName>
+    <DefinitionName>Connectivity and Cuts</DefinitionName>
     <DefinitionContent>
-        A path $P$ is a walk such that $v_1,\ldots,v_k$ are distinct vertices, meaning that we visit a new node at each step.
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>Cycle</DefinitionName>
-    <DefinitionContent>
-        A cycle $C = v_1,\ldots,v_k$ is a walk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>$st$-walk</DefinitionName>
-    <DefinitionContent>
-        An $st$-walk is a walk that starts at $s$ and ends at $t$.
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>$st$-path</DefinitionName>
-    <DefinitionContent>
-        An $st$-path is a path that starts at $s$ and ends at $t$, with $s \neq t$.
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>Cut</DefinitionName>
-    <DefinitionContent>
-        For a subset of vertices $S \subseteq V$, the cut with shore $S$ is the set of edges with exactly one endpoint in $S$. We use the notation
-        $$
-        \delta(S) = \{ij \in E : i \in S, j \notin S\}
-        $$
-        For example, we have
-        $$
-        \delta(S) = \{e_{12}, e_{25}, e_{35}, e_{45}, e_{14}\}
-        $$
-        for the following
-        ![Cut Example](/images/school/spring-2024/co351/1-1.png)
-    </DefinitionContent>
-</Definition>
-<Definition withName={true}>
-    <DefinitionName>$st$-Cut</DefinitionName>
-    <DefinitionContent>
-        For vertices $s$ and $t$ with $s \neq t$ of $G$, and $st$-cut of $G$ is a cut $\delta(S)$ where $S \subset V$, with $s \in S$ and $t \notin S$.
-
-        Using the example from above, if we have $s = v_1$ and $t = v_3$, then the above is an $st$-cut.
+        - A graph $G = (V, E)$ is **connected** if for each pair $i, j \in V$, there exists an $ij$-path.
+        - For a subset of vertices $S \subseteq V$, the **cut** with shore $S$ is the set of edges with exactly one endpoint in $S$. We use the notation
+            $$
+            \delta(S) = \{ij \in E : i \in S, j \notin S\}
+            $$
+            For example, we have
+            $$
+            \delta(S) = \{e_{12}, e_{25}, e_{35}, e_{45}, e_{14}\}
+            $$
+            for the following
+            ![Cut Example](/images/school/spring-2024/co351/1-1.png)
+        - For vertices $s$ and $t$ with $s \neq t$ of $G$, and **$st$-cut** of $G$ is a cut $\delta(S)$ where $S \subset V$, with $s \in S$ and $t \notin S$. 
+        
+            Using the example from above, if we have $s = v_1$ and $t = v_3$, then the above is an $st$-cut.
     </DefinitionContent>
 </Definition>
 Now, we have our first theorem.
@@ -98,161 +56,12 @@ Now, we have our first theorem.
         ![](/images/school/spring-2024/co351/1-3.png)
     </ProofContent>
 </Proof>
-<Definition withName={true}>
-<DefinitionName>Connected</DefinitionName>
-<DefinitionContent>
-A graph $G = (V, E)$ is connected if for each pair $i, j \in V$, there exists an $ij$-path.
-</DefinitionContent>
-</Definition>
-<Definition withName={true}>
-<DefinitionName>Digraph</DefinitionName>
-<DefinitionContent>
-A digraph $D$ is a pair $(N, A)$ where $N$ is a finite set and $A$ is a set of ordered pairs of elements of $N$. The elements of $N$ are called nodes, and the elements of $A$ are called arcs. An arc $(i,j)$ is also written as $ij$.
-
-For an arc $ij$, node $i$ is called the tail, and node $j$ is called the head.
-
-The **out-degree** of a node $v$ is the number of arcs with tail $v$, we write $d(v)$.
-
-The **in-degree** of a node $v$ is the number of arcs with head $v$, we write $\bar d(v)$.
-</DefinitionContent>
-</Definition>
-<Definition withName={true}>
-<DefinitionName>Node-arc Incidence Matrix</DefinitionName>
-<DefinitionContent>
-The node-arc incidence matrix of a digraph $D = (N, A)$ is an $|N| \times |A|$ matrix $M$ such that
-- its rows are the nodes of $D$
-- its columns are the arcs of $D$
-- the entry for node $v$ and arc $ij$, $m_{v, ij}$ is given by
-    $$
-    m_{v, ij} = \begin{cases}
-        0 & \text{if $v \neq i$ and $v \neq j$} \\
-        1 & \text{if $v = j$} \\
-        -1 & \text{if $v = i$}
-    \end{cases}
-    $$
-</DefinitionContent>
-</Definition>
-Let's illustrate this on an example. Suppose that we have the digraph
-
-![Digraph Example](/images/school/spring-2024/co351/1-4.png)
-
-Then the node-arc incidence matrix $M$ is
-
-| $v \downarrow$ $e \rightarrow$ | 12 | 14 | 24 | 31 | 35 | 43 | 45 | 51 |
-|---|---|---|---|---|---|---|---|---|
-| 1 | -1 | -1 | 0 | 1 | 0 | 0 | 0 | 1 |
-| 2 | 1 | 0 | -1 | 0 | 0 | 0 | 0 | 0 |
-| 3 | 0 | 0 | 0 | -1 | 1 | 1 | 0 | 0 |
-| 4 | 0 | 1 | 1 | 0 | 0 | -1 | -1 | 0 |
-| 5 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | -1 |
-
-Notice that each column has exactly one 1 and one -1, and the rest are 0s. This is because each arc has exactly one tail and one head.
-
-## Lecture 2 (May 9 2024)
-### Fundamentals (Continued)
-Let's continue with some more definitions.
-#### Basic Definitions for Digraphs
 <Definition>
-<DefinitionName>Diwalk</DefinitionName>
-<DefinitionContent>
-A diwalk $Q$ is a non-empty sequence of arcs $v_1v_2,v_2v_3,\ldots,v_{k-1}v_k$. 
-
-We can abbreviate this by only writing the nodes: $Q = v_1,v_2,\ldots,v_k$. Note that this implies that $v_iv_{i+1}$ is an arc, and an arc may appear several times in a walk.
-</DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>Dipath</DefinitionName>
+    <DefinitionName>Trees</DefinitionName>
     <DefinitionContent>
-        A dipath $P$ is a diwalk such that $v_1,\ldots,v_k$ are distinct nodes.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>Dicycle</DefinitionName>
-    <DefinitionContent>
-        A dicycle $C$ is a diwalk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>$st$-diwalk</DefinitionName>
-    <DefinitionContent>
-        An $st$-diwalk is a diwalk that starts at $s$ and ends at $t$.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>$st$-dipath</DefinitionName>
-    <DefinitionContent>
-        An $st$-dipath is a dipath that starts at $s$ and ends at $t$, with $s \neq t$.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>Acyclic</DefinitionName>
-    <DefinitionContent>
-        A digraph $D$ that contains no dicycle is acyclic.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>Reach</DefinitionName>
-    <DefinitionContent>
-        For nodes $s,v$ of digraph $D$, $v$ can be reached from $s$ if $D$ has an $sv$-diwalk.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>Subdigraph</DefinitionName>
-    <DefinitionContent>
-        $D' = (N', A')$ is called a subdigraph of $D = (N, A)$ if $N' \subseteq N$ and $A \subseteq A$.
-    </DefinitionContent>
-</Definition>
-
-<Definition>
-    <DefinitionName>Spanning Subdigraph</DefinitionName>
-    <DefinitionContent>
-        $D' = (N', A')$ is called a spanning subdigraph of $D = (N, A)$ if $N' = N$ and $A' \subseteq A$. In other words, $D'$ contains all the nodes of $D$, but only contains a subset of the arcs.
-    </DefinitionContent>
-</Definition>
-
-#### Cuts
-Suppose we have a digraph $D = (N, A)$
-<Definition>
-    <DefinitionName>Cut</DefinitionName>
-    <DefinitionContent>
-        For $S \subseteq N$, the cut with shore $S$ is the set of arcs with **tails in** $S$ and **heads not in** $S$.
-
-        We use the notation 
-        $$
-        \delta_D(S) = \delta(S) = \{uv \in A: u \in S, v \not \in S\}
-        $$
-    </DefinitionContent>
-</Definition>
-<Definition>
-    <DefinitionName>$st$-Cut</DefinitionName>
-    <DefinitionContent>
-        For nodes $s, t$ where $s \neq t$ of $D$, an $st$-cut of $D$ is a cut $\delta(S)$ where $S \subset N$, with $s \in S$ and $t \not \in S$.
-    </DefinitionContent>
-</Definition>
-<Theorem>
-    <TheoremContent>
-        Let $D = (N, A)$ be a digraph, and let $s, t$ be distinct nodes of $D$. There exists an $st$-dipath if and only if every $st$-cut is non-empty.
-    </TheoremContent>
-</Theorem>
-
-#### Trees
-<Definition>
-    <DefinitionName>Tree</DefinitionName>
-    <DefinitionContent>
-        A tree is a connected digraph that contains no cycles.
-    </DefinitionContent>
-</Definition>
-<Definition>
-    <DefinitionName>Spanning Tree</DefinitionName>
-    <DefinitionContent>
-        A spanning tree of a graph $G$ is a subgraph $T$ of $H$ such that $V(T) = V(G)$ and $T$ is a tree.
+        - A **tree** is a connected digraph that contains no cycles. Note that a tree with $n$ vertices has $n-1$ edges.
+        - A **spanning tree** of a graph $G$ is a subgraph $T$ of $H$ such that $V(T) = V(G)$ and $T$ is a tree.
+        - Note that a graph $G$ has a spanning tree if and only if $G$ is connected.
     </DefinitionContent>
 </Definition>
 <Lemma>
@@ -327,3 +136,140 @@ Now, we can finally prove Theorem 1.7.
         Now we prove the second part. Since $T$ is a tree (which is connected), $T + e$ is connected as well. Moreover, $T + e$ contains a unique cycle $C$ from the first part of the theorem. Let $e' \in C$. Then $T + e - e'$ is connected by Lemma 1.9. Then by first part, since $C$ is unique, $T + e - e'$ is acyclic. Thus, $T + e - e'$ is a tree.
     </ProofContent>
 </Proof>
+
+## Directed Graphs
+<Definition withName={true}>
+<DefinitionName>Directed Graph Definitions</DefinitionName>
+<DefinitionContent>
+    - A **directed graph** (or **digraph**) $D$ is a pair $(N, A)$ where $N$ is a finite set and $A$ is a set of ordered pairs of elements of $N$. The elements of $N$ are called **nodes**, and the elements of $A$ are called **arcs**. An arc $(i,j)$ is also written as $ij$.
+    - For an arc $ij$, node $i$ is called the **tail**, and node $j$ is called the **head**.
+    - The **out-degree** of a node $v$ is the number of arcs with tail $v$, we write $d(v)$.
+    - The **in-degree** of a node $v$ is the number of arcs with head $v$, we write $\bar d(v)$.
+    - A **diwalk** $Q$ is a non-empty sequence of arcs $v_1v_2,v_2v_3,\ldots,v_{k-1}v_k$. 
+
+        We can abbreviate this by only writing the nodes: $Q = v_1,v_2,\ldots,v_k$. Note that this implies that $v_iv_{i+1}$ is an arc, and an arc may appear several times in a walk.
+    - A **dipath** $P$ is a diwalk such that $v_1,\ldots,v_k$ are distinct nodes.
+    - A **dicycle** $C$ is a diwalk such that $k \geq 3$ and $v_1 = v_k$ with $v_1,\ldots,v_{k-1}$ being distinct.
+    - An **$st$-diwalk** is a diwalk that starts at $s$ and ends at $t$.
+    - An **$st$-dipath** is a dipath that starts at $s$ and ends at $t$, with $s \neq t$.
+    - A digraph $D$ that contains no dicycle is **acyclic**.
+    - For nodes $s,v$ of digraph $D$, $v$ can be **reached** from $s$ if $D$ has an $sv$-diwalk.
+    - $D' = (N', A')$ is called a **subdigraph** of $D = (N, A)$ if $N' \subseteq N$ and $A \subseteq A$.
+    - $D' = (N', A')$ is called a **spanning subdigraph** of $D = (N, A)$ if $N' = N$ and $A' \subseteq A$. In other words, $D'$ contains all the nodes of $D$, but only contains a subset of the arcs.
+</DefinitionContent>
+</Definition>
+<Definition>
+    <DefinitionName>Digraph Cuts</DefinitionName>
+    <DefinitionContent>
+        - For $S \subseteq N$, the **cut** with shore $S$ is the set of arcs with **tails in** $S$ and **heads not in** $S$.
+
+            We use the notation 
+            $$
+            \delta_D(S) = \delta(S) = \{uv \in A: u \in S, v \not \in S\}
+            $$
+        - For nodes $s, t$ where $s \neq t$ of $D$, an **$st$-cut** of $D$ is a cut $\delta(S)$ where $S \subset N$, with $s \in S$ and $t \not \in S$.
+        - Similarly, the cut $\delta(\overline S)$ is the set of arcs with **heads in** $S$ and **tails not in** $S$.
+    </DefinitionContent>
+</Definition>
+<Theorem>
+    <TheoremContent>
+        Let $D = (N, A)$ be a digraph, and let $s, t$ be distinct nodes of $D$. There exists an $st$-dipath if and only if every $st$-cut is non-empty.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        $(\Rightarrow)$ Let $s = v_1,v_2,\ldots,v_k = t$ be an $st$-dipath. Let $\delta(S)$ be an $st$-cut. Since $v_1 \in S$ and $v_k \not \in S$, there exists a largest index $i$ such that $v_i \in S$ and $i < k$. Then $v_{i + 1} \not \in S$, so $v_i v_{i+1} \in \delta(S)$, so $\delta(S)$ is not empty.
+
+        $(\Leftarrow)$ Assume every $st$-cut is non-empty. We will prove that there exists an $st$-dipath. Let $S$ be the set of all nodes $v$ such that an $sv$-dipath exists. If $t \in S$, then an $st$-dipath exists, and we are done. Otherwise, suppose by contradiction we have $t \not \in S$ (so we assume no $st$-dipath exists) and $\delta(S)$ is an $st$-cut. By assumption, all $st$-cuts are non-empty, so there exists an arc $uv \in \delta(S)$. Since $u \in S$, there exists an $su$-dipath. Then $P + uv$ is an $sv$-dipath, so $v$ is reachable from $s$, and thus $v \in S$. This is a contradiction since $v \not \in S$ by definition of $uv \in \delta(S)$. Therefore, there exists an $st$-dipath.
+    </ProofContent>
+</Proof>
+<Definition>
+    <DefinitionName>Underlying Graph</DefinitionName>
+    <DefinitionContent>
+        - The **underlying graph** of a digraph $D = (N, A)$ is obtained by removing the directions on the arcs in $A$ to obtain edges.
+        - A digraph is **connected** if its underlying graph is connected. Therefore, we do not need to care about the directions of the arcs when determining connectivity.
+        - A **spanning tree** in a digraph corresponds to a spanning tree in the underlying graph.
+        - A **cycle** in a digraph corresponds to a cycle in the underlying graph.
+        - Take the cycle in the underlying graph. If we fix a direction, we say that it is an **oriented cycle**. The arcs of the cycles in the digraph that match the oriented cycle are called **forward arcs**, otherwise they are called **backward arcs**.
+    </DefinitionContent>
+</Definition>
+<Definition withName={true}>
+<DefinitionName>Node-arc Incidence Matrix</DefinitionName>
+<DefinitionContent>
+The node-arc incidence matrix of a digraph $D = (N, A)$ is an $|N| \times |A|$ matrix $M$ such that
+- its rows are the nodes of $D$
+- its columns are the arcs of $D$
+- the entry for node $v$ and arc $ij$, $m_{v, ij}$ is given by
+    $$
+    m_{v, ij} = \begin{cases}
+        0 & \text{if $v \neq i$ and $v \neq j$} \\
+        1 & \text{if $v = j$} \\
+        -1 & \text{if $v = i$}
+    \end{cases}
+    $$
+</DefinitionContent>
+</Definition>
+Let's illustrate this on an example. Suppose that we have the digraph
+
+![Digraph Example](/images/school/spring-2024/co351/1-4.png)
+
+Then the node-arc incidence matrix $M$ is
+
+| $v \downarrow$ $e \rightarrow$ | 12 | 14 | 24 | 31 | 35 | 43 | 45 | 51 |
+|---|---|---|---|---|---|---|---|---|
+| 1 | -1 | -1 | 0 | 1 | 0 | 0 | 0 | 1 |
+| 2 | 1 | 0 | -1 | 0 | 0 | 0 | 0 | 0 |
+| 3 | 0 | 0 | 0 | -1 | 1 | 1 | 0 | 0 |
+| 4 | 0 | 1 | 1 | 0 | 0 | -1 | -1 | 0 |
+| 5 | 0 | 0 | 0 | 0 | 1 | 0 | 1 | -1 |
+
+Notice that each column has exactly one 1 and one -1, and the rest are 0s. This is because each arc has exactly one tail and one head.
+
+## Transshipment Problem (TP)
+In a transshipment problem, we are given a digraph $D = (N, A)$. Each node $v \in N$ has demand $b_v$. The demand can be positive or negative, where positive means that the node demands goods, and negative means that the node supplies goods. Each arc $e \in A$ has arc cost $w_e$.
+
+We need to move all the goods from supply nodes to demand nodes, the solution to this is called a **flow**. Our goal is then to minimize the total cost of the flow.
+
+For example, consider the following digraph on the left. The square boxes next to the nodes are the demands, and the number on the arcs are the cost. A feasible flow is shown on the right. We can see that all the demands are met, and the cost is $5 \cdot 100 + 2 \cdot 80 + 2 \cdot 30 + 3 \cdot 40 = 840$.
+
+![TP Example](/images/school/spring-2024/co351/3-1.png)
+
+### LP Formulation
+1. Variables: For each arc $e \in A$, we define a variable $x_e \in \mathbb R$ which represents the flow on arc $e$. Note that all flows $x_e$ are non-negative.
+2. Objective function: the cost of transporting $x_e$ on arc $e$ is $w_e x_e$. We want to minimize the total cost, so our objective function is $\min \sum_{e \in A} w_e x_e$, written in vector form, it is $\min w^T x$.
+3. Constraints: We can think of a node as having a value, which increases as there is flow going into the node (inflow), and decreases when there is flow going out of the node (outflow). We want this value to be equal to the demand of the node. This gives us the constraint inflow minus outflow equalling the demand. Also, all variables are non-negative, $x_e \geq 0$ for all $e \in A$.
+
+Using the example from above, our full LP is
+$$
+\begin{align*}
+    \min \quad &100 x_{ab} + 30x_{ac} + 50x_{ad} + 80x_{cb} + 40 x_{eb} + 30x_{dc} + 20x_{ce} + 40x_{de} \\
+    \text{s.t.} &-x_{ab} - x_{ac} - x_{ad} = -5 \\
+    &x_{ab} + x_{cb} + x_{eb} = 7 \\
+    &x_{ac} - x_{cb} + x_{dc} - x_{ce} = 0 \\
+    &x_{ad} - x_{dc} - x_{de} = -5 \\
+    &-x_{eb} + x_{ce} + x_{de} = 3 \\
+    &x_e \geq 0 \quad \forall e \in A
+\end{align*}
+$$
+Note that we can use $x \in \mathbb R^A$ to replace $x_e$ for all $e \in A$, and $b \in \mathbb R^N$ for demands, and $w \in \mathbb R^A$ for arc costs. Thus, the objective function can be written as a dot product: $\min w^T x$.
+
+We can use $\delta(v)$ (shorthand for $\delta(\{v\})$) to denote the set of outgoing arcs from node $v$, and $\delta(\overline v)$ (shorthand for $\delta(\overline{\{v\}})$) to denote the set of incoming arcs to node $v$. Moreover, we use the notation $x(S)$ to denote the sum of a vector over a subset. If $x \in \mathbb R^T$ and $S \subseteq T$, then $x(S) = \sum_{i \in S} x_i$. If $x$ is a flow, then the total inflow at $v$ can be written as $x(\delta(\overline v))$, and the total outflow at $v$ can be written as $x(\delta(v))$.
+
+Thus, a general LP for a TP is
+$$
+\begin{align*}
+    \min \quad &w^T x \\
+    \text{s.t.} &x(\delta(\overline v)) - x(\delta(v)) = b_v \quad \forall v \in N \\
+    &x \geq 0
+\end{align*}
+$$
+Or, we can have a coefficient matrix $M$, where $M$ is the node-arc incidence matrix. Then, the LP can be written as
+$$
+\begin{align*}
+    \min \quad &w^T x \\
+    \text{s.t.} &Mx = b \\
+    &x \geq 0
+\end{align*}
+$$
+
+## Dual LP for TP
