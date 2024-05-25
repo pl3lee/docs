@@ -1137,3 +1137,34 @@ So the formula is false.
         Thus $n \mid ab - a'b'$ and this implies that $ab \equiv a'b' \pmod n$.
     </ProofContent>
 </Proof>
+
+So now we can do algebra in $\mathbb Z/n\mathbb Z$:
+$$
+[a]([b] + [c]) = [a] [b] + [a] [c]
+$$
+### Examples
+1. Calculate $33 \cdot 106 + 63^3 \mod 4$. We have
+    $$
+    \begin{align*}
+        [33][106] + [63]^3 &= [1][2] + [-1]^3 \\
+        &= [1]
+    \end{align*}
+    $$
+2. Calculate $1! + 2! + 3! + \cdots + 100! \mod 5$. This is an exercise.
+3. Prove $6 \mid a^3 - a$. We want to show that $a^3 - a \equiv 0 \pmod 6$. The only choices for $a$ are $0, 1, 2, 3, 4, 5, 6$. So we can check
+
+    - $a = 0$: $0^3 - 0 = 0$
+    - $a = 1$: $1^3 - 1 = 0$
+    - $a = 2$: $2^3 - 2 = 6 = 0$
+    - $\vdots$
+4. Show $30 \mid a^5 - a$. This is an exercise.
+5. Divisibility test for 9. In general, $9 \mid n$ iff $n \equiv 0 \pmod 9$ iff $9 \mid \text{sum of digits of }n$. We can give a proof. Suppose that $n = (a_k a_{k-1} \ldots a_0)$ in decimal form. Then
+
+    $$
+    \begin{align*}
+        n &= (a_k a_{k-1} \ldots a_0) \\
+        &= a_k 10^k + a_{k-1} 10^{k-1} + \cdots + a_0 \\
+        &\equiv a_k (1)^k + a_{k-1} (1)^{k-1} + \cdots + a_0 \pmod 9 
+    \end{align*}
+    $$
+    So $n \equiv \text{sum of digits of }n \pmod 9$.
