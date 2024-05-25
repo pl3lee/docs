@@ -941,5 +941,199 @@ In fact, these two equations are equivalent since $\frac{x}{\log x} \sim L_i(x)$
   $f(x) \sim g(x)$ means $\lim_{x \to \infty} \frac{f(x)}{g(x)} = 1$.
 </Callout>
 ## Lecture 8 (May 22, 2024)
+### Prime Loose Ends
+Last time, we had $\pi(x) \sim \frac{x}{\log x}$. How do we interpret this? We can say that the proportion (probability) of an integer $\leq x$ being prime is $\frac{1}{\log x}$. Therefore, the number of primes $\leq x$ is $\frac{x}{\log x}$.
 
+An equivalent formulation is that if $p_n$ is the $n$th prime, then $p_n \sim n \log n$ (i.e. when $n$ is large, the $n$th prime is approximately $n \log n$).
+<Theorem withName={true}>
+    <TheoremName>Prime Number Theorem</TheoremName>
+    <TheoremContent>
+        $\lim_{x \to \infty} \frac{\pi(x)}{\frac{x}{\log x}} = 1$
+    </TheoremContent>
+</Theorem>
+<Proof withName={true}>
+    <ProofName>Sketch</ProofName>
+    <ProofContent>
+        The main device is the Riemann Zeta function
+        $$
+        \zeta(s) = \sum_{n \geq 1} \frac{1}{n^s} = 1 + \frac{1}{2^s} + \frac{1}{3^s} + \cdots
+        $$
+        Recall Euler's trick that 
+        $$
+        \begin{align*}
+            \prod_p \frac{1}{1 - \frac{1}{p}} &= \prod_p \left(1 + \frac{1}{p} + \frac{1}{p^2} + \cdots\right) \\
+            &= \sum^\infty_{n=1} \frac{1}{n}
+        \end{align*}
+        $$
+        Then adding the exponent $s$, we have
+        $$
+        \begin{align*}
+            \prod_p \frac{1}{1 - \frac{1}{p^2}} &= \prod_p \left(1 + \frac{1}{p^s} + \frac{1}{p^{2s}} + \cdots\right) \\
+            &= \sum^\infty_{n=1} \frac{1}{n^s} \\
+            &= \zeta(s)
+        \end{align*}
+        $$
+        this converges for $s \in \mathbb R > 1$.
+
+        Then, Riemann generalized this to $\mathbb C$. Let $s \in \mathbb C$, then
+        $$
+        \zeta(s) = \sum^\infty_{n=1} \frac{1}{n^2}
+        $$
+        converges if $\text{Re}(s) > 1$. He found an extension of $\zeta(s)$ for all of $\mathbb C$, except for $s = 1$. He had a big discovery, which is that primes are related to the roots of $\zeta(s)$. So, if you can prove that $\zeta(s) \neq 0$ for $s$ with $\text{Re}(s) = 1$, you get the Prime Number Theorem.
+    </ProofContent>
+</Proof>
+<Theorem withName={true}>
+    <TheoremName>Dirichlet</TheoremName>
+    <TheoremContent>
+        If $a, b$ are coprime, then there exists infinitely many primes of the form $a + bq$.
+    </TheoremContent>
+</Theorem>
+Now, a question is that are there arbitrary long arithmetic progression of only primes? Currently, we have
+| length | progression | jump |
+|--------|-------------|------|
+| 1 | 3 | 0 |
+| 2 | 3, 5 | 2 |
+| 3 | 3, 7, 11 | 4 |
+| 4 | 5, 11, 17, 23 | 6 |
+| 5 | 5, 11, 17, 23, 29 | 6 |
+
+The largest known example has length 27, which is a 18 digit number plus the product of $q$ and a 17 digit number.
+
+<Theorem>
+    <TheoremContent>
+        There are arbitrary long arithmetic progressions of only primes.
+    </TheoremContent>
+</Theorem>
+
+<Theorem withName={true}>
+    <TheoremName>Bertrand's Postulate</TheoremName>
+    <TheoremContent>
+        For all $n > 1$, there exists prime $p$ such that $n < p < 2n$.
+    </TheoremContent>
+</Theorem>
+### Congruence Modulo $n$
+One of our first examples is to prove that $x^2 + y^2 = 3$. We showed that squares leave remainders of either 0 or 1 after division by 4, so the sum of squares leave remainder of 0, 1, or 2. But, 3 leaves remainder 3 by 4, so there are no solutions.
+
+So, our idea is to replace integers with remainders divided by a number.
+<Definition>
+    <DefinitionName>Congruence</DefinitionName>
+    <DefinitionContent>
+        Fix $n \geq 1$. We say $a$ is congruent to $b$ modulo $n$ if $a, b$ leave the same remainder after division by $n$. We write $a \equiv b \pmod n$.
+    </DefinitionContent>
+</Definition>
+<Proposition>
+    <PropositionContent>
+        $a \equiv b \pmod n$ if and only if $n \mid a - b$.
+    </PropositionContent>
+</Proposition>
+<Proof>
+    <ProofContent>
+        For the forward direction, let $a = q_1 n + r$ and $b = q_2 n + r$. Then $a - b = (q_1 - q_2)n$. So $n \mid a - b$.
+    </ProofContent>
+</Proof>
+<Definition>
+    <DefinitionName>Congruence Class Modulo $n$</DefinitionName>
+    <DefinitionContent>
+        A congruence class modulo $n$ is a set of the form
+        $$
+        [a]_n = \{b \in \mathbb Z: b \equiv a \pmod n\}
+        $$
+        for some fixed $a \in \Z$.
+    </DefinitionContent>
+</Definition>
+Here are some examples.
+$$
+\begin{align*}
+    [1]_4 &= \{b \in \Z: b \equiv 1 \pmod 4\} \\
+    &= \{\ldots, -7, -3, 1, 5, 9, \ldots\} \\
+    [0]_2 &= \{b \in \Z: b \equiv 0 \pmod 2\} \\
+    &= \{\ldots, -4, -2, 0, 2, 4, \ldots\}
+\end{align*}
+$$
+Then we can partition $\Z$ into congruence classes modulo $n$.
 ## Lecture 9 (May 24, 2024)
+### Modular Arithmetic
+<Theorem>
+    <TheoremContent>
+        $[a]_n = [b]_n$ if and only if $a \equiv b \pmod n$.
+    </TheoremContent>
+</Theorem>
+<Definition>
+    <DefinitionName>Integers Modulo $n$</DefinitionName>
+    <DefinitionContent>
+        For a fixed $n \in \mathbb Z_{> 0}$, the set of all congruence classes is called the set of integers modulo $n$, denoted $\mathbb Z/n\mathbb Z$.
+    </DefinitionContent>
+</Definition>
+Some examples include
+- $\mathbb Z/2\mathbb Z = \{[0]_2, [1]_2\}$
+- $\mathbb Z/3\mathbb Z = \{[0]_3, [1]_3, [5]_3\}$
+
+In general, $\mathbb Z/ n \mathbb Z = \{[0]_n, [1]_n, \ldots, [n-1]_n\}$.
+<Definition>
+    <DefinitionName>Complete Set of Representations</DefinitionName>
+    <DefinitionContent>
+        A complete set of representations modulo $n$ is a set of $n$ integers $\{a_1, \ldots, a_{n}\}$ such that
+        $$
+        \mathbb Z/n \mathbb Z = \{[a_1]_n, \ldots, [a_n]_n\}
+        $$
+    </DefinitionContent>
+</Definition>
+In general, $\{0,1,\ldots,n-1\}$ is a complete set of representations modulo $n$ of $\mathbb Z/n\mathbb Z$.
+
+We can then define
+$$
+\begin{align*}
+    [a] \pm [b] &= [a \pm b] \\
+    [a] \cdot [b] &= [a \cdot b]
+\end{align*}
+$$
+For this to make sense, we need to confirm that if $[a] = [a']$ and $[b] = [b']$, then $[a \pm b] = [a' \pm b']$ and $[a \cdot b] = [a' \cdot b']$.
+
+Before we prove this, let's give an example of this not working. Consider $[a]^{[b]} = [a^b]$ for $b \geq 0$. We can show that this is false by providing a counter example. Consider $\mathbb Z/ 4 \mathbb Z$. Let $a = 2, b = 1$.
+
+On one hand,
+$$
+[a]^{[b]} = [2]^1 = [2]
+$$
+On the other hand
+$$
+[b] = [1] = [5]
+$$
+However, 
+$$
+\begin{align*}
+    [a]^{[b]} &= [2]^{[5]} \\
+    &= [2^5] \\
+    &= [32] \\
+    &= [0] \\
+    &\neq [2]
+\end{align*}
+$$
+So the formula is false.
+<Proof withName={true}>
+    <ProofName>of $[a\cdot b] = [a' \cdot b']$ if $[a] = [a']$ and $[b] = [b']$</ProofName>
+    <ProofContent>
+        We need $ab \equiv a'b' \pmod n$. We have $a \equiv a', b \equiv b' \pmod n$.
+
+        So $n \mid a - a'$ and $n \mid b - b'$. So,
+        $$
+        a - a' = kb, \quad b - b' = \ell n
+        $$
+        Rearranging gives
+        $$
+        a = a' + kb, \quad b = b' + \ell n
+        $$
+        Then
+        $$
+        \begin{align*}
+            ab &= (a' + kb)(b' + \ell n) \\
+            &= a'b' + n(a' \ell + k b' + k \ell n) 
+        \end{align*}
+        $$
+        Rearranging gives
+        $$
+        ab - a'b' = n(a' \ell + k b' + k \ell n)
+        $$
+        Thus $n \mid ab - a'b'$ and this implies that $ab \equiv a'b' \pmod n$.
+    </ProofContent>
+</Proof>
