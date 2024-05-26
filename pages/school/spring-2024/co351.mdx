@@ -455,3 +455,100 @@ Thus, if we calculate the node potentials $y$, we can use it to calculate the re
         A vector $y \in \mathbb R^N$ is called a node potential. Given $y$, the reduced cost of arc $uv$ is $\bar{w}_{uv} = w_{uv} + y_u - y_v$. A node potential is **feasible** if $\bar{w}_{uv} \geq 0$ for all $uv \in A$.
     </DefinitionContent>
 </Definition>
+## Finding a Leaving Arc
+<Proposition>
+    <PropositionContent>
+        Given a digraph $D = (N, A)$ and node demands $b \in \mathbb R^N$, suppose $x \in \mathbb R^A$ satisfies the flow constraints at each node (i.e. $x(\delta(\bar v)) - x(\delta(v)) = b_v$). Let $C$ be a cycle. Suppose we fix a direction of $C$, and let $F, B$ be the set of forward and backward arcs respectively. We define $x' \in \mathbb R^A$ by
+        $$
+        x'_e = x_e + \begin{cases}
+            t & \text{if $e \in F$} \\
+            -t & \text{if $e \in B$} \\
+            0 & \text{otherwise}
+        \end{cases}
+        $$
+        Then $x'$ also satisfies the flow constraint at each node.
+    </PropositionContent>
+</Proposition>
+Since we need to make sure the flow is non-negative when we subtract $t$ from a flow, for example $x'_e = x_e - t \geq 0$, we have to set $t$ to be the minimum flow $x_e$ such that $e$ is a backward arc. So, $t = \min\{x_e: e \in B\}$.
+
+Then when we update the flow, at least one arc in the cycle has flow 0. We pick one of them as the leaving arc.
+
+## Network Simplex for TP
+An assumption is that we have a spanning tree to start with that corresponds to a feasible flow (tree flow). Then the Network Simplex for TP algorithm is as follows:
+
+Given $D = (N, A)$, arc costs $w \in \mathbb R^A$, node demands $b \in \mathbb R^N$, spanning tree $T$ with tree flow $x \in \mathbb R^A$.
+1. Calculate node potentials $y$ as follows:
+    1. Arbitrarily choose a root node $r$ and set $y_r = 0$ as its node potential.
+    2. Solve the other node potentials by $-y_u + y_v = w_{uv}$ for each arc $uv$ in the spanning tree.
+2. Calculate reduced costs $\bar{w}_{ij} = w_{ij} + y_i - y_j$ for each arc $ij$ that is not in the spanning tree $T$.
+3. If every arc satisfies $\bar{w}_{ij} \geq 0$, then $x$ is optimal and STOP.
+4. Otherwise, there exists arc $uv$ such that $\bar{w}_{uv} < 0$. We arbitrarily pick one as the entering arc.
+5. $T + uv$ contains a cycle $C$. We fix a direction of $C$ where $uv$ is considered a forward arc in the cycle.
+6. Pick $t = \min\{x_e: e \in B\}$, where $B$ is the set of backward arcs in the cycle. Pick the arc that has $t$ flow as the leaving arc.
+7. For any forward arcs $e$, update the flow by $x^{\text{new}}_e = x_e + t$, and for any backward arcs $e$, update the flow by $x^{\text{new}}_e = x_e - t$. For all other arcs (that are not in the cycle), the flow remains the same.
+8. Replace $T$ with $T + uv - pq$, that is, remove the leaving arc, and add the entering arc to the spanning tree.
+9. Go back to step 1.
+
+Here is an example of the Network Simplex for TP algorithm. Suppose we are given a digraph with the following demands and arc costs:
+
+![Digraph Example](/images/school/spring-2024/co351/9-1.png)
+
+Then in the following, each iteration has two digraphs. Both digraph shows the current spanning tree in red. The left digraph shows the flow in orange with node demands in the black square boxes. The right digraph shows the node potentials in the green square boxes, the arc costs in black, and the reduced costs in purple. The purple-boxed reduced cost is the reduced cost of the entering arc, and the corresponding purple arc in the left digraph is the entering arc.
+
+![Iteration 1](/images/school/spring-2024/co351/9-2.png)
+
+![Iteration 2](/images/school/spring-2024/co351/9-3.png)
+
+![Iteration 3](/images/school/spring-2024/co351/9-4.png)
+
+## Economic Interpretation
+To gain some intuition on the Network Simplex for TP algorithm, we can think of the following economic interpretation. 
+
+In a TP, we transport goods, and we want to reduce the total shipping cost.
+
+The interpretation of the dual potential is that it is a shadow price. So, the meaning of reduced cost is this:
+$$
+\bar{w}_{uv} = w_{uv} + y_u - y_v
+$$
+- $w_{uv}$: cost of transport through $uv$
+- $y_u$: cost of buying at node $u$
+- $y_v$: money we get for selling at node $v$
+
+So, if $\bar{w}_{uv} = a$, then we lose $a$ dollars by moving through $uv$. That is, if we have positive reduced cost, then that means we are losing money, and if we have negative reduced cost, then we are making money. This is why in Network Simplex, we want to pick an arc that has negative reduced cost as the entering arc.
+
+At the end of network simplex, all arcs with some flow must be in the spanning tree with reduced cost 0, neutral. For arcs not in the tree, they all have non-negative reduced costs, so we will lose money if we have flow through them. Thus, the optimal solution is to have flow only through the arcs in the spanning tree.
+
+## Unbounded TPs
+In each iteration of Simplex, we find an entering arc $uv$, and inserting it into $T$ creates a cycle $C$. Suppose that all arcs in the cycle are forward arcs, so we add $t$ to add arcs in $C$. Now, how do we arbitrarily increase flow on $C$ while minimizing total cost?
+
+With non-negative arc costs $w$, this is impossible. However, with negative arc costs, if arcs in $C$ have negative total cost, then we can drive down the total cost arbitrarily by increasing $t$ arbitrarily.
+
+The total cost of arcs in $C$ is $w(C)$. If $w(C) < 0$, we call $C$ a negative dicycle. Let's try to verify the existence of a negative dicycle. Suppose that $\bar{w}_{uv} < 0$, so $uv$ is chosen to be the entering arc. Then suppose we have the following dicycle with all forward arcs.
+
+![Negative Dicycle](/images/school/spring-2024/co351/11-1.png)
+
+We can trace the node potentials around $C$.
+$$
+\begin{align*}
+    \bar{w}_{uv} &= w_{uv} + y_u - y_v \\
+    &= w_{uv} + (w_{e_k} + y_{a}) - y_v \\
+    &= w_{uv} + (w_{e_k} + w_{e_{k-1}} + y_{b}) - y_v \\
+    &= \ldots \\
+    &= w_{uv} + w_{e_1} + \cdots + w_{e_k} \\
+    &= w(C)
+\end{align*}
+$$
+Thus, $w(C) = \bar{w}_{uv} < 0$, so $C$ is a negative dicycle.
+
+Conversely, if there exists a negative dicycle, does that mean the TP is unbounded? Maybe. Yes, if the TP is feasible.
+
+<Theorem>
+    <TheoremContent>
+        An instance of a feasible TP is unbounded if and only if there exists a negative directed cycle.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Look at Martin Pei's Lecture 11 for the proof.
+    </ProofContent>
+</Proof>
