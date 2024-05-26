@@ -342,3 +342,116 @@ If $-y_u + y_v = w_{uv}$, we call $uv$ a tight arc.
 Now, recall that if (P) and (D) is a primal-dual pair, then $x, y$ are optimal solutions to (P) and (D) if and only if
 - $x$ is feasible for (P), $y$ is feasible for (D), and 
 - $x$ and $y$ satisfy the CS conditions.
+
+So, suppose that we have the same examples as above:
+
+![Digraph Example](/images/school/spring-2024/co351/4-1.png)
+
+Then we have the following digraphs. The left digraph shows a spanning tree (in red) and the corresponding flow (in orange), with the demands shown in the black square boxes. The right digraph shows the same spanning tree, with node potentials shown in the green square boxes. The weights of the arcs are also shown in the right digraph.
+
+We can calculate the node potentials by starting at a node with potential 0, and solving the equation $-y_u + y_v = w_{uv}$ for each arc **in the spanning tree**. In our example, we started with node $a$ and set its potential to 0. Then, we can solve the following series of equations to get the potentials of the other nodes:
+$$
+\begin{align*}
+    -y_a + y_c &= 30 \implies y_c = 30 \\
+    -y_c + y_e &= 20 \implies y_e = 50 \\
+    -y_d + y_e &= 40 \implies y_d = 10 \\
+    -y_e + y_b &= 40 \implies y_b = 90
+\end{align*}
+$$
+
+![](/images/school/spring-2024/co351/5-1.png)
+
+So, we have that $x$ is feasible, and $x, y$ satisfy the CS conditions. It remains to show that $y$ is feasible. Recall that the dual constraints are $-y_u + y_v \leq w_{uv}$ for all $uv \in A$. We can check that $y$ satisfies these constraints:
+$$
+\begin{align*}
+    -y_a + y_b &= 90 \leq 100 \\
+    -y_a + y_c &= 30 \leq 30 \\
+    -y_a + y_d &= 10 \leq 50 \\
+    -y_c + y_e &= 20 \leq 20 \\
+    -y_c + y_b &= 60 \leq 80 \\
+    -y_d + y_e &= 40 \leq 40 \\
+    -y_e + y_b &= 40 \leq 40 
+\end{align*}
+$$
+Thus, $x, y$ are feasible solutions, and all CS conditions are satisfied, so our flow is optimal.
+
+Now, also recall that by Strong Duality Theorem, if $x, y$ are feasible solutions with same objective values, then they are optimal solutions. We can check that the objective values above are the same.
+
+## Basic Feasible Solutions
+Recall that in the Simplex algorithm, we start with a basis. A **basis** consists of a set of linearly independent columns that form a square invertible matrix. Each basis corresponds to a unique **basic solution**. A **basic solution** is a solution where only variables corresponding to the basis can be non-zero, while the rest are zero. What if we apply to the TP?
+
+Suppose we have the following digraph from before:
+
+![Digraph Example](/images/school/spring-2024/co351/4-1.png)
+
+Then the constraints are
+$$
+\begin{align*}
+    \begin{bmatrix}
+        -1 & -1 & -1 & 0 & 0 & 0 & 0 & 0 \\
+        1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & -1 & 0 & 1 & -1 & 0 \\
+        0 & 0 & 1 & 0 & 0 & -1 & 0 & -1 \\
+        0 & 0 & 0 & 0 & -1 & 0 & 1 & 1
+    \end{bmatrix}x &= \begin{bmatrix}
+        -5 \\ 7 \\ 0 \\ -5 \\ 3
+    \end{bmatrix}
+\end{align*}
+$$
+To form a basis, we need 5 independent columns. However, this is impossible since the rows are linearly dependent (since adding up all rows gives the zero vector). Thus, the rank is at most 4 and we cannot find 5 independent columns.
+
+However, in Simplex algorithm, we assume that the coefficient matrix has full row rank. If not, we row reduce to get an equivalent system with full row rank, and the size of a basis is equal to the rank of the matrix. In the incidence matrix, since there are $|N|$ rows, and the rows are dependent, the rank of the matrix is at most $|N| - 1$.
+
+Note: Since each column represents an arc, we can ask which arcs to pick so that the corresponding columns form a basis.
+
+### Cycles and the Incidence Matrix
+<Proposition>
+    <PropositionContent>
+        If a set of arcs contains a cycle, then the columns of the incidence matrix corresponding to these arcs are linearly dependent.
+    </PropositionContent>
+</Proposition>
+<Proposition>
+    <PropositionContent>
+        If a set of arcs does not contain a cycle, then the columns of the incidence matrix corresponding to these arcs are linearly independent.
+    </PropositionContent>
+</Proposition>
+<Proof>
+    <ProofContent>
+        Suppose that the columns are not independent. Then we have a non-trivial linear combination of the columns that gives the zero vector. For example,
+        $$
+        2 \begin{bmatrix}
+            \vdots \\ \pm 1 \\ \vdots \\ \mp 1 \\ \vdots
+        \end{bmatrix} + 0 \begin{bmatrix}
+            \vdots \\ \pm 1 \\ \vdots \\ \mp 1 \\ \vdots
+        \end{bmatrix} + \ldots + (-1) \begin{bmatrix}
+            \vdots \\ \pm 1 \\ \vdots \\ \mp 1 \\ \vdots
+        \end{bmatrix} = 0
+        $$
+        If we look at a row of the equation above (corresponding to a node), then that row must have either 0, or at least 2 non-zero entries. This is because the sum of the entries must be 0. So there cannot be a single non-zero entry in a row. We collect all the non-zero arcs in the linear combination, and the nodes with at least 2 non-zero entries, then we have a digraph where every node is incident with at least 2 arcs. Thus this digraph must have a cycle, contradiction.
+    </ProofContent>
+</Proof>
+
+Thus, to find independent columns, we find arcs that do not have cycles. To find a basis, we need as many arcs as possible. Thus for connected digraphs, they are spanning trees.
+
+For any connected digraph, a spanning tree must exist. The spanning tree has $|N| - 1$ arcs, corresponding to $|N| - 1$ independent columns. So the rank is at least $|N| - 1$. We also said that the rank is at most $|N| - 1$, so the rank is exactly $|N| - 1$, and we have a basis.
+
+<Theorem>
+    <TheoremContent>
+        Let $M$ be the incidence matrix of a connected digraph $D = (N,A)$. Then the rank of $M$ is $|N| - 1$. Moreover, a set of $|N| - 1$ columns of $M$ is a basis if and only if the $|N| - 1$ arcs corresponding to these columns is a spanning tree of $D$.
+    </TheoremContent>
+</Theorem>
+Therefore, a basic solution of a TP corresponds to a flow of a spanning tree. In general, to find the basic feasible solution (a flow), we can first find a leaf, then calculate the flow at that leaf. Then, we can remove the leaf and repeat the process until we have a flow for the entire digraph.
+
+In the simplex algorithm, $x$ is always feasible, and the CS conditions are always satisfied. The algorithm then works towards feasibility of $y$. When $y$ becomes feasible, we have optimal solutions.
+
+Notice that in the dual of the TP, we have $-y_u + y_v \leq w_{uv}$ for all $uv \in A$. We can add a slack variable $\bar{w}_{uv}$ to make this an equality constraint:
+$$
+-y_u + y_v + \bar{w}_{uv} = w_{uv}
+$$
+Thus, if we calculate the node potentials $y$, we can use it to calculate the reduced cost $\bar{w}_{uv}$. Notice that if $\bar{w}_{uv}$ is negative, then the dual constraint is not satisfied, and thus this is a candidate for the entering arc.
+<Definition>
+    <DefinitionName>Node Potential and Reduced Cost</DefinitionName>
+    <DefinitionContent>
+        A vector $y \in \mathbb R^N$ is called a node potential. Given $y$, the reduced cost of arc $uv$ is $\bar{w}_{uv} = w_{uv} + y_u - y_v$. A node potential is **feasible** if $\bar{w}_{uv} \geq 0$ for all $uv \in A$.
+    </DefinitionContent>
+</Definition>
