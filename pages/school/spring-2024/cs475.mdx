@@ -2,28 +2,27 @@ import { Definition, DefinitionName, DefinitionContent, Corollary, CorollaryName
 import { Steps, Callout } from 'nextra/components'
 
 # CS 475: Computational Linear Algebra
-## Lecture 1 (May 7, 2024)
-### Introduction
-#### What is Numerical Linear Algebra?
+## Introduction
+### What is Numerical Linear Algebra?
 Briefly, it is developing **efficient** algorithms to **accurately** solve linear algebra problems on a computer (with finite precision arithmetic). We will focus on the following topics:
 - solving linear systems of equations.
 - solving linear least squares problems.
 - solving eigenvalue problems.
 - performing singular value decompositions.
 
-#### Types of Algorithms
+### Types of Algorithms
 There are two types of algorithms:
 - **Direct**: These algorithms compute the final solution with a finite sequence of arithmetic operations. For example, Gaussian elimination (LU factorization)
 - **Iterative**: These algorithms start with an initial guess, and iteratively apply the same operation to get closer to the solution, until it is good enough. For example, Jacobi, Gauss-Seidel, Conjugate Gradient, and PageRank.
 
-#### Matrix Structure
+### Matrix Structure
 There are two types of matrices:
 - **Dense**: Most of the entries are non-zero. These are stored in $N \times N$ arrays, which we can manipulate normally.
 - **Sparse**: Most entries are zero. Non-zero locations may exhibit patterns.
 
 It is possible to exploit sparsity patterns/structure to save memory and/or flops. However, just because a matrix is sparse, it does not mean that it will be faster to solve. It depends on the sparsity pattern and the algorithm used. For example, even if we input a sparse matrix into a Gaussian elimination algorithm, it will still take the same amount of time.
 
-#### Factorization
+### Factorization
 A common theme is that we can express a given matrix as a product of other matrices. For example,
 $$
 A = BCD
@@ -37,7 +36,7 @@ Some common factorizations are:
 
 These factorizations have properties that we can exploit in algorithm design.
 
-#### Orthogonality
+### Orthogonality
 Notions of orthogonality will arise repeatedly in designing algorithms. Recall the following definitions for orthogonality.
 <Definition withName={true}>
     <DefinitionName>Orthogonal Vectors</DefinitionName>
@@ -52,12 +51,12 @@ Notions of orthogonality will arise repeatedly in designing algorithms. Recall t
     </DefinitionContent>
 </Definition>
 
-#### Linear Systems
+### Linear Systems
 This is the problem of solving $Ax = b$ for $x$ where $A \in \mathbb R^{n \times n}, x \in \mathbb R^n, b \in \mathbb R^n$. Doing it efficiently and accurately on large problems (in floating point arithmetic) can take substantial effort to get right.
 
 For example, if we have the system $Ax = b$, then we could rearrange it to get $x = A^{-1}b$. However, computing the inverse of $A$ is potentially expensive and numerically unstable.
 
-#### Least Squares Problem
+### Least Squares Problem
 This is used for solving more general problems which may have
 - Too many equations/constraints (over-determined).
 
@@ -99,9 +98,7 @@ $$
 $$
 If we minimize $||Ax - b||_2^2$, then in the best case, we will get a line that passes through all the points. Even if we are not in the best case, we still get a line that is as close as possible to the points.
 
-## Lecture 2 (May 9 2024)
-### Introduction (Continued)
-#### Eigenvalue Problems
+### Eigenvalue Problems
 Find the eigenvalues $\lambda$ and eigenvectors $v$ of a $n \times n$ matrix $A$ such that
 $$
 Av = \lambda v
@@ -122,7 +119,7 @@ We also have the definition of invariant:
     </DefinitionContent>
 </Definition>
 
-#### Singular Value Decomposition (SVD)
+### Singular Value Decomposition (SVD)
 Given a general matrix $A$, how do we associate it with a square matrix? We can simply take $A^TA$ or $AA^T$, and they are square matrices. The SVD is a generalization of the eigenvalue problem that applies to all matrices. We solve for a factorization of a general $m \times n$ matrix $A$ such that
 $$
 A = U \Sigma V^T
@@ -131,7 +128,8 @@ where
 - $U, V$ are orthogonal matrices
 - $\Sigma$ is diagonal with non-negative entries (called the singular values of $A$), which are found by taking the square root of the eigenvalues of $A^TA$ or $AA^T$.
  
-### Linear Algebra Background
+## Background and LU Factorization
+### Background
 Here are some basic definitions.
 <Definition>
     <DefinitionName>Vector Space</DefinitionName>
@@ -329,3 +327,210 @@ We have the following pseudocode for LU factorization
       - **end for**
    - **end for**
 - **end for**
+
+So, suppose $A$ row reduces to $A^{(4)}$ by performing 3 row operations. We can store these row operations in identity matrices $M^{(1)}, M^{(2)}, M^{(3)}$ such that
+$$
+A^{(4)} = M^{(3)}M^{(2)}M^{(1)}A
+$$
+Now, if we set $A^{(4)} = U$, where $U$ is an upper triangular matrix, then we have
+$$
+\begin{align*}
+    A &=  (M^{(1)})^{-1}(M^{(2)})^{-1}(M^{(3)})^{-1}U \\
+      &= L U
+\end{align*}
+$$
+So, we have $L = (M^{(1)})^{-1}(M^{(2)})^{-1}(M^{(3)})^{-1}$. We define $L_j$ as the inverse of the matrix $M^{(j)}$.
+
+$L_j$ can be obtained from $M^{(j)}$ be swapping the signs of the off-diagonal elements. For example, consider the matrix $M^{(3)} = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+    0 & -\frac{1}{2} & 1
+\end{bmatrix}$. We can obtain $L_3$ by swapping the sign of the off-diagonal element, so $L_3 = \begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+    0 & \frac{1}{2} & 1
+\end{bmatrix}$.
+
+Moreover, $L$ can be obtained from all $L_j$'s by placing all of the off-diagonal elements in the matrices into the corresponding position in $L$. So, consider matrices
+$$
+\begin{align*}
+    M^{(1)} &= \begin{bmatrix}
+        1 & 0 & 0 \\
+        0.3 & 1 & 0 \\
+        0 & 0 & 1
+        \end{bmatrix} \\
+    M^{(2)} &= \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        -0.5 & 0 & 1
+        \end{bmatrix} \\
+    M^{(3)} &= \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0 & 25 & 1
+        \end{bmatrix}
+\end{align*}
+$$
+Then, we have
+$$
+\begin{align*}
+    L &= L_1L_2L_3 \\
+    &= (M^{(1)})^{-1}(M^{(2)})^{-1}(M^{(3)})^{-1} \\
+    &= \begin{bmatrix}
+        1 & 0 & 0 \\
+        -0.3 & 1 & 0 \\
+        0 & 0 & 1
+    \end{bmatrix} \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0.5 & 0 & 1
+    \end{bmatrix} \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0 & -25 & 1
+    \end{bmatrix} \\
+    &= \begin{bmatrix}
+        1 & 0 & 0 \\
+        -0.3 & 1 & 0 \\
+        0.5 & -25 & 1
+    \end{bmatrix}
+\end{align*}
+$$
+
+Let's try to solve $\begin{bmatrix}
+    1 & 1 & 1 \\
+    1 & -2 & 2 \\
+    1 & 2 & -1
+\end{bmatrix} \begin{bmatrix}
+    x_0 \\ x_1 \\ x_2
+\end{bmatrix} = \begin{bmatrix}
+    0 \\ 4 \\ 2
+\end{bmatrix}$ for the vector $x$.
+
+First, we will factor $A$ into $LU$.
+1. We start with the intial matrix $A$ and the $L$ the identity matrix
+    $$
+    A = \begin{bmatrix}
+        1 & 1 & 1 \\
+        1 & -2 & 2 \\
+        1 & 2 & -1
+    \end{bmatrix}, L = \begin{bmatrix}
+        1 & 0 & 0 \\
+        0 & 1 & 0 \\
+        0 & 0 & 1
+    \end{bmatrix}
+    $$
+2. We row reduce by $R_2 \to R_2 - R_1$ to obtain
+    $$
+    A = \begin{bmatrix}
+        1 & 1 & 1 \\
+        0 & -3 & 1 \\
+        1 & 2 & -1
+    \end{bmatrix}, L = \begin{bmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        0 & 0 & 1
+    \end{bmatrix}
+    $$
+3. We row reduce by $R_3 \to R_3 - R_1$ to obtain
+    $$
+    A = \begin{bmatrix}
+        1 & 1 & 1 \\
+        0 & -3 & 1 \\
+        0 & 1 & -2
+    \end{bmatrix}, L = \begin{bmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        1 & 0 & 1
+    \end{bmatrix}
+    $$
+4. We row reduce by $R_3 \to R_3 - \left(-\frac{1}{3}\right)R_2$ to obtain
+    $$
+    U = A = \begin{bmatrix}
+        1 & 1 & 1 \\
+        0 & -3 & 1 \\
+        0 & 0 & -\frac{5}{3}
+    \end{bmatrix}, L = \begin{bmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        1 & -\frac{1}{3} & 1
+    \end{bmatrix}
+    $$
+
+Then, given $b = \begin{bmatrix}
+    0 \\ 4 \\ 2
+\end{bmatrix}$, we can find $x$ such that $Ax = b$ using forward/backward solve. We first do forward solve $Ly = b$ for $y$.
+$$
+\begin{align*}
+    \begin{bmatrix}
+        1 & 0 & 0 \\
+        1 & 1 & 0 \\
+        1 & -\frac{1}{3} & 1
+    \end{bmatrix} \begin{bmatrix}
+        y_1 \\ y_2 \\ y_3
+    \end{bmatrix} = \begin{bmatrix}
+        0 \\ 4 \\ 2
+    \end{bmatrix} \\
+    \begin{bmatrix}
+        y_1 \\ y_2 \\ y_3
+    \end{bmatrix} = \begin{bmatrix}
+    0 \\ 4 \\ \frac{10}{3}
+    \end{bmatrix}
+\end{align*}
+$$
+Why is it called forward solve? Because we solve $y_1$ first, then $y_2$, and finally $y_3$. Now, we do backward solve $Ux = y$ for $x$.
+$$
+\begin{align*}
+    \begin{bmatrix}
+        1 & 1 & 1 \\
+        0 & -3 & 1 \\
+        0 & 0 & -\frac{5}{3}
+    \end{bmatrix} \begin{bmatrix}
+        x_1 \\ x_2 \\ x_3
+    \end{bmatrix} = \begin{bmatrix}
+        0 \\ 4 \\ \frac{10}{3}
+    \end{bmatrix} \\
+    \begin{bmatrix}
+        x_1 \\ x_2 \\ x_3
+    \end{bmatrix} = \begin{bmatrix}
+        4 \\ -2 \\ -2
+    \end{bmatrix}
+\end{align*}
+$$
+
+So, the solution to the system of equations is $x = \begin{bmatrix}
+    4 \\ -2 \\ -2
+\end{bmatrix}$.
+
+Now, why is two matrix solves better than one? It is because we can often reuse the factorization to solve for different $b$'s. So, we have the following pseudo code:
+```python
+# Forward solve
+
+# loops for i = 1,..., n
+for i in range(1, n + 1):
+    y_i = b_i
+    # loops for j = 1,..., i - 1
+    for j in range(1, i):
+        y_i = y_i - l_ij * y_j
+```
+
+```python
+# Backward solve
+
+# loops for i = n,..., 1
+for i in range(n, 0, -1):
+    x_i = y_i
+    # loops for j = i + 1,..., n
+    for j in range(i + 1, n + 1):
+        x_i = x_i - u_ij * x_j
+    x_i = x_i / u_ii
+```
+We want to know the asymptotic cost to solve a system of size $n$. We will measure the cost in total FLOPs: floating point operations. This is approximated as the number of additions and multiplications. The cost of factorization is
+$$
+\sum^n_{k=1} \left(\sum^n_{i = k + 1}\left(1 + \sum^n_{j=k+1} 2\right)\right) = \frac{2n^3}{3} + O(n^2)
+$$
+where $\sum^n_{i=k+1}$ is the middle loop, and $\sum^n_{j=k+1}$ is the innermost loop. In the inner loop, there are 2 operations, and in the middle loop, there is 1 operation.
+
+So LU factorization costs approximately $O(n^3)$ FLOPs. What about forward and backward solves? Counting gives $n^2 + O(n)$ FLOPs for each triangular solve. Thus the total is $O(n^3)$. For large $n$, the cost of factorization is dominant. Then, given a factorization, solving an additional RHS is cheap, only $O(n^2)$.
+
+### Finding the Inverse
