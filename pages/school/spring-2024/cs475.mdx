@@ -534,3 +534,94 @@ where $\sum^n_{i=k+1}$ is the middle loop, and $\sum^n_{j=k+1}$ is the innermost
 So LU factorization costs approximately $O(n^3)$ FLOPs. What about forward and backward solves? Counting gives $n^2 + O(n)$ FLOPs for each triangular solve. Thus the total is $O(n^3)$. For large $n$, the cost of factorization is dominant. Then, given a factorization, solving an additional RHS is cheap, only $O(n^2)$.
 
 ### Finding the Inverse
+Given a matrix $A$, how might we construct $A^{-1}$, if we really wanted to? We define $e_i$ to be the $i$th column in the identity matrix. Suppose that we let
+$$
+A^{-1} = \begin{bmatrix}
+    v_1 & | & v_2 & | & \cdots & | & v_n
+\end{bmatrix}
+$$
+We can then factor $A = LU$. Then, notice that we are finding $B$ such that
+$$
+AB = I
+$$
+Now, notice that when we perform matrix multiplication, we have
+$$
+\text{Col}_1(I) = e_1 = A \text{Col}_1(B) 
+$$
+and in general,
+$$
+\text{Col}_i(I) = e_i = A \text{Col}_i(B)
+$$
+So, we can solve the equations
+$$
+\begin{align*}
+    A v_1 &= e_1 \implies LU v_1 &= e_1 \\
+    A v_2 &= e_2 \implies LU v_2 &= e_2 \\
+    &\vdots \\
+    A v_n &= e_n \implies LU v_n &= e_n
+\end{align*}
+$$
+each equation takes $O(n^2)$ FLOPs to solve, thus in total, we have $O(n^3)$ FLOPs to find the inverse of a matrix.
+
+## Solving Special Linear Systems
+Can we exploit matrix properties to more efficiently solve $Ax = b$? We will look at the following special cases:
+- Symmetric systems $A = A^T$
+- Positive definite systems $A$ satisfies $x^T A x > 0$ for all $x \neq 0$.
+- Symmetric positive definite systems
+- Banded systems
+- Tri-diagonal systems
+- General Sparse systems
+
+### Symmetric Systems
+Consider systems satisfying $A = A^T$. Clearly, such systems must also be square. Consider a new factorization $A = LDM^T$
+<Theorem>
+    <TheoremContent>
+        If $A$ possesses an $LU$ factorization, then there exists unique unit lower triangular matrices $L$ and $M$ (unit triangular meaning that the diagonal entries are all $1$), and a diagonal matrix $D$, such that
+        $$
+        A = LDM^T
+        $$
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Suppose we have $A = LU$, where $L$ is lower triangular and $U$ is upper triangular. Recall that $L$ is constructed from the identity matrix, so $L$ is already unit lower triangular. $U$ is constructed by applying Gaussian elimination to $A$, so $U$ is upper triangular, but not unit triangular. So we need to change $U$ so that it has 1s on the diagonal. How do we do this? We can multiply $U$ by a diagonal matrix $D$ that has the reciprocal of the diagonal entries of $U$. This is the general idea.
+
+        Consider diagonal entries of $U$ and form a diagonal matrix $D$ with $d_{ii} = u_{ii}$ for $1 \leq i \leq n$. Then we have
+        $$
+        A = L DD^{-1} U
+        $$
+        The matrix $M^T = D^{-1}U$ is a unit upper triangular matrix, so $M$ is a unit lower triangular matrix, and we have 
+        $$
+        A = LDD^{-1}U = LDM^T
+        $$
+    </ProofContent>
+</Proof>
+The Flop count for this factorization is asymptotically unchanged from $LU$ factorization. This factorization is valid for both symmetric and non-symmetric matrices. But, if the matrix $A$ is symmetric, we find an advantage, by skipping redundant computation, and we can save roughly half the cost of $LU$ factorization.
+<Theorem>
+    <TheoremContent>
+        Assume $A$ is invertible and has an $LU$ factorization. If $A$ is also symmetric, then $A = LDL^T$ (i.e. $M = L$).
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Let $A = LU$. Then $A = LDM^T$. We see that $M^{-1}AM^{-T}$ is a symmetric matrix since:
+        $$
+        \begin{align*}
+            (M^{-1}AM^{-T})^T &= (M^{-T})^T A^T (M^{-1})^T \\
+            &= M^{-1} A M^{-T}
+        \end{align*}
+        $$
+        Now, we can write
+        $$
+        \begin{align*}
+            M^{-1}AM^{-T} &= M^{-1}LDM^TM^{-T} \\
+            &= M^{-1}LD
+        \end{align*}
+        $$
+        Since $M^{-1}AM^{-T}$ is symmetric, we have that $M^{-1}LD$ is symmetric as well. $M^{-1}$L is the product of 2 lower triangular matrices, so it must also be lower triangular.
+
+        Since $D$ is a diagonal matrix, $M^{-1}LD$ is a lower triangular matrix. Since it is both symmetric and lower triangular, it means that $M^{-1} LD$ is diagonal.
+
+        We also know that $M^{-1}L$ is unit lower triangular (since both are lower unit triangular). On the other hand, $D$ is diagonal, so $M^{-1}L$ must be diagonal as well. This means that $M^{-1}L$ is the identity matrix, which gives us $M = L$.
+    </ProofContent>
+</Proof>
