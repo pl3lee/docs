@@ -625,3 +625,17 @@ The Flop count for this factorization is asymptotically unchanged from $LU$ fact
         We also know that $M^{-1}L$ is unit lower triangular (since both are lower unit triangular). On the other hand, $D$ is diagonal, so $M^{-1}L$ must be diagonal as well. This means that $M^{-1}L$ is the identity matrix, which gives us $M = L$.
     </ProofContent>
 </Proof>
+Now, under what condition can we write $A$ as $A = GG^T$? If entries of $D$ are all positive, then we can define
+$$
+D^{\frac{1}{2}} = \text{diag}(\sqrt{d_1}, \ldots, \sqrt{d_n})
+$$
+then we have
+$$
+\begin{align*}
+    A &= LDL^T \\
+    &= LD^{\frac{1}{2}} D^{\frac{1}{2}} L^T \\
+    &= LD^{\frac{1}{2}} (D^{\frac{1}{2}})^T L^T \\
+    &= LD^{\frac{1}{2}} (LD^{\frac{1}{2}})^T \\
+    &= GG^T
+\end{align*}
+$$
