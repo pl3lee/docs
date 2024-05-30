@@ -239,7 +239,7 @@ Using the example from above, our full LP is
 $$
 \begin{align*}
     \min \quad &100 x_{ab} + 30x_{ac} + 50x_{ad} + 80x_{cb} + 40 x_{eb} + 30x_{dc} + 20x_{ce} + 40x_{de} \\
-    \text{s.t.} &-x_{ab} - x_{ac} - x_{ad} = -5 \\
+    \text{s.t.}\quad &-x_{ab} - x_{ac} - x_{ad} = -5 \\
     &x_{ab} + x_{cb} + x_{eb} = 7 \\
     &x_{ac} - x_{cb} + x_{dc} - x_{ce} = 0 \\
     &x_{ad} - x_{dc} - x_{de} = -5 \\
@@ -255,7 +255,7 @@ Thus, a general LP for a TP is
 $$
 \begin{align*}
     \min \quad &w^T x \\
-    \text{s.t.} &x(\delta(\overline v)) - x(\delta(v)) = b_v \quad \forall v \in N \\
+    \text{s.t.}\quad &x(\delta(\overline v)) - x(\delta(v)) = b_v \quad \forall v \in N \\
     &x \geq 0
 \end{align*}
 $$
@@ -263,7 +263,7 @@ Or, we can have a coefficient matrix $M$, where $M$ is the node-arc incidence ma
 $$
 \begin{align*}
     \min \quad &w^T x \\
-    \text{s.t.} &Mx = b \\
+    \text{s.t.}\quad &Mx = b \\
     &x \geq 0
 \end{align*}
 $$
@@ -277,7 +277,7 @@ $$
     \min \quad &\begin{bmatrix}
         100 & 30 & 50 & 80 & 40 & 30 & 20 & 40
     \end{bmatrix} x \\
-    \text{s.t.} \quad &\begin{bmatrix}
+    \text{s.t.}\quad \quad &\begin{bmatrix}
         -1 & -1 & -1 & 0 & 0 & 0 & 0 & 0 \\
         1 & 0 & 0 & 1 & 1 & 0 & 0 & 0 \\
         0 & 1 & 0 & -1 & 0 & 1 & -1 & 0 \\
@@ -295,7 +295,7 @@ $$
     \max \quad &\begin{bmatrix}
         -5 & 7 & 0 & -5 & 3
     \end{bmatrix}y \\
-    \text{s.t.} \quad &\begin{bmatrix}
+    \text{s.t.}\quad \quad &\begin{bmatrix}
         -1 & 1 & 0 & 0 & 0 \\
         -1 & 0 & 1 & 0 & 0 \\
         -1 & 0 & 0 & 1 & 0 \\
@@ -313,7 +313,7 @@ So in general, for LP
 $$
 \begin{align*}
     \min \quad &w^T x \\
-    \text{s.t.} &x(\delta(\overline v)) - x(\delta(v)) = b_v \quad \forall v \in N \\
+    \text{s.t.}\quad &x(\delta(\overline v)) - x(\delta(v)) = b_v \quad \forall v \in N \\
     &x \geq 0
 \end{align*}
 $$
@@ -321,7 +321,7 @@ we have the dual LP
 $$
 \begin{align*}
     \max \quad &b^T y \\
-    \text{s.t.} &-y_u + y_v \leq w_{uv} \quad \forall uv \in A
+    \text{s.t.}\quad &-y_u + y_v \leq w_{uv} \quad \forall uv \in A
 \end{align*}
 $$
 ### Complementary Slackness (CS) Conditions
