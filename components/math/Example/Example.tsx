@@ -1,7 +1,7 @@
 import styles from './Example.module.scss'
 import { Box } from '../Box/Box'
 
-export function Example({ id, withName = false, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
+export function Example({ id, withName = false, children, number }: { id?: string, withName?: boolean, children: React.ReactNode, number?: string }) {
     return (
         <Box id={id ?? id}>
             {!withName && <ExampleName />}
@@ -10,10 +10,10 @@ export function Example({ id, withName = false, children }: { id?: string, withN
     )
 }
 
-export function ExampleName({ children }: { children?: React.ReactNode }) {
+export function ExampleName({ children, number }: { children?: React.ReactNode, number?: string }) {
     return (
         <div className={styles.name}>
-            <div>Example{children && ":"}</div>
+            <div>Example{number ? ` ${number}` : ""}{children && ":"}</div>
             <div>{children}</div>
         </div>
     )

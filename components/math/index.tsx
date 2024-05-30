@@ -6,4 +6,3 @@ export * from "./Proposition/Proposition";
 export * from "./Theorem/Theorem";
 export * from "./Lemma/Lemma";
 export * from "./Proof/Proof";
-export * from "./PseudoCode/PseudoCode";

@@ -1,19 +1,19 @@
 import styles from './Corollary.module.scss'
 import { Box } from '../Box/Box'
 
-export function Corollary({ id, withName = false, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
+export function Corollary({ id, withName = false, children, number }: { id?: string, withName?: boolean, children: React.ReactNode, number?: string }) {
     return (
         <Box id={id ?? id}>
-            {!withName && <CorollaryName />}
+            {!withName && <CorollaryName number={number ?? number} />}
             {children}
         </Box>
     )
 }
 
-export function CorollaryName({ children }: { children?: React.ReactNode }) {
+export function CorollaryName({ children, number }: { children?: React.ReactNode, number?: string }) {
     return (
         <div className={styles.name}>
-            <div>Corollary{children && ":"}</div>
+            <div>Corollary{number ? ` ${number}` : ""}{children && ":"}</div>
             <div>{children}</div>
         </div>
     )

@@ -1,19 +1,19 @@
 import styles from './Lemma.module.scss'
 import { Box } from '../Box/Box'
 
-export function Lemma({ id, withName = false, children }: { id?: string, withName?: boolean, children: React.ReactNode }) {
+export function Lemma({ id, withName = false, children, number }: { id?: string, withName?: boolean, children: React.ReactNode, number?: string }) {
     return (
         <Box id={id ?? id}>
-            {!withName && <LemmaName />}
+            {!withName && <LemmaName number={number ?? number} />}
             {children}
         </Box>
     )
 }
 
-export function LemmaName({ children }: { children?: React.ReactNode }) {
+export function LemmaName({ children, number }: { children?: React.ReactNode, number?: string }) {
     return (
         <div className={styles.name}>
-            <div>Lemma{children && ":"}</div>
+            <div>Lemma{number ? ` ${number}` : ""}{children && ":"}</div>
             <div>{children}</div>
         </div>
     )
