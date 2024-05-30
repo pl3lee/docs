@@ -1168,3 +1168,102 @@ $$
     \end{align*}
     $$
     So $n \equiv \text{sum of digits of }n \pmod 9$.
+
+## Lecture 10 (May 27, 2024)
+Suppose we are given a Diophantine equation $f(x_1,x_2,\ldots,x_k) = 0$, where $f$ is a polynomial with integer coefficeints. We want a solution in $\mathbb Z$. 
+
+Observe that if $(a_1,\ldots,a_k)$ is a solution, then we have $f(a_1,\ldots,a_k) = 0$. Then we also have 
+$$
+f(a_1,\ldots,a_k) \equiv 0 \pmod n
+$$
+so solutions in $\mathbb Z$ also gives solutions in $\mathbb Z/n \mathbb Z$. Taking the contrapositive, if there are no solutions in $\mathbb Z/n\mathbb Z$, then there are no solutions in $\mathbb Z$.
+
+Is the converse true? If there are solutions modulo $n$ for all $n$, must there be solutions in $\mathbb Z$? We will answer this later.
+
+### Examples
+1. Show that there is no solutions to $x^2 - 5y^2 = 13$ in $\mathbb Z$. We can consider this question in $\mathbb Z/5 \mathbb Z$. We have
+$$
+\begin{align*}
+    x^2 - 5y^2 &\equiv 13 \pmod 5 \\
+    x^2 &\equiv 3 \pmod 5 
+\end{align*}
+$$
+We check that for $x = 0,1,2,3,4$, there are no solutions. Since there are no solutions in $\mathbb Z/5\mathbb Z$, there are no solutions in $\mathbb Z$.
+
+2. Show that there is no solutions to $x^2 + y^2 + z^2 = 7$. We can consider this question in $\mathbb Z/8 \mathbb Z$. We have the following table.
+
+| $a$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+|-----|---|---|---|---|---|---|---|---|
+| $x^2$ | 0 | 1 | 4 | 1 | 0 | 1 | 4 | 1 |
+
+So
+$$
+\begin{align*}
+    x^2 + y^2 + z^2 &\equiv 0,1,2,3,4,5,6 \pmod 8 \\
+    &\not \equiv 7 \pmod 8
+\end{align*}
+$$
+Since there are no solutions in $\mathbb Z/8\mathbb Z$, there are no solutions in $\mathbb Z$.
+
+3. Show that there is no solutions to $x^3 + 117y^3 = 5$. We can consider this question in $\mathbb Z/9 \mathbb Z$. We have the following:
+$$
+\begin{align*}
+    x^3 + 117y^3 &\equiv 5 \pmod 9 \\
+    x^3 &\equiv 5 \pmod 9 
+\end{align*}
+$$
+We can check that for $x = 0,1,2,3,\ldots,8$, there are no solutions. Since there are no solutions in $\mathbb Z/9\mathbb Z$, there are no solutions in $\mathbb Z$.
+
+### Division in $\mathbb Z/n\mathbb Z$
+Suppose that $[a],[b] \in \mathbb Z/n\mathbb Z$. We want to define $[x] = \frac{[b]}{[a]}$. This only happens if
+$$
+\begin{align*}
+    x = \frac{[b]}{[a]} &\iff [a][x] = [b] \\
+    &\iff [ax] = [b] \\
+    &\iff ax \equiv b \pmod n
+\end{align*}
+$$
+Let's look at some examples.
+1. Consider $2x \equiv 1 \pmod 4$. If $2x \equiv 1 \pmod 4$, then we can write $2x = 1 + 4y$ for some $y \in \mathbb Z$. This implies that $2x - 4y = 1$, so $2(x - 2y) = 1$. Since LHS is even and RHS is odd, we have no solutions. Therefore, $\frac{1}{2}$ makes no sense in $\mathbb Z/4\mathbb Z$.
+
+2. Consider $2x \equiv 2 \pmod 4$. One obvious solution is $x = 1$, but another one is $x = 3$. So, $\frac{[2]}{[2]}$ has two possible meanings in $\mathbb Z/4\mathbb Z$. It is $[1]$ or $[3]$, which is ambiguous, so we leave it undefined.
+
+What is going on? The congruence $ax \equiv b \pmod n$ is equivalent to the linear diophantine equation $ax = b + ny$, and rearranging it gives $ax - ny = b$. So, if we have a particular solution, then there are general solutions, which means there could be more than one solutions.
+
+<Theorem>
+    <TheoremContent>
+        $ax \equiv b \pmod n$ has as solution in $\mathbb Z/n\mathbb Z$ if and only if $\gcd(a,n) \mid b$.
+
+        Furthermore if $\gcd(a,n) \mid b$ and if $[x_0]$ is a solution then the general solution set is $\{\left[x_0 + k \frac{n}{\gcd(a,n)}\right]: k \in \mathbb Z\}$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Rearranging the linear diophantine equation $ax = b + ny$ gives $ax + (-n)y = b$. If $(x_0,y_0)$ is a particular solution, then the general solution is
+        $$
+        (x_0, y_0) + k \left(\frac{n}{\gcd(a,n)}, \frac{a}{\gcd(a,n)}\right)
+        $$
+    </ProofContent>
+</Proof>
+So, if there are solutions, how many are there? Let's look at an example. Consider $6x \equiv 9 \pmod{15}$. Let $g = \gcd(6,15) = 3$. Since $3 \mid 9$, there are solutions. A particular solution is $x_0 \equiv 4 \pmod{15}$. Thus a general solution is
+$$
+\begin{align*}
+    x &= x_0 + k \frac{15}{g} \\
+    &= 4 + 5k
+\end{align*}
+$$
+for $k \in \mathbb Z$. We can see that the solution set is $\{[4], [9], [14]\}$. So the number of solutions is $3 = g$. This is not a coincidence. In general, for general solution
+$$
+x = x_0 + k \frac{n}{g}
+$$
+the number of distinct solutions is $g$, obtained by $k = 0,1,2\ldots,g-1$.
+
+Thus, if $g = \gcd(a,n) = 1$, then $ax \equiv b \pmod n$ has a unique solution modulo $n$. In this case, $\frac{[b]}{[a]}$ makes sense in modulo $n$. That is, if $a,n$ are coprime, then we can divide by $a$ in $\mathbb Z/n\mathbb Z$.
+
+
+
+## Lecture 11 (May 29, 2024)
+
+
+
+## Lecture 12 (May 31, 2024)
