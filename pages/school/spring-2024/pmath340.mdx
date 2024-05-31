@@ -1263,7 +1263,111 @@ Thus, if $g = \gcd(a,n) = 1$, then $ax \equiv b \pmod n$ has a unique solution m
 
 
 ## Lecture 11 (May 29, 2024)
+To recap, we need to solve $ax \equiv b \pmod n$ in order to define $x = \frac{b}{a} \mod n$. However, there are two problems:
+1. There might not be a solution
+2. There might be more than one solution
 
+For both cases, we say that $\frac{b}{a}$ is undefined modulo $n$. So we need $\gcd(a,n) = 1$ in order for $\frac{b}{a}$ to make sense.
+<Theorem>
+    <TheoremContent>
+        Consider the linear congruence $ax \equiv b \pmod n$. Let $g = \gacd(a,n)$. Then
+        1. If $g \nmid b$, there are no solutions.
+        2. If $g \mid b$, then there are $g$ solutions modulo $n$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        $ax \equiv b \pmod n$ if and only if $ax - ny = b$ has a solution in $\mathbb Z$.
+    </ProofContent>
+</Proof>
+For example, consider $12x \equiv 18 \pmod{27}$. We have $g = \gcd(12,27) = 3$. Since $3 \mid 18$, there are $3$ solutions modulo $27$. To find them, we solve $12x - 27y = 18$. Applying the Euclidean Algorithm, we find a solution $(x_0,y_0) = (6,2)$. Then the general solution is
+$$
+x = 6 + \frac{27}{3}k = 6 + 9k
+$$
+In $\mathbb Z/27\mathbb Z$, the solutions are 6, 15, 24 modulo 27.
 
+Observe that the previous congruence has $g = 3$ solutions modulo 27, but it has a unique solution modulo 9.
 
+<Proposition>
+    <PropositionContent>
+        If $g \mid b$ then the congruence $ax \equiv b \pmod n$ has a unique solution modulo $\frac{n}{g}$.
+    </PropositionContent>
+</Proposition>
+<Corollary>
+    <CorollaryContent>
+        If $\gcd(a,n) = 1$, then there is a unique solution to $ax \equiv 1 \pmod n$.
+    </CorollaryContent>
+</Corollary>
+<Definition>
+    <DefinitionName>Inverse</DefinitionName>
+    <DefinitionContent>
+        If $\gcd(a,n) = 1$, then there exists unique $[b] \in \mathbb Z/n\mathbb Z$ such that $[a][b] = [1]$. We call $a[b]$ the inverse of $[a]$ in $\mathbb Z/n\mathbb Z$.
+    </DefinitionContent>
+</Definition>
+For example, in $\mathbb Z/10\mathbb Z$, we have $\gcd(3, 10) = 1$. So $[3]$ has an inverse modulo 10, which is $[7]$. Notice that $[3]$ has different inverses in $\mathbb Z/4 \mathbb Z$ and $\mathbb Z/7 \mathbb Z$. In $\mathbb Z/4 \mathbb Z$, we have $[3]^{-1} = [3]$, and in $\mathbb Z/7 \mathbb Z$, we have $[3]^{-1} = [5]$.
+
+Let's try to find the inverses in $\mathbb Z/10 \mathbb Z$. We have
+| $x$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|-----|---|---|---|---|---|---|---|---|---|---|
+| $x^{-1}$ | - | 1 | - | 7 | - | - | - | 3 | - | 9 |
+
+<Definition>
+    <DefinitionName>Unit and Group of Units</DefinitionName>
+    <DefinitionContent>
+        If $[a]^{-1}$ exists in $\mathbb Z/n\mathbb Z$, then $[a]$ is called a unit in $\mathbb Z/n\mathbb Z$, and $[a]$ is invertible.
+
+        The group of units is $(\mathbb Z/n\mathbb Z)^* = \{\text{units in $\mathbb Z/n\mathbb Z$}\}$.
+    </DefinitionContent>
+</Definition>
+For example
+- $(\mathbb Z/10 \mathbb Z)^* = \{[1],[3],[7],[9]\}$
+- $(\mathbb Z/7 \mathbb Z)^* = \{[1],[2],[3],[4],[5],[6]\}$
+
+In general, $(\mathbb Z/n\mathbb Z)^* = \{[a]: \gcd(a,n) = 1\}$.
+<Proposition>
+    <PropositionContent>
+        In $\mathbb Z/n\mathbb Z$:
+        1. $[a]$ is a unit if and only if $\gcd(a,n) = 1$.
+        2. $[1]$ is a unit.
+        3. If $[a],[b]$ are units, then $[a][b]$ is a unit.
+        4. If $[a]$ is a unit, then $[a]^{-1}$ is a unit.
+    </PropositionContent>
+</Proposition>
+<Proof>
+    <ProofContent>
+        1. This follows from the fact that $\gcd(a,n) = 1$ implies that $ax \equiv 1 \pmod n$ has a unique solution, which implies that $[a]$ has an inverse and thus is a unit.
+        2. $[1] \cdot [1] = [1]$ so $[1]^{-1}$ exists.
+        3. We have
+            $$
+            \begin{align*}
+                [ab][b]^{-1}[a]^{-1} &= [a][b][b]^{-1}[a]^{-1} \\
+                &= [1]
+            \end{align*}
+            $$
+            so $[ab]^{-1}$ exists, which is $[b]^{-1}[a]^{-1}$.
+        4. $[a]^{-1}[a] = [1]$, so $([a]^{-1})^{-1}$ exists.
+    </ProofContent>
+</Proof>
+In fact, items 2-4 from above are the group axioms.
+<Definition>
+    <DefinitionName>Group Definitions</DefinitionName>
+    <DefinitionContent>
+        A group is a set $G$ together with an operation $*$ such that if $g, h \in G$, then $g * h \in G$. In addition, the following properties must be satisfied:
+        1. **Associative Law**: $g * (h * k) = (g * h) * k$ for all $g,h,k \in G$.
+        2. **Identity**: There exists an element $e \in G$ such that $g * e = e * g = g$ for all $g \in G$.
+        3. **Inverse**: For all $g \in G$, there exists an element $g^{-1} \in G$ such that $g * g^{-1} = g^{-1} * g = e$.
+
+        Note that commutativity is not required. If Commutativity holds, then we say that $G$ is a **commutative group**.
+
+        If $G$ is a finite set, then the **order** of $G$ is the size of $G$, denoted by $|G|$.
+    </DefinitionContent>
+</Definition>
+Here are some examples:
+1. $(\mathbb Z, +)$ is a group. The identity is $0$, and the inverse of $n$ is $-n$.
+2. $(\mathbb Z/n\mathbb Z, +)$ is a group. The identity is $[0]$, and $[x]^{-1} = -[x]$, and the order is $n$.
+3. $((\mathbb Z/n\mathbb Z)^*, \cdot)$ is a group. Identity is $[1]$, and the inverse of $[a]$ is $[a]^{-1}$.
+
+$\mathbb Z$ is infinite, while $\mathbb Z/n\mathbb Z$ and $(\mathbb Z/n\mathbb Z)^*$ are finite. We have $|\mathbb Z/n\mathbb Z| = n$ and $|(\mathbb Z/n\mathbb Z)^*| =$ the number of coprime integers less than or equal to $n$. All examples above are commutative groups.
+
+4. $G = \{A \in \mathbb R^{2 \times 2}: A \text{ is an invertible matrix}\}$ is a group under matrix multiplication. The identity is the identity matrix, and the inverse of $A$ is $A^{-1}$. However, it is not commutative.
 ## Lecture 12 (May 31, 2024)
