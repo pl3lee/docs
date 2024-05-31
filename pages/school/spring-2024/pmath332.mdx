@@ -1185,232 +1185,332 @@ We can think of Dirichlet problems as a way to find the temperature distribution
 </Proof>
 ### Elementary Functions
 Now, we will generalize familiar functions to $\mathbb C$.
-1. **Polynomials**
+#### Polynomials
 
-    An $n$th degree polynomial in $\mathbb C$ has the form
-    $$
-    p(z) = a_0 + a_1z + a_2z^2 + \cdots + a_nz^n
-    $$
-    where $a_i \in \mathbb C$ and $a_n \neq 0$. Note that polynomials are **entire**, meaning that they are analytic everywhere in $\mathbb C$.
+An $n$th degree polynomial in $\mathbb C$ has the form
+$$
+p(z) = a_0 + a_1z + a_2z^2 + \cdots + a_nz^n
+$$
+where $a_i \in \mathbb C$ and $a_n \neq 0$. Note that polynomials are **entire**, meaning that they are analytic everywhere in $\mathbb C$.
 
-    The Fundamental Theorem of Algebra tells us that we can factor any polynomial into linear factors, so we can write
-    $$
-    p(z) = a_n(z - z_1)(z - z_2) \cdots (z - z_n)
-    $$
-    Note that $z_0$ is a root with multiplicity $k$ if and only if $p(z) = (z-z_0)^k q(z)$ where $q(z_0) \neq 0$.
+The Fundamental Theorem of Algebra tells us that we can factor any polynomial into linear factors, so we can write
+$$
+p(z) = a_n(z - z_1)(z - z_2) \cdots (z - z_n)
+$$
+Note that $z_0$ is a root with multiplicity $k$ if and only if $p(z) = (z-z_0)^k q(z)$ where $q(z_0) \neq 0$.
 
-2. **Rational Functions**
+#### Rational Functions
 
-    They are of the form
-    $$
-    R(z) = \frac{p(z)}{q(z)}
-    $$
-    where all common terms have already been cancelled. The roots (or zeroes) of $p(z)$ are the roots of $R(z)$. The roots of $q(z)$ are called the **poles** (or **singularities**) of $R(z)$. 
+They are of the form
+$$
+R(z) = \frac{p(z)}{q(z)}
+$$
+where all common terms have already been cancelled. The roots (or zeroes) of $p(z)$ are the roots of $R(z)$. The roots of $q(z)$ are called the **poles** (or **singularities**) of $R(z)$. 
 
-    Let's look at an example. Let
-    $$
-    R(z) = \frac{3i(z - 1)(z - \frac{i}{3})^2(z+i)}{(z-i)^3(z-2-i)}
-    $$
-    This has
-    - simple zeroes at $1$ and $-i$.
-    - a zero of multiplicity 2 at $\frac{i}{3}$.
-    - a simple pole at $2 + i$
-    - a pole of multiplicity 3 at $i$.
+Let's look at an example. Let
+$$
+R(z) = \frac{3i(z - 1)(z - \frac{i}{3})^2(z+i)}{(z-i)^3(z-2-i)}
+$$
+This has
+- simple zeroes at $1$ and $-i$.
+- a zero of multiplicity 2 at $\frac{i}{3}$.
+- a simple pole at $2 + i$
+- a pole of multiplicity 3 at $i$.
 
-    Partial fractions have simpler rules when compared to real numbers, but we will get ugly numbers. Also, in $\mathbb R$, we often need all coefficients when performing partial fractions decomposition, but in $\mathbb C$, we may only need one of the coefficients.
+Partial fractions have simpler rules when compared to real numbers, but we will get ugly numbers. Also, in $\mathbb R$, we often need all coefficients when performing partial fractions decomposition, but in $\mathbb C$, we may only need one of the coefficients.
 
-    For example, consider $R(z) = \frac{1}{(z+4)^2(z^2+1)}$. We know that this can be written as
-    $$
-    \begin{align*}
-        \frac{1}{(z+4)^2(z^2+1)} &= \frac{1}{(z+4)^2(z+i)(z-i)} \\
-        &= \frac{A}{z+4} + \frac{B}{(z+4)^2} + \frac{C}{z+i} + \frac{D}{z-i}
-    \end{align*}
-    $$
-    Normally, we could multiply both sides by the denominator to solve for $A, B, C, D$, but there is a better way. Suppose we want to get $B$. Then we have
-    $$
-    \begin{align*}
-        \frac{1}{(z+4)^2(z+i)(z-i)} &= \frac{A}{z+4} + \frac{B}{(z+4)^2} + \frac{C}{z+i} + \frac{D}{z-i} \\
-        \frac{1}{(z+i)(z-i)} &= A(z+4) + B + \frac{C(z+4)^2}{z+i} + \frac{D(z+4)^2}{z-i}
-    \end{align*}
-    $$
-    Then we can plug in $z = -4$ to cancel everything coefficient except $B$.
+For example, consider $R(z) = \frac{1}{(z+4)^2(z^2+1)}$. We know that this can be written as
+$$
+\begin{align*}
+    \frac{1}{(z+4)^2(z^2+1)} &= \frac{1}{(z+4)^2(z+i)(z-i)} \\
+    &= \frac{A}{z+4} + \frac{B}{(z+4)^2} + \frac{C}{z+i} + \frac{D}{z-i}
+\end{align*}
+$$
+Normally, we could multiply both sides by the denominator to solve for $A, B, C, D$, but there is a better way. Suppose we want to get $B$. Then we have
+$$
+\begin{align*}
+    \frac{1}{(z+4)^2(z+i)(z-i)} &= \frac{A}{z+4} + \frac{B}{(z+4)^2} + \frac{C}{z+i} + \frac{D}{z-i} \\
+    \frac{1}{(z+i)(z-i)} &= A(z+4) + B + \frac{C(z+4)^2}{z+i} + \frac{D(z+4)^2}{z-i}
+\end{align*}
+$$
+Then we can plug in $z = -4$ to cancel everything coefficient except $B$.
 
-    So, to get $B$, we can multiply everything by $(z+4)^2$ and then set $z = -4$. That is,
-    $$
-    \begin{align*}
-        B &= \lim_{z \to -4} (z+4)^2 R(z) \\
-        &= \lim_{z \to -4} \frac{1}{z^2 + 1} \\
-        &= \frac{1}{17}
-    \end{align*}
-    $$
-    Similarly for $C$, we have
-    $$
-    \begin{align*}
-        C &= \lim_{z \to -i} (z+i) R(z) \\
-        &= \lim_{z \to -i} \frac{1}{(z+4)^2(z-i)} \\
-        &= \frac{-8-15i}{578}
-    \end{align*}
-    $$
-    and similarly for $D$ we have
-    $$
-    \begin{align*}
-        D &= \lim_{z \to i} (z-i) R(z) \\
-        &= \lim_{z \to i} \frac{1}{(z+4)^2(z+i)} \\
-        &= \frac{-8+15i}{578}
-    \end{align*}
-    $$
-    What about $A$? We can't just plug in $z = -4$ because the denominator is 0 for $B$. Here is a new trick, we can multiply through by $(z+4)^2$, then differentiate, then set $z = -4$. That is,
-    $$
-    \begin{align*}
-        A &= \lim_{z \to -4} \frac{d}{dz} \left(\frac{1}{z^2 + 1}\right) \\
-        &= \lim_{z \to -4} \frac{-2z}{(z^2 + 1)^2} \\
-        &= \frac{8}{289}
-    \end{align*}
-    $$
+So, to get $B$, we can multiply everything by $(z+4)^2$ and then set $z = -4$. That is,
+$$
+\begin{align*}
+    B &= \lim_{z \to -4} (z+4)^2 R(z) \\
+    &= \lim_{z \to -4} \frac{1}{z^2 + 1} \\
+    &= \frac{1}{17}
+\end{align*}
+$$
+Similarly for $C$, we have
+$$
+\begin{align*}
+    C &= \lim_{z \to -i} (z+i) R(z) \\
+    &= \lim_{z \to -i} \frac{1}{(z+4)^2(z-i)} \\
+    &= \frac{-8-15i}{578}
+\end{align*}
+$$
+and similarly for $D$ we have
+$$
+\begin{align*}
+    D &= \lim_{z \to i} (z-i) R(z) \\
+    &= \lim_{z \to i} \frac{1}{(z+4)^2(z+i)} \\
+    &= \frac{-8+15i}{578}
+\end{align*}
+$$
+What about $A$? We can't just plug in $z = -4$ because the denominator is 0 for $B$. Here is a new trick, we can multiply through by $(z+4)^2$, then differentiate, then set $z = -4$. That is,
+$$
+\begin{align*}
+    A &= \lim_{z \to -4} \frac{d}{dz} \left(\frac{1}{z^2 + 1}\right) \\
+    &= \lim_{z \to -4} \frac{-2z}{(z^2 + 1)^2} \\
+    &= \frac{8}{289}
+\end{align*}
+$$
 ## Lecture 11 (May 24, 2024)
 ### Elementary Functions (Continued)
-3. **Natural Exponentiation**
+#### Natural Exponentiation
 
-    We have already defined before that
-    $$
-    \begin{align*}
-        e^z &= e^{x + iy} \\
-        &= e^x e^{iy} \\
-        &= e^x(\cos y - i\sin y)
-    \end{align*}
-    $$
-    Note that $e^z \neq 0$ for all $z \in \mathbb C$. We have the usual rules
-    - $e^{z_1}e^{z_2} = e^{z_1 + z_2}$
-    - $\frac{e^{z_1}}{e^{z_2}} = e^{z_1 - z_2}$
-    - $\frac{d}{dz} e^z = e^z$
+We have already defined before that
+$$
+\begin{align*}
+    e^z &= e^{x + iy} \\
+    &= e^x e^{iy} \\
+    &= e^x(\cos y - i\sin y)
+\end{align*}
+$$
+Note that $e^z \neq 0$ for all $z \in \mathbb C$. We have the usual rules
+- $e^{z_1}e^{z_2} = e^{z_1 + z_2}$
+- $\frac{e^{z_1}}{e^{z_2}} = e^{z_1 - z_2}$
+- $\frac{d}{dz} e^z = e^z$
 
-    $e^z$ is periodic in $y$.
+$e^z$ is periodic in $y$.
 
-4. **Hyperbolic Fucntions**
+#### Hyperbolic Fucntions
 
-    Here is a fact. 
-    <Proposition>
-        <PropositionContent>
-            Any $f: \mathbb R \to \mathbb R$ can be expressed as the sum of even and odd components:
-            $$
-            f(x) = \underbrace{\frac{1}{2}[f(x) + f(-x)]}_{\text{even}} + \underbrace{\frac{1}{2} [f(x) - f(-x)]}_{odd}
-            $$
-        </PropositionContent>
-    </Proposition>
-    Applying this to $e^x$, we define
-    - the hyperbolic cosine of $x$ is $\cosh x = \frac{1}{2}(e^x + e^{-x})$
-    - the hyperbolic sine of $x$ is $\sinh x = \frac{1}{2}(e^x - e^{-x})$
+Here is a fact. 
+<Proposition>
+    <PropositionContent>
+        Any $f: \mathbb R \to \mathbb R$ can be expressed as the sum of even and odd components:
+        $$
+        f(x) = \underbrace{\frac{1}{2}[f(x) + f(-x)]}_{\text{even}} + \underbrace{\frac{1}{2} [f(x) - f(-x)]}_{odd}
+        $$
+    </PropositionContent>
+</Proposition>
+Applying this to $e^x$, we define
+- the hyperbolic cosine of $x$ is $\cosh x = \frac{1}{2}(e^x + e^{-x})$
+- the hyperbolic sine of $x$ is $\sinh x = \frac{1}{2}(e^x - e^{-x})$
 
-    Note that 
-    1. $\cosh x + \sinh x = e^x$
-    2. $\cosh^2 x - \sinh^2 x = \frac{1}{4} (e^{2x} + 2 + e^{-2x}) - \frac{1}{4}(e^{2x} - 2 + e^{-2x})$
+Note that 
+1. $\cosh x + \sinh x = e^x$
+2. $\cosh^2 x - \sinh^2 x = \frac{1}{4} (e^{2x} + 2 + e^{-2x}) - \frac{1}{4}(e^{2x} - 2 + e^{-2x})$
 
-    This means that we can use the hyperbolic functions to parameterize a unit hyperbola. That is, we can write
-    $$
-    \begin{align*}
-        x &= \cosh t \\
-        y &= \sinh t
-    \end{align*}
-    $$
-    where $t$ is the parameter. This gives $x^2 - y^2 = 1$, which gives a hyperbola.
+This means that we can use the hyperbolic functions to parameterize a unit hyperbola. That is, we can write
+$$
+\begin{align*}
+    x &= \cosh t \\
+    y &= \sinh t
+\end{align*}
+$$
+where $t$ is the parameter. This gives $x^2 - y^2 = 1$, which gives a hyperbola.
 
-    Here are the graphs of the hyperbolic functions.
+Here are the graphs of the hyperbolic functions.
 
-    ![](/images/school/spring-2024/pmath332/11-1.png)
+![](/images/school/spring-2024/pmath332/11-1.png)
 
-    We call them $\sinh, \cosh$ because the hyperbolic functions obey the identities similar to trigonometric identities. The only difference is **Osborne's Rule**, which is that we change the sign of every product of two sines.
+We call them $\sinh, \cosh$ because the hyperbolic functions obey the identities similar to trigonometric identities. The only difference is **Osborne's Rule**, which is that we change the sign of every product of two sines.
 
-    For example,
-    - $\cos(x + y) = \cos x \cos y - \sin x \sin y$
-    - $\cosh(x + y) = \cosh x \cosh y + \sinh x \sinh y$
-    - $\cos^2 \theta = \frac{1}{2}(1 + \cos 2\theta)$
-    - $\cosh^2 x = \frac{1}{2}(1 + \cosh 2x)$ which is the same as above since there are no product of sines.
-    - $\frac{d}{dx} \sinh x = \frac{d}{dx} \frac{1}{2}(e^x - e^{-x}) = \cosh x$
-    - $\frac{d}{dx} \cosh x = \frac{d}{dx} \frac{1}{2}(e^x + e^{-x}) = \sinh x$
+For example,
+- $\cos(x + y) = \cos x \cos y - \sin x \sin y$
+- $\cosh(x + y) = \cosh x \cosh y + \sinh x \sinh y$
+- $\cos^2 \theta = \frac{1}{2}(1 + \cos 2\theta)$
+- $\cosh^2 x = \frac{1}{2}(1 + \cosh 2x)$ which is the same as above since there are no product of sines.
+- $\frac{d}{dx} \sinh x = \frac{d}{dx} \frac{1}{2}(e^x - e^{-x}) = \cosh x$
+- $\frac{d}{dx} \cosh x = \frac{d}{dx} \frac{1}{2}(e^x + e^{-x}) = \sinh x$
 
-    The hyperbolic functions for complex inputs are defined in the same way as for real inputs.
-    $$
-    \begin{align*}
-        \cosh z &= \frac{1}{2}(e^z + e^{-z}) \\
-        \sinh z &= \frac{1}{2}(e^z - e^{-z})
-    \end{align*}
-    $$
+The hyperbolic functions for complex inputs are defined in the same way as for real inputs.
+$$
+\begin{align*}
+    \cosh z &= \frac{1}{2}(e^z + e^{-z}) \\
+    \sinh z &= \frac{1}{2}(e^z - e^{-z})
+\end{align*}
+$$
 
-5. **Trigonometric Functions**
+#### Trigonometric Functions
     
-    Consider Euler's formula: $e^{i\theta} = \cos \theta + i \sin \theta$.
+Consider Euler's formula: $e^{i\theta} = \cos \theta + i \sin \theta$.
 
-    Replacing $\theta$ with $-\theta$ gives $e^{-i\theta} = \cos \theta - i \sin \theta$. Adding these two equations gives
-    $$
-    \cos \theta = \frac{1}{2}(e^{i\theta} + e^{-i\theta})
-    $$
-    and subtracting gives
-    $$
-    \sin \theta = \frac{1}{2i}(e^{i\theta} - e^{-i\theta})
-    $$
-    So we define
-    $$
-    \begin{align*}
-        \cos z &= \frac{1}{2}(e^{iz} + e^{-iz}) \\
-        \sin z &= \frac{1}{2i}(e^{iz} - e^{-iz})
-    \end{align*}
-    $$
-    We can see that 
-    $$
-    \cosh(iz) = \cos z, \quad \sin(iz) = i\sin z
-    $$
-    and furthermore,
-    $$
-    \cos(iz) = \cosh z, \quad \sin(iz) = i\sinh z
-    $$
-    So we have the following
-    $$
-    \begin{align*}
-        e^z &= e^{x + iy} \\
-        &= e^x e^{iy} \\
-        &= (\cosh x + \sinh x)(\cos y + i \sin y)
-    \end{align*}
-    $$
-    While $\cos z, \sin z$ are periodic on the real axis, $\cosh z, \sinh z$ are periodic on the imaginary axis. So now we can see why Osborne's rule works.
-    $$
-    \begin{align*}
-        \cos^2 \theta + \sin^2 \theta &= 1 \\
-        \cos^2(ix) + \sin^2(ix) &= 1 \\
-        \cosh^2 x + i^2 \sinh^2 x &= 1 \\
-        \cosh^2 x - \sinh^2 x &= 1
-    \end{align*}
-    $$
-    And for derivatives, we have
-    $$
-    \begin{align*}
-        \frac{d}{dz} \sin z &= \frac{d}{dz} \left(\frac{1}{2i}(e^{iz} - e^{-iz})\right) \\
-        &= \frac{1}{2i} (ie^{iz} + ie^{-iz}) \\
-        &= \cos z
-    \end{align*}
-    $$
-    So, we now have an easy way to evaluate trigonometric functions of complex numbers by using the sum-of-angle identities.
-    $$
-    \begin{align*}
-        \cos z &= \cos(x + iy) \\
-        &= \cos x \cos(iy) - \sin x \sin(iy) \\
-        &= \cos x \cosh y - i \sin x \sinh y \\
-        \sin z &= \sin x \cosh y + i \cos x \sinh y \\
-        \cosh z &= \cosh x \cos y + i \sinh x \sin y \\
-        \sinh z &= \sinh x \cos y + i \cosh x \sin y
-    \end{align*}
-    $$
-    which can be calculated easily on a calculator.
+Replacing $\theta$ with $-\theta$ gives $e^{-i\theta} = \cos \theta - i \sin \theta$. Adding these two equations gives
+$$
+\cos \theta = \frac{1}{2}(e^{i\theta} + e^{-i\theta})
+$$
+and subtracting gives
+$$
+\sin \theta = \frac{1}{2i}(e^{i\theta} - e^{-i\theta})
+$$
+So we define
+$$
+\begin{align*}
+    \cos z &= \frac{1}{2}(e^{iz} + e^{-iz}) \\
+    \sin z &= \frac{1}{2i}(e^{iz} - e^{-iz})
+\end{align*}
+$$
+We can see that 
+$$
+\cosh(iz) = \cos z, \quad \sin(iz) = i\sin z
+$$
+and furthermore,
+$$
+\cos(iz) = \cosh z, \quad \sin(iz) = i\sinh z
+$$
+So we have the following
+$$
+\begin{align*}
+    e^z &= e^{x + iy} \\
+    &= e^x e^{iy} \\
+    &= (\cosh x + \sinh x)(\cos y + i \sin y)
+\end{align*}
+$$
+While $\cos z, \sin z$ are periodic on the real axis, $\cosh z, \sinh z$ are periodic on the imaginary axis. So now we can see why Osborne's rule works.
+$$
+\begin{align*}
+    \cos^2 \theta + \sin^2 \theta &= 1 \\
+    \cos^2(ix) + \sin^2(ix) &= 1 \\
+    \cosh^2 x + i^2 \sinh^2 x &= 1 \\
+    \cosh^2 x - \sinh^2 x &= 1
+\end{align*}
+$$
+And for derivatives, we have
+$$
+\begin{align*}
+    \frac{d}{dz} \sin z &= \frac{d}{dz} \left(\frac{1}{2i}(e^{iz} - e^{-iz})\right) \\
+    &= \frac{1}{2i} (ie^{iz} + ie^{-iz}) \\
+    &= \cos z
+\end{align*}
+$$
+So, we now have an easy way to evaluate trigonometric functions of complex numbers by using the sum-of-angle identities.
+$$
+\begin{align*}
+    \cos z &= \cos(x + iy) \\
+    &= \cos x \cos(iy) - \sin x \sin(iy) \\
+    &= \cos x \cosh y - i \sin x \sinh y \\
+    \sin z &= \sin x \cosh y + i \cos x \sinh y \\
+    \cosh z &= \cosh x \cos y + i \sinh x \sin y \\
+    \sinh z &= \sinh x \cos y + i \cosh x \sin y
+\end{align*}
+$$
+which can be calculated easily on a calculator.
 
-    For example,
-    $$
-    \cos(2 - i) = \cos 2 \cosh 1 + i \sin 2 \sinh 1
-    $$
-    and
-    $$
-    \begin{align*}
-        \sin(\pi + i) &= \sin \pi \cosh 1 + i \cos \pi \sinh 1 \\
-        &= -i \sinh 1
-    \end{align*}
-    $$
+For example,
+$$
+\cos(2 - i) = \cos 2 \cosh 1 + i \sin 2 \sinh 1
+$$
+and
+$$
+\begin{align*}
+    \sin(\pi + i) &= \sin \pi \cosh 1 + i \cos \pi \sinh 1 \\
+    &= -i \sinh 1
+\end{align*}
+$$
     
+## Lecture 12 (May 27, 2024)
+### Elementary Functions (Continued)
+#### Trigonometric Functions (Continued)
+Continuing from the previous section, we start with an example. Find all solutions of the equation $\sin z = 1000$. We have
+$$
+\begin{align*}
+    \sin z &= \sin(x + iy) \\
+    &= \sin x \cos(iy) + \cos x \sin(iy) \\
+    &= \sin x \cosh y + i \cos \sinh y
+\end{align*}
+$$
+So if $\sin z = 1000$, then matching real and imaginary parts gives us
+$$
+\begin{align*}
+\sin x \cosh y &= 1000 \tag{1} \\
+\cos \sinh y &= 0 \tag{2}
+\end{align*}
+$$
+From (2), we get $\cos x = 0$, which implies $x = (2n + 1) \frac{\pi}{2}$ for any integer $n$, or $\sinh y = 0$, which implies $y = 0$.
+
+Looking at (1), 
+1. If $y = 0$, then $\cosh y = 1$, and $\sin x = 1000$, which is impossible.
+2. If $x = (2n + 1) \frac{\pi}{2}$, then $\sin x = \pm 1$. If $\sin x = -1$, then $\cosh y = -1000$, which is impossible. Therefore $\sin x = 1$. That is,
+    $$
+    x = (4n + 1) \frac{\pi}{2}
+    $$
+    which is $\frac{\pi}{2}$ plus a multiple of $2\pi$. With this, $\cosh y = 1000$ and so $y = \pm \cosh^{-1}(1000)$.
+
+So we have 
+$$
+z = (4n + 1) \frac{\pi}{2} \pm i \cosh^{-1}(1000)
+$$
+which has the following solutions:
+
+![](/images/school/spring-2024/pmath332/12-1.png)
+
+#### The Natural Logarithm
+How should we define this? We let $z = e^w$, and solve for $w$. To do this, we write $w = u + iv$, and write $z = re^{i(\theta + 2\pi k)}$. We can also write
+$z = e^w = e^u e^{iv}$. Matching the modulus and argument, we must have $r = e^u$ and $\theta + 2\pi k = v$. Therefore we define
+$$
+\log z = \ln |z| + i \arg z
+$$
+<Callout type="info" emoji="ℹ️">
+  We use $\ln$ for real inputs, and $\log$ for complex inputs.
+</Callout>
+Since $e^z$ is periodic, $\log z$ is multivalued. In fact, $e^{\log z} = z$ but $\log e^z = z + 2 \pi k i$.
+
+As an example, we have
+$$
+\begin{align*}
+    \log(1 + i) &= \ln| 1 + i| + i \arg(1 + i) \\
+    &= \ln \sqrt 2 + \left(\frac{\pi}{4} + 2 \pi k\right)i
+\end{align*}
+$$
+and
+$$
+\begin{align*}
+    \log(i) &= \left(\frac{\pi}{2} + 2 \pi k\right)i
+\end{align*}
+$$
+If we want a single-valued function, we may pick a branch of $\arg z$.
+$$
+\mathrm{Log}(z) = \ln|z| + i \mathrm{Arg}(z)
+$$
+recall that $\mathrm{Arg}(z) \in (-\pi, \pi]$. This is the **principal branch** of $\log z$. Then for other branches, we will write
+$$
+\mathrm{Log}_t(z) = \ln|z| + i \mathrm{arg}_t(z)
+$$
+where $\mathrm{arg}_t(z) \in [t, t + 2\pi)$.
+<Callout type="info" emoji="ℹ️">
+  This is not log base $t$. For logarithms, we only consider base $e$. $t$ is used to describe the branch cut.
+</Callout>
+For example, we have
+$$
+\begin{align*}
+    \mathrm{Log}(1 + i) &= \frac{1}{2} \ln 2 + \frac{\pi}{4}i \\
+    \mathrm{Log}(i) &= \frac{\pi}{2}i
+\end{align*}
+$$
+Notes:
+- $\mathrm{Log}(e^z) = z$ iff $\mathrm{Im}(z) \in (-\pi, \pi]$.
+- $\mathrm{Log}(z)$ has a discontinuity on the negative real axis.
+- $\frac{d}{dz} \mathrm{Log}(z) = \frac{1}{z}$.
+
+We now need to be careful of identities. For example,
+$$
+\mathrm{Log}(z_1z_2) = \mathrm{Log}(z_1) + \mathrm{Log}(z_2)
+$$
+is not always true.
+
+<Definition>
+    <DefinitionName>Branch, Branch Cut, and Branch Point</DefinitionName>
+    <DefinitionContent>
+        Let $f$ be a multivalued function. $F(z)$ is said to be a **branch** of $f(z)$ on a domain $D$ if $F(z)$ is continuous on $D$ and for each $z \in D$, $F(z)$ is one and only one value of $f(z)$. Usually, $D$ will abe the place with part of a line removed. This is a **branch cut**. A **branch point** is a point which is common to all possible branch cuts.
+    </DefinitionContent>
+</Definition>
+As an example, find a branch of $f(z) = \log(z + 4)$ which is analytic at $z = -5$, with $F(-5) = 7 \pi i$. We could use $F(z) = \log_{6\pi} (z + 4)$.
+## Lecture 13 (May 29, 2024)
+
+## Lecture 14 (May 31, 2024)
     
