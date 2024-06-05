@@ -1636,3 +1636,104 @@ So we can write
 - $\sin^{-1}z = -i \log(iz + (1 - z^2)^{\frac{1}{2}})$
 - $\cos^{-1}z = -i \log(z + (z^2 - 1)^{\frac{1}{2}})$
     
+## Lecture 14 (May 31, 2024)
+### Integration
+Preliminary discussion: If we consider complex-valued functions of real variables, then we just treat $i$ as a constant. That is, if $f(t) = u(t) + iv(t)$, then we have
+$$
+\int^b_a f(t) dt = \int^b_a u(t) dt + i \int^b_a v(t) dt
+$$
+For example
+$$
+\begin{align*}
+  \int^1_0 (it^2 + 2)dt &= i\int^1_0 t^2 dt + \int^1_0 2 \dt \\
+  &= i\left[\frac{t^3}{3}\right]^1_0 + 2[t]^1_0 \\
+  &= \frac{i}{3} + 2 \\
+  &= 2 + \frac{i}{3}
+\end{align*}
+$$
+Integration involving cosines and sines can be made easier by treating them as components of $e^{i\theta}$.
+$$
+\begin{align*}
+  \int e^{2x} \cos(3x) dx &= \int e^{2x} \text{Re}(e^{i3x}) dx \\
+  &= \int \text{Re} (e^{(2 + 3i)x}) dx \\
+  &= \text{Re}\left[\int e^{(2 + 3i)x} dx\right] \\
+  &= \text{Re}\left[\frac{e^{(2 + 3i)x}}{2 + 3i} + C\right] \\
+  &= \text{Re}\left[\left(\frac{2 - 3i}{13}\right)e^{2x}e^{3xi} + C\right] \\
+  &= \text{Re}\left[\left(\frac{2 - 3i}{13}\right)e^{2x}(\cos(3x) + i\sin(3x)) + C\right] \\
+  &= \frac{e^{2x}}{13}(2\cos 3x + 3\sin 3x) + C_1
+\end{align*}
+$$
+And similarly,
+$$
+\begin{align*}
+  \int e^{2x}(\sin 3x) dx &= \frac{e^{2x}}{13} [2\sin 3x - 3 \cos 3x] + C_2
+\end{align*}
+$$
+To introduce integrals of **complex** variables, we need some definitions.
+<Definition>
+  <DefinitionName>Curve Definitions</DefinitionName>
+  <DefinitionContent>
+    - Let $z(t) = x(t) + iy(t)$ be a continuous complex-valued function of a real variable $t$ defined on the interval $[a,b]$. The range of $z(t)$ is called a **smooth curve** if $z'(t) = x'(t) + iy'(t)$ is continuous and non-zero on $[a,b]$.
+
+      Note that we can interpret $z(t)$ as a parameterization of this curve.
+    - A curve is called **simple** if $z(t_1) \neq z(t_2)$ whenever $t_1 \neq t_2$ except possibly at the endpoints $t_1 = a$ and $t_2 = b$. In other words, the curve does not cross itself.
+
+    - $z(a)$ and $z(b)$ are called the **initial** and **terminal** points
+    - If $z(a) = z(b)$, then $z(t)$ is called a closed curve.
+    - A curve composed of finitely many smooth curves joined end-to-end is a **contour**.
+    - A simple closed contour is called a **Jordan curve**
+    - A Jordan curve is **positively oritned** if the interior is on the left as we follow the curve. In the examples below, all closed curves are positively oriented.
+
+    ![Curves](/images/school/spring-2024/pmath332/14-1.png)
+  </DefinitionContent>
+</Definition>
+<Theorem withName={true}>
+  <TheoremName>Jordan Curve Theorem</TheoremName>
+  <TheoremContent>
+    A Jordan curve separates the plane into two domains, one bounded (the interior) and one unbounded (the exterior).
+  </TheoremContent>
+</Theorem>
+There are 3 basic tools for parameterizing curves.
+1. A line segment from $z_0$ to $z_1$ can be parameterized as
+  $$
+  z = z_0 + (z_1 - z_0) t, \quad t \in [0, 1]
+  $$
+  For example, if we want to parameterize the following contour
+  ![Line Segment](/images/school/spring-2024/pmath332/14-2.png)
+  We could write for $C_1$
+  $$
+  z(t) = (-1 + 3i) - 3ti, \quad t \in [0, 1]
+  $$
+  For $C_2$,
+  $$
+  z(t) = -1 + (2 + i)t, \quad t \in [0, 1]
+  $$
+  To get consecutive values of $t$, we might rewrite $C_2$ as
+  $$
+  z(t) = -1 + (2 + i)(t - 1), \quad t \in [1, 2]
+  $$
+2. A circle of radius $r$ centered at $z_0$ can be parameterized as
+  $$
+  z(t) = z_0 + re^{it}, \quad t \in [0, 2\pi]
+  $$
+3. To parameterize a curve with equation $y = f(x)$, we simply let 
+  $$
+  z(t) = t + i f(t)
+  $$
+  where the first term corresponds to $x = t$, and the second term corresponds to $y = f(t)$.
+
+We can also define the arc length of a contour $C$. If we treat each small segment of the curve as $ds$, then its change in $x$ is $dx$ and change in $y$ is $dy$. The length of $ds$ is
+$$
+\begin{align*}
+  ds &= \sqrt{dx^2 + dy^2} \\
+  &\implies \frac{ds}{dt} = \sqrt{\left(\frac{dx}{dt}\right)^2 + \left(\frac{dy}{dt}\right)^2}
+\end{align*}
+$$
+The arc length of the curve is then
+$$
+\begin{align*}
+  \int_C ds &= \int^b_a \frac{ds}{dt} dt \\
+  &= \int^b_a \sqrt{\left(\frac{dx}{dt}\right)^2 + \left(\frac{dy}{dt}\right)^2} dt \\
+  &= \int^b_a \left|\frac{dz}{dt}\right| dt
+\end{align*}
+$$
