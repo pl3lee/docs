@@ -1610,3 +1610,69 @@ We assume that $m, c \in \mathbb Z_{\geq 0}$. This is valid because we can encod
         Note that $d(e(m)) = (m^e)^d = m^{ed} = m \pmod p$.
     </ExampleContent>
 </Example>
+
+## Lecture 14 (June 5, 2024)
+### Mathematical Cryptography (Continued)
+Recall the Pohlig-Hellman Exponentiation Cipher from last time.
+1. Choose prime $p$ whihc is largest in any of the blocks, so $p$ is at least $2525$. Let's take $p = 3037$
+2. Choose $e \in \{0,1,\ldots,p-1\}$ such that $\gcd(e, p - 1) = 1$. For example $e = 3$.
+3. We now have key $(e, p) = (3, 3037)$.
+4. For decryption, choose $d \in \{1,\ldots,p-1\}$ where $d = e^{-1} \mod p - 1$, so $e \cdot d \equiv 1 \pmod{p - 1}$.
+5. To encrypt a message, we compute $e(m) = m^e \mod p$.
+6. To decrypt a message, we compute $d(c) = c^d \mod p$.
+
+Let's go through an example. Let $m = 1907$, with $e = 31, p = 3037$. Using Euclidean Algorithm, we find $d = e^{-1} \mod p - 1 = 1567$.
+
+For encryption, we compute
+$$
+\begin{align*}
+  e(m) &= 1907^{31} \mod 3037 \\
+  &\equiv 696 \pmod{3037}
+\end{align*}
+$$
+For decryption, we compute
+$$
+\begin{align*}
+  d(c) &= 696^{1567} \mod 3037 \\
+  &\equiv 1907 \pmod{3037}
+\end{align*}
+$$
+so we have recovered $m$.
+<Proof withName={true}>
+  <ProofName>Correctness of Pohlig-Hellman Exponentiation Cipher</ProofName>
+  <ProofContent>
+    We need to show that $d(e(m)) = m$. We have $d(e(m)) = m^{ed} \mod p$. Recall that $ed \equiv 1 \pmod{\phi(p)}$. Also recall that by implication of Fermat's Little Theorem, if $k \equiv \ell \pmod{p - 1}$, then $m^k \equiv m^\ell \pmod{p}$.
+
+    Since $ed \equiv 1 \pmod{p - 1}$, we have $m^{ed} \equiv m^1 \pmod{p}$, so $d(e(m)) = m$.
+  </ProofContent>
+</Proof>
+Now, how would we break this encryption scheme? Assume Eve knows $p$ and knows we are using this cipher, but $e$ and $d$ are secret. Assume also that Eve knows a plaintext/ciphertext pair $(m,c)$. Eve wants to know $e$ or $d$.
+
+So, Eve wants to solve $c \equiv m^e \pmod p$ for $e$. That is, Eve wants $\log_m(c)$. This is the Discrete Logarithm Problem (DLP), which is hard to solve. Even could try to brute force by trying $e = 1,2,\ldots,p$, but this is infeasible for large $p$. So for security, we need $p$ to be large.
+
+The encryption scheme above is a symmetric key encryption scheme, since each party shares the same secret key.
+
+### Public Key Cryptography
+We want each party to have their own private and public keys. This solves the problem of distributing secret keys in a secure way. However, since public key cryptography is generally slower than symmetric key encryption, a hybrid approach is often used where the public key is used to encrypt a symmetric key, which is then used to encrypt the message.
+
+#### RSA
+For key generation, we have the following steps:
+1. Choose large primes $p,q$ and set $n = pq$.
+2. Compute $\phi(n) = (p - 1)(q - 1)$.
+3. Choose $e$ which is a unit modulo $\phi(n)$ (so it has an inverse in modulo $\phi(n)$, and $\gcd(e, \phi(n)) = 1$).
+4. Copmute $d = e^{-1} \mod \phi(n)$.
+5. Public key is $(e,n)$, private key is $d$.
+
+For example, if $p = 3, q = 11$, then $n = 33$. And $\phi(n) = 2 \times 10 = 20$. We choose $e = 7$ since $\gcd(7, 20) = 1$ and we can compute $d = 3$.
+
+For encryption, $e(m) = m^e \pmod n$ and for decryption, $d(c) = c^d \pmod n$.
+
+Suppose $m = 4$, then
+$$
+\begin{align*}
+  e(m) &= 4^7 \mod 33 \\
+  &\equiv 16 \pmod{33} \\
+  d(c) &= 16^3 \mod 33 \\
+  &\equiv 4 \pmod{33}
+\end{align*}
+$$
