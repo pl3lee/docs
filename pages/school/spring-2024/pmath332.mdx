@@ -1592,35 +1592,35 @@ We define $S_1$ to be the branch on which $\theta \in \{\ldots, [-4\pi, -2\pi], 
 Lets go through some examples.
 
 1.
-  $$
-  \begin{align*}
-    4^{\frac{1}{2}} &= e^{\frac{1}{2} \log 4} \\
-    &= e^{\frac{1}{2}(\ln 4 + 2\pi k i)} \\
-    &= e^{\ln 2 + \pi k i} \\
-    &= 2e^{\pi k i} \\
-    &= \pm 2
-  \end{align*}
-  $$
+    $$
+    \begin{align*}
+        4^{\frac{1}{2}} &= e^{\frac{1}{2} \log 4} \\
+        &= e^{\frac{1}{2}(\ln 4 + 2\pi k i)} \\
+        &= e^{\ln 2 + \pi k i} \\
+        &= 2e^{\pi k i} \\
+        &= \pm 2
+    \end{align*}
+    $$
 2.
-  $$
-  \begin{align*}
-    (1 + i)^3 &= \exp[3\log(1 + i)] \\
-    &= \exp\left[3(\ln \sqrt{2} + i \frac{\pi}{4} + 2\pi k i)\right] \\
-    &= \exp\left[\frac{3}{2} \ln 2 + \left(\frac{3\pi}{4} + 6\pi k\right)i\right] \\
-    &= 2^{\frac{3}{2}} e^{\frac{3\pi}{4}i} + e^{6\pi ki} \\
-    &= 2^{\frac{3}{2}} \left(-\frac{1}{\sqrt 2} + i \frac{1}{\sqrt 2}\right)(1) \\
-    &= -2 + 2i
-  \end{align*}
-  $$
+    $$
+    \begin{align*}
+        (1 + i)^3 &= \exp[3\log(1 + i)] \\
+        &= \exp\left[3(\ln \sqrt{2} + i \frac{\pi}{4} + 2\pi k i)\right] \\
+        &= \exp\left[\frac{3}{2} \ln 2 + \left(\frac{3\pi}{4} + 6\pi k\right)i\right] \\
+        &= 2^{\frac{3}{2}} e^{\frac{3\pi}{4}i} + e^{6\pi ki} \\
+        &= 2^{\frac{3}{2}} \left(-\frac{1}{\sqrt 2} + i \frac{1}{\sqrt 2}\right)(1) \\
+        &= -2 + 2i
+    \end{align*}
+    $$
 3.
-  $$
-  \begin{align*}
-    i^i &= e^{i \log i} \\ 
-    &= e^{i[(\frac{\pi}{2} + 2\pi k)i]} \\
-    &= e^{-\frac{\pi}{2} - 2\pi k}
-  \end{align*}
-  $$
-  So $i^i = \{\ldots, e^{-\frac{5\pi}{2}}, e^{-\frac{\pi}{2}}, e^{\frac{3\pi}{2}}, \ldots\}$.
+    $$
+    \begin{align*}
+        i^i &= e^{i \log i} \\ 
+        &= e^{i[(\frac{\pi}{2} + 2\pi k)i]} \\
+        &= e^{-\frac{\pi}{2} - 2\pi k}
+    \end{align*}
+    $$
+    So $i^i = \{\ldots, e^{-\frac{5\pi}{2}}, e^{-\frac{\pi}{2}}, e^{\frac{3\pi}{2}}, \ldots\}$.
 
 #### Inverse Trigonometric and Hyperbolic Functions
 $y = \sinh^{-1}x$ can be rewritten in terms of logarithms.
@@ -1695,32 +1695,32 @@ To introduce integrals of **complex** variables, we need some definitions.
 </Theorem>
 There are 3 basic tools for parameterizing curves.
 1. A line segment from $z_0$ to $z_1$ can be parameterized as
-  $$
-  z = z_0 + (z_1 - z_0) t, \quad t \in [0, 1]
-  $$
-  For example, if we want to parameterize the following contour
-  ![Line Segment](/images/school/spring-2024/pmath332/14-2.png)
-  We could write for $C_1$
-  $$
-  z(t) = (-1 + 3i) - 3ti, \quad t \in [0, 1]
-  $$
-  For $C_2$,
-  $$
-  z(t) = -1 + (2 + i)t, \quad t \in [0, 1]
-  $$
-  To get consecutive values of $t$, we might rewrite $C_2$ as
-  $$
-  z(t) = -1 + (2 + i)(t - 1), \quad t \in [1, 2]
-  $$
+    $$
+    z = z_0 + (z_1 - z_0) t, \quad t \in [0, 1]
+    $$
+    For example, if we want to parameterize the following contour
+    ![Line Segment](/images/school/spring-2024/pmath332/14-2.png)
+    We could write for $C_1$
+    $$
+    z(t) = (-1 + 3i) - 3ti, \quad t \in [0, 1]
+    $$
+    For $C_2$,
+    $$
+    z(t) = -1 + (2 + i)t, \quad t \in [0, 1]
+    $$
+    To get consecutive values of $t$, we might rewrite $C_2$ as
+    $$
+    z(t) = -1 + (2 + i)(t - 1), \quad t \in [1, 2]
+    $$
 2. A circle of radius $r$ centered at $z_0$ can be parameterized as
-  $$
-  z(t) = z_0 + re^{it}, \quad t \in [0, 2\pi]
-  $$
+    $$
+    z(t) = z_0 + re^{it}, \quad t \in [0, 2\pi]
+    $$
 3. To parameterize a curve with equation $y = f(x)$, we simply let 
-  $$
-  z(t) = t + i f(t)
-  $$
-  where the first term corresponds to $x = t$, and the second term corresponds to $y = f(t)$.
+    $$
+    z(t) = t + i f(t)
+    $$
+    where the first term corresponds to $x = t$, and the second term corresponds to $y = f(t)$.
 
 We can also define the arc length of a contour $C$. If we treat each small segment of the curve as $ds$, then its change in $x$ is $dx$ and change in $y$ is $dy$. The length of $ds$ is
 $$
@@ -1737,3 +1737,108 @@ $$
   &= \int^b_a \left|\frac{dz}{dt}\right| dt
 \end{align*}
 $$
+
+## Lecture 15 (June 3, 2024)
+### Integration (Continued)
+We first define a path integral in $\mathbb C$. Let $f(z)$ be defined on a set containing a contour $C$. Let $z(t), a \leq t \leq b$ be a parameterization of $C$. We partition $C$ into subcontours by selecting values $t_0,t_1,\ldots,t_n$ such that
+$$
+a = t_0 < t_1 < \cdots < t_n = b
+$$
+and such that $\max|\Delta t| \to 0$ as $n \to \infty$.
+
+For each $k =1,2\ldots,n$, we pick $t_k^* \in (t_{k-1},t_k)$, and define
+$$
+\Delta z_k = z_k - z_{k-1} = z(t_k) - z(t_{k-1})
+$$
+We can now construct a Riemann sum
+$$
+\sum^n_{k=1} f(z(t_k^*)) \Delta z_k
+$$
+(Assuming that the limit exists and is independent of the choice of partition)
+
+- It can be shown that if $f$ is continuous on $C$, then the integral will exist.
+- We define the integral of $f$ over a single point to be $0$.
+- We will not want to use this definition. Instead, we have a parameterization, so we will use it by defining the integral as
+  $$
+  \begin{align*}
+    \int_C f(z) dz &= \lim_{n \to \infty} \sum^n_{k=1} f(z(t_k^*)) \frac{\Delta z_k}{\Delta t_k} \Delta t_k \\
+    &= \int^b_a f(z(t)) \frac{dz}{dt} dt \\
+    &= \int^b_a f(z(t)) z'(t) dt
+  \end{align*}
+  $$
+We have the usual properties of integrals:
+- $\int_C (f(z) \pm g(z)) dz = \int_C f(z) dz \pm \int_C g(z) dz$
+- $\int_C k f(z) dz = k \int_C f(z) dz$
+- $\int_{-C} f(z) dz = -\int_C f(z) dz$
+
+But the triangle inequality needs to be modified. Recall that
+$$
+\left| \int_a^b f(x) dx \right| \leq \int_a^b |f(x)| dx
+$$
+We cannot just replace $x$ with $z$, since $\int^b_a |f(z)|dz$ is complex, while $\left| \int^b_a f(z) dz \right|$ is real, so the inequality becomes nonsensical. Instead, we have the ML inequality.
+<Theorem withName={true}>
+  <TheoremName>$ML$ Inequality</TheoremName>
+  <TheoremContent>
+    If $f(z) = u(x,y) + iv(x,y)$ is continuous on a contour $C$, then $|\int_C f(z) dz | \leq ML$, where $L$ is the length of the curve and $M$ is an upper bound for $|f(z)|$ on $C$. (that is, $|f(z)| \leq M$ on $C$)
+  </TheoremContent>
+</Theorem>
+<Proof>
+  <ProofContent>
+    Let $z(t), t \in [a, b]$ be a parameterization of $C$. Then
+    $$
+    \begin{align*}
+      \left| \int_C f(z) dz \right| &= \left| \int^b_a f(z(t)) \frac{dz}{dt} dt \right| \\
+      &\leq \int^b_a |f(z(t)) z'(t) | dt \\
+      &\leq \int^b_a |f(z(t))| |z'(t)| dt \\
+      &\leq \int^b_a M \left| \frac{dz}{dt} \right| dt \\
+      &= M \int^b_a \left| \frac{dz}{dt} \right| dt \\
+      &= ML
+    \end{align*}
+    $$
+  </ProofContent>
+</Proof>
+Let's work on some examples.
+
+1. Find an upper bound for $\int_C e^{\frac{1}{z}}dz$, where $C$ is the unit circle traversed in the positive direction. Observe that $L = 2\pi$, and we have
+    $$
+    \begin{align*}
+      |e^{\frac{1}{z}}| &= |e^{\frac{1}{x+iy}}| \\
+      &= \left| e^{\frac{x}{x^2+y^2}} e^{-i\frac{y}{x^2+y^2}} \right| \\
+      &= \left| e^{\frac{x}{x^2 + y^2}} \cdot e^{-i\frac{y}{x^2+y^2}} \right| \\
+      &= e^{\frac{x}{x^2 + y^2}} \\
+      &= e^x \\
+      &\leq e
+    \end{align*}
+    $$
+    since $x \leq 1$. The equality $\left| e^{\frac{x}{x^2 + y^2}} \cdot e^{-i\frac{y}{x^2+y^2}} \right| = e^{\frac{x}{x^2 + y^2}}$ is due to the fact that $|e^{i\theta}| = 1$ for all $\theta$, and the equality $e^{\frac{x}{x^2 + y^2}} = e^x$ is due to the fact that $x^2 + y^2 = 1$ on the unit circle.
+
+    Thus, by the $ML$ inequality, we have
+    $$
+    \left| \int_C e^{\frac{1}{z}} dz \right| \leq 2\pi e
+    $$
+2. Evaluate $\int_C \cos z dz$, where $C$ is the line segment from $0$ to $1 + 2i$. We can parameterize $C$:
+    $$
+    z(t) = (1 + 2i)t, \quad t \in [0,1]
+    $$
+    so we have $\frac{dz}{dt} = 1 + 2i$, which implies $dz = (1 + 2i)dt$. Thus, we have
+    $$
+    \begin{align*}
+      \int_C \cos z dz &= \int^1_0 \underbrace{\cos((1 + 2i)t)}_{\cos z} \underbrace{(1 + 2i)dt}_{dz} \\
+      &= \sin((1 + 2i)t) \Big|_0^1 \\
+      &= \sin(1 + 2i)
+    \end{align*}
+    $$
+3. Evaluate $\int_C \cos z dz$, where $C$ is as shown:
+    ![Contours](/images/school/spring-2024/pmath332/15-1.png)
+    On $C_1$, we can use $z = x, x \in [0, 1]$. Therefore, $dz = dx$.
+
+    On $C_2$, we have $z = 1 + iy, y \in [0, 2]$. Therefore, $dz = idy$. Thus, we have
+    $$
+    \begin{align*}
+      \int_C \cos z dz &= \int_{C_1} \cos z dz + \int_{C_2} \cos z dz \\
+      &= \int^1_0 \cos x dx + \int^2_0 \cos(1 + iy) dy \\
+      &= \sin x \Big|_0^1 + \sin(1 + iy) \Big|_0^2 \\
+      &= \sin 1 + (\sin(1 + 2i) - \sin 1) \\
+      &= \sin(1 + 2i)
+    \end{align*}
+    $$
