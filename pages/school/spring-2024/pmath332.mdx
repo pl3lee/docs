@@ -1842,3 +1842,151 @@ Let's work on some examples.
       &= \sin(1 + 2i)
     \end{align*}
     $$
+
+
+## Lecture 16 (June 5, 2024)
+### Integration (Continued)
+Let's continue with more examples.
+1. Evaluate $\int_C e^z dz$, where $C$ is the segment of the parabola $y = x^2 + 1$ from $z = i$ to $z = 2 + 5i$.
+
+    Since we have a function $y = x^2 + 1$, we can simply let $t = x$, and we have the parameterization
+    $$
+    z(t) = t + (t^2 + 1)i, \quad t \in [0, 2]
+    $$
+    Differentiating both sides and we get
+    $$
+    dz = (1 + 2ti)dt
+    $$
+    So, the integral is
+    $$
+    \begin{align*}
+        \int_C e^z dz &= \int^2_0 e^{t + (t^2 + 1)i}(1 + 2ti) dt \\
+        &= e^{t + (t^2 + 1)i} \Big|_0^2 \\
+        &= e^{2 + 5i} - e^{i}
+    \end{align*}
+2. Evaluate the integral $\int_C \bar z dz$, where the contour is
+    1. $C_a$, the line segment from $0$ to $1 + i$.
+
+        We let $z(t) = (1 + i)t$ with $t \in [0, 1]$. Then $dz = (1 + i)dt$, and
+        $$
+        \begin{align*}
+            \int_{C_a} \bar z dz &= \int^1_0 (1 - i)t (1 + i)dt \\
+            &= \int^1_0 2t dt \\
+            &= t^2 \Big|_0^1 \\
+            &= 1
+        \end{align*}
+        $$
+    2. $C_b$, the arc of the circle $x^2 + (y - 1)^2 = 1$ from $0$ to $1 + i$.
+    
+            We let $z(t) = e^{it} + i$ with $t \in \left[-\frac{\pi}{2}, 0\right]$, since $e^{it}$ is the parameterization of a circle, and we need to shift it up by 1 unit. Then $dz = ie^{it}dt$, and
+            $$
+            \begin{align*}
+                \int_{C_b} \bar z dz &= \int^0_{-\frac{\pi}{2}} (e^{-it} - i)(ie^{it})dt \\
+                &= \int^0_{-\frac{\pi}{2}} (i + e^{it})dt \\
+                &= \left[it + \frac{e^{it}}{i}\right]^0_{-\frac{\pi}{2}} \\
+                &= \frac{1}{i} - \left(- \frac{\pi}{2} i + \frac{e^{-i \frac{\pi}{2}}}{i}\right) \\
+                &= -i + \frac{\pi}{2} i + 1 \\
+                &= 1 + \left(\frac{\pi}{2} - 1\right)i
+            \end{align*}
+            $$
+
+We are now ready for Fundamental Theorem of Calculus.
+<Theorem withName={true}>
+    <TheoremName>Fundamental Theorem of Calculus - Complex Case</TheoremName>
+    <TheoremContent>
+        If $f(z)$ is continuous in a domain $D$ and has an antiderivative $F(z)$ throughout $D$, then for any contour $C$ lying in $D$ with initial point $z_1$ and terminal point $z_2$, we have
+        $$
+        \int_C f(z) dz = F(z_2) - F(z_1)
+        $$
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        First suppose $C$ is smooth (so $z'(t)$ exists and is continuous). Let $z(t), t \in [a, b]$ be a parameterization of $C$. Then
+        $$
+        \int_C f(z) dz = \int^b_a f(z(t)) z'(t) dt
+        $$
+        If $F'(z) = f(z)$, then this is
+        $$
+        \begin{align*}
+            \int^b_a F'(z(t))z'(t) dt &= \int^b_a \frac{dF}{dt} dt \\
+            &= F(z(b)) - F(z(a)) \\
+            &= F(z_2) - F(z_1)
+        \end{align*}
+        $$
+        If $C$ is not smooth, then decompose it into smooth subcontours: $C = C_1 + C_2 + \cdots + C_n$. We let $a_0 = z_0,\ldots, a_n = z_n$. Let $a_i$ be the point joining $C_i$ to $C_{i +1}$. Then
+        $$
+        \begin{align*}
+            \int_C f(z) dz &= \int_{C_1} f dz + \int_{C_2} f dz + \cdots + \int_{C_n} fdz \\
+            &= [F(a_1) - F(a_0)] + [F(a_2) - F(a_1)] + \cdots + [F(a_n) - F(a_{n - 1})] \\
+            &= F(a_n) - F(a_0)
+        \end{align*}
+        $$
+    </ProofContent>
+</Proof>
+Let's work on some examples to see FTC in action.
+
+1. Evaluate $\int_C (1 + z^2) dz$ where $C$ is as follows:
+
+    ![Contours](/images/school/spring-2024/pmath332/16-1.png)
+
+    We have
+    $$
+    \begin{align*}
+        \int_C (1 + z^2)dz &= \left[z + \frac{z^3}{3}\right]^{4 + 2i}_0 \\
+        &= \frac{28}{3} + \frac{94}{3}i
+    \end{align*}
+    $$
+2. Evaluate $\int_C e^z dz$, where $C$ is a simple closed contour. Note that **any** closed contour has integral 0, since the initial and terminal points are the same.
+
+    So, $\int_C e^z dz = 0$.
+    
+<Theorem>
+    <TheoremContent>
+        Let $f$ be a continuous function on a domain $D$. Then the following are equivalent:
+        1. $f$ has an antiderivative on $D$.
+        2. If $C$ is any closed contour in $D$, then $\int_C f(z) dz = 0$.
+        3. The contour integrals of $f$ are independent of paths in $C$.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        $(1 \to 2)$ A direct consequence of FTC.
+
+        $(2 \to 3)$ Let $C_1$ and $C_2$ be any two contours in $D$ with the same initial and terminal points. Let $C$ be the loop $C_1 + (-C_2)$ ($-C_2$ is $C_2$ but in reverse). Then
+        $$
+        \begin{align*}
+            \int_{C_1} f(z)dz - \int_{C_2} f(z) dz &= \int_{C_1} fdz + \int_{-C_2} fdz \\
+            &= \int_C fdz \\
+            &= 0
+        \end{align*}
+        $$
+        $(3 \to 1)$ To prove that $f$ has an antiderivative, we will construct it. Pick a point $z_0$ in $D$, and let $C$ be any contour in $D$ with intial point $z_0$ and terminal point $z \in D$. Define $F(z) = \int_C f(w) dw$.
+
+        By assumption, $F(z)$ is single-valued. For any point $z \in D$, pick $\Delta z$ small enough such that the line segment from $z$ to $z + \Delta z$ is in $D$. Let $T$ be this segment and parameterize it as
+        $$
+        z(t) = z + t \Delta z, \quad t \in [0, 1]
+        $$
+        Now
+        $$
+        \begin{align*}
+            F(z + \Delta z) - F(z) &= \left[\int_C fdz + \int_D fdz \right] - \int_C fdz \\
+            &= \int_T f(z) dz \\
+            &= \int^1_0 f(z(t)) z'(t) dt \\
+            &= \int^1_0 f(z + t \Delta z) \Delta z dt
+        \end{align*}
+        $$
+        Therefore, if we divide both sides by $\Delta z$, we get
+        $$
+        \frac{F(z + \Delta z) - F(z)}{\Delta z} = \int^1_0 f(z + t \Delta z) dt
+        $$
+        Letting $\Delta z \to 0$, we have
+        $$
+        \begin{align*}
+            F'(z) &= \int^1_0 f(z) dt \\
+            &= f(z) \int^1_0 dt \\
+            &= f(z)
+        \end{align*}
+        $$
+    </ProofContent>
+</Proof>
