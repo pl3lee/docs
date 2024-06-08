@@ -1181,7 +1181,13 @@ $$
         &= [1]
     \end{align*}
     $$
-2. Calculate $1! + 2! + 3! + \cdots + 100! \mod 5$. This is an exercise.
+2. Calculate $1! + 2! + 3! + \cdots + 100! \mod 5$. Since we have $n! = (n)(n-1)\ldots (1)$, for any $n \geq 5$, we have $n! \equiv 0 \pmod 5$. So we only need to find $1! + 2! + 3! + 4! \mod 5$. We have
+    $$
+    \begin{align*}
+        1! + 2! + 3! + 4! &= 1 + 2 + 6 + 24 \\
+        &= 33
+    \end{align*}
+    $$
 3. Prove $6 \mid a^3 - a$. We want to show that $a^3 - a \equiv 0 \pmod 6$. The only choices for $a$ are $0, 1, 2, 3, 4, 5, 6$. So we can check
 
     - $a = 0$: $0^3 - 0 = 0$
