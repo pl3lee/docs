@@ -757,8 +757,27 @@ Note that in general for $n!$, we have
 </Lemma>
 We also have the following results, which could be nice exercises.
 - $v_p(ab) = v_p(a) + v_p(b)$
+<Proof>
+    <ProofContent>
+        Let $a = p_1^{a_1} \cdots p_k^{a_k}$ and $b = q_1^{b_1} \cdots q_l^{b_l}$, with $v_p(a) = n$ and $v_p(b) = m$. Then
+        $$
+        ab = p_1^{a_1} \cdots p_k^{a_k}p^n q_1^{b_1} \cdots q_l^{b_l}p^m
+        $$
+        Thus, $v_p(ab) = n + m = v_p(a) + v_p(b)$.
+    </ProofContent>
+</Proof>
 - $v_p(a^k) = kv_p(a)$
+<Proof>
+    <ProofContent>
+        By applying the previous result repeatedly.
+    </ProofContent>
+</Proof>
 - $v_p(1) = 0$
+<Proof>
+    <ProofContent>
+        Since $1 = p^0$ for all $p$.
+    </ProofContent>
+</Proof>
 
 ### Distribution of Primes
 <Theorem>
