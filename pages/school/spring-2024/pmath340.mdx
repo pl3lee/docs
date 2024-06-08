@@ -64,7 +64,7 @@ If the equation $a_0 + a_1 x + a_2 x^2 + \cdots + a_n x^n = 0$ has a solution $x
 Let's give a proof of this proposition.
 <Proof>
 <ProofContent>
-We have $a_0 + a_1x + \cdots + a_nx^n = 0$. Suppose that $s$ is a solution, so we can plug in $x = s$ and earranging it gives
+We have $a_0 + a_1x + \cdots + a_nx^n = 0$. Suppose that $s$ is a solution, so we can plug in $x = s$ and rearranging it gives
 $$
 a_0 = s(-a_1 - a_2s - \cdots - a_ns^{n-1})
 $$
@@ -533,7 +533,19 @@ An example is that 4 and 15 are coprime, but 4 and 10 are not coprime.
             c = cx a + bc y
             $$
             In particular, $a \mid cx a$ and $a \mid bc y$ since $a \mid a$ and $a \mid bc$ by assumption. Thus, $a \mid c$.
-        3. Exercise. Try to give 2 proofs, 1 with Bezout's Lemma and 1 without.
+        3. Suppose $b \mid a$ and $c \mid a$, and $b, c$ are coprime. We prove $bc \mid a$. We can write $a = bn$ and $a = cm$. Since $b, c$ are coprime, by Bezout's lemma, there exists $x, y$ such that
+            $$
+            bx + cy = 1
+            $$
+            Multiplying both sides by $a$ gives
+            $$
+            abx + acy = a
+            $$
+            Substituting $a = bn$ and $a = cm$ gives
+            $$
+            cmbx + bncy = a \implies bc(mx + ny) = a
+            $$
+            Thus, $bc \mid a$.
     </ProofContent>
 </Proof>
 <Proposition>
