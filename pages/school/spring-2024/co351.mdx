@@ -549,5 +549,83 @@ Conversely, if there exists a negative dicycle, does that mean the TP is unbound
     </ProofContent>
 </Proof>
 
-## Finding a Tree Flow
-Recall that 
+## Minimum-cost Flow Problems (MCPF)
+MCFPs are Transshipment problems with arc capacities.
+
+<Definition>
+    <DefinitionName>Minimum-cost Flow Problems</DefinitionName>
+    <DefinitionContent>
+        Given digraph $D = (N,A)$, node demands $b \in \mathbb R^N$, arc costs $w \in \mathbb R^A$, non-negative arc capacities $c \in \mathbb R^A$, the goal is to find a flow with minimum cost, where the flow on each arc is at most its capacity.
+    </DefinitionContent>
+</Definition>
+For example, we have the following digraph, where each arc has a cost and a capacity, $(w_{uv}, c_{uv})$. We have a feasible flow on the right.
+
+![MCPF](/images/school/spring-2024/co351/16-1.png)
+
+Here is the LP formulation:
+$$
+\begin{align*}
+\min \quad &  w^Tx \\
+\text{s.t.} \quad &  x(\delta(\bar v)) - x(\delta(v)) = b_v, \quad \forall v \in N \\
+& x_{uv} \leq c_{uv}, \quad \forall uv \in A \\
+& x \geq 0
+\end{align*}
+$$
+We can see that this is similar to the Transshipment problem, but with an extra constraint on arc capacities. To make it easier to construct the dual, we will change the direction of the inequality in the second constraint to $\geq$.
+$$
+\begin{align*}
+\min \quad &  w^Tx \\
+\text{s.t.} \quad &  x(\delta(\bar v)) - x(\delta(v)) = b_v, \quad \forall v \in N \\
+& -x_{uv} \geq -c_{uv}, \quad \forall uv \in A \\
+& x \geq 0
+\end{align*}
+$$
+We try to take the dual. In addition to the usual $y$ variables, we introduce $z$ variables for the capacity constraints.
+$$
+\begin{align*}
+\max \quad &  b^Ty - c^Tz \\
+\text{s.t.} \quad &  -y_u + y_v - z_{uv} \leq w_{uv}, \quad \forall v \in N \\
+& z \geq 0
+\end{align*}
+$$
+Recall that we defined the reduced cost $\overline{w}_{uv} = w_{uv} + y_u - y_v$, so we can rewrite the dual as
+$$
+\begin{align*}
+\max \quad &  b^Ty - c^Tz \\
+\text{s.t.} \quad &  - z_{uv} \leq \overline{w}_{uv}, \quad \forall v \in N \\
+& z \geq 0
+\end{align*}
+$$
+The CS conditions are:
+- $x_{uv} = 0$ or $-z_{uv} = \overline{w}_{uv}$ for all $uv \in A$.
+- $z_{uv} = 0$ or $x_{uv} = c_{uv}$ for all $uv \in A$.
+
+## Optimality Conditions of MCFP
+Let's look at the role of $z$ in the dual. Each $z_{uv}$ is in 2 constraints, $-z_{uv} \leq \overline{w}_{uv}$ and $z_{uv} \geq 0$. This implies that $z_{uv} \geq -\overline{w}_{uv}$ and $z_{uv} \geq 0$.
+
+In the objective function, we also have the term $-c_{uv} z_{uv}$, with the assumption that $c_{uv} \geq 0$. Since we are maximizing $-c_{uv} z_{uv}$, this is equivalent to minimizing $c_{uv} z_{uv}$, which means minimizing $z_{uv}$. Since $z_{uv}$ is lower bounded by two values, we have $z_{uv} = \max\{0, -\overline{w}_{uv}\}$.
+
+Now, let's look at the CS conditions, we can rewrite them as
+1. If $-z_{uv} < \overline{w}_{uv}$, then $x_{uv} = 0$.
+2. If $z_{uv} > 0$, then $x_{uv} = c_{uv}$.
+
+From the first condition, we have $-z_{uv} < \overline{w}_{uv}$, and since we are given that $z_{uv} = \max\{0, -\overline{w}_{uv}\}$, we must have $z_{uv} \neq -\overline{w}_{uv}$ and thus $z_{uv} = 0$. Now, since $z_{uv} = \max\{0, -\overline{w}_{uv}\}$, this means that we have $0$ is larger than $-\overline{w}_{uv}$, which implies that $-\overline{w}_{uv} < 0$, so $\overline{w}_{uv} > 0$.
+
+So, the hypothesis that $-z_{uv} < \overline{w}_{uv}$ is equivalent to $\overline{w}_{uv} > 0$. Rewriting the first CS condition,
+1. If $\overline{w}_{uv} > 0$, then $x_{uv} = 0$.
+
+So we have removed the $z$ variables from the CS conditions. We do the same thing to the second CS condition. 
+
+We have the hypothesis $z_{uv} > 0$. This implies that $z_{uv} = \max\{0, -\overline{w}_{uv}\} = -\overline{w}_{uv}$. Meaning that $-\overline{w}_{uv} > 0$, so $\overline{w}_{uv} < 0$. Thus, we can rewrite the second CS condition,
+2. If $\overline{w}_{uv} < 0$, then $x_{uv} = c_{uv}$ (If the reduced cost is negative, then the flow on $uv$ is at its capacity).
+
+Thus, we have the optimality conditions for MCFP:
+1. If $\overline{w}_{uv} > 0$, then $x_{uv} = 0$.
+2. If $\overline{w}_{uv} < 0$, then $x_{uv} = c_{uv}$.
+
+and now $z$ does not appear in our optimality conditions.
+
+Let's look at the economic interpretaion to gain some intuition. Recall that $y$ represents prices, and $\overline w$ represents the net cost of transporting goods. So, $\overline w_{uv} > 0$ means that we are losing money through $uv$, and $\overline w_{uv} < 0$ means that we are making money through $uv$.
+
+1. If $\overline w_{uv} > 0$, then we lose money sending flow through $uv$, so we do not send any flow through $uv$, thus $x_{uv} = 0$.
+2. If $\overline w_{uv} < 0$, then we gain money by sending money through $uv$, so we want to send as much flow as possible. But we are limited by the capacity $c_{uv}$, so we will use all of it, $x_{uv} = c_{uv}$.
