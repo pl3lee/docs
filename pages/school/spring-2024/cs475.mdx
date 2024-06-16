@@ -1109,3 +1109,52 @@ $$
 \end{align*}
 $$
 so $\tilde x = Q^T x$ and $\tilde b = Pb$. Then, by solving $\tilde A \tilde x = \tilde b$, we can recover $x$ by $x = Q \tilde x$.
+
+## Matrix Re-ordering
+### Symmetric Permutations
+The special case of symmetric permutation is of particular importance. A symmetric permutation is when we replace $A$ with $PAP^T$, i.e. we permute the rows and columns in the same way.
+
+
+### Level Sets/Cuthill-McKee
+#### Cuthill-Mckee
+$S_i$ is the group of nodes that are the same graph distance from some starting point. For example,
+- $S_1$ is the starting node
+- $S_2$ is the set of all immediate neighbours of the node in $S_1$
+- $S_3$ is the set of all immediate neighbours of the node in $S_2$ that are not in $S_1$
+- and so on.
+
+Here is an example:
+
+![level sets](/images/school/spring-2024/cs475/6-1.png)
+
+This is basically a breadth-first search. Now, how do we order nodes within each level set? In Cuthill-McKee, We order in increasing order of their degree.
+
+What happens if the graph is not connected? We can pick a new starting node from unvisited nodes until all components are visited.
+
+Let's work on an example. We have the following graph with its level sets:
+
+![level sets](/images/school/spring-2024/cs475/6-2.png)
+
+Then 
+- $S_1 = \{s\}$
+- $S_2 = \{a, b\}$
+- $S_3 = \{e, c\}$
+- $S_4 = \{d\}$
+
+We start ordering from $S_1$ to $S_4$, within each level set, we order by degree. So the final ordering is $s, a, b, e, c, d$.
+
+#### Reverse Cuthill-Mckee
+This is just the ordering of Cuthill-McKee but in reverse. We can obtain this by performing Cuthill-Mckee, then reverse the ordering.
+
+This has better performance than Cuthill-Mckee in terms of number of fill-ins. This is because the patterns produced by RCM are more like the low fill downward arrow matrix, rather than the upward arrow.
+
+![CM](/images/school/spring-2024/cs475/6-3.png)
+
+![comparison](/images/school/spring-2024/cs475/6-4.png)
+
+<Theorem>
+    <TheoremContent>
+        If the graph is a tree, then the reverse Cuthill-McKee produces no fill-ins. (Not necessarily true for Cuthill-McKee)
+    </TheoremContent>
+</Theorem>
+The intuition of this theorem is that the last ordering of CM is a leaf node with degree 1, so RCM puts the degree 1 node first, which results in less fill-ins.
