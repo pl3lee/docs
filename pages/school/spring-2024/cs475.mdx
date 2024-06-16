@@ -107,7 +107,7 @@ What does this mean geometrically? Recall that matrices are linear transformatio
 
 The eigenvalue problem is related to a factorization of $A$ into
 $$
-A = Q\LambdaQ^{-1}
+A = Q\Lambda Q^{-1}
 $$
 where $\Lambda$ is a diagonal matrix, and columns of $Q$ are eigenvectors of $A$.
 
@@ -625,6 +625,181 @@ The Flop count for this factorization is asymptotically unchanged from $LU$ fact
         We also know that $M^{-1}L$ is unit lower triangular (since both are lower unit triangular). On the other hand, $D$ is diagonal, so $M^{-1}L$ must be diagonal as well. This means that $M^{-1}L$ is the identity matrix, which gives us $M = L$.
     </ProofContent>
 </Proof>
+
+### Positive Definite Matrices
+<Definition>
+    <DefinitionName>Positive Definite</DefinitionName>
+    <DefinitionContent>
+        $A$ is positive definite if $x^T Ax > 0$ for all vectors $x \neq 0$.
+
+        $f(x) = x^TAx$ is called a **quadratic form**, where $A$ contains the coefficients. If $A$ is positive definite, then $A$ is invertible and have strictly positive eigenvalues.
+
+        In this course, we assume that positive definite matrices are symmetric.
+    </DefinitionContent>
+</Definition>
+
+For example, for $x \in \mathbb R^2$, we have
+$$
+\begin{align*}
+    \begin{bmatrix}
+        x_1 & x_2
+    \end{bmatrix} \begin{bmatrix}
+        a & b \\
+        b & c
+    \end{bmatrix} \begin{bmatrix}
+        x_1 \\
+        x_2
+    \end{bmatrix} &= ax_1^2 + 2bx_1x_2 + cx_2^2
+\end{align*}
+$$
+If we are given a quadratic form $5x_1^2 + 7x_1x_2 + 12x_2^2$, we can just match the coefficients to recover the matrix $A$.
+
+Even if $A$ is not symmetric, we can still define a symmetric matrix $B = \frac{1}{2}(A + A^T)$, then $B$ gives the same quadratic form of $A$.
+
+Let's show that positive definiteness implies invertibility.
+<Proof withName={true}>
+    <ProofName>Positive Definiteness $\implies$ Invertibility</ProofName>
+    <ProofContent>
+        Suppose $A$ is positive definite. For contradiction, assume $A$ is not invertible. Then the nullspace of $A$ is not trivial. So there exists $v \neq 0$ such that $Av = 0$. Then we have
+        $$
+        \begin{align*}
+            Av &= 0 \\
+            v^T Av &= v^T 0 \\
+            v^T Av = 0
+        \end{align*}
+        $$
+        But since $A$ is positive definite, $v^T Av > 0$ for all $v \neq 0$, so we have a contradiction. Therefore, $A$ must be invertible.
+    </ProofContent>
+</Proof>
+Now we show that positive definiteness implies that the eigenvalues are strictly positive.
+<Proof withName={true}>
+    <ProofName>Positive Definiteness $\implies$ $>0$ Eigenvalues</ProofName>
+    <ProofContent>
+        We proved above that positive definiteness implies invertibility. So $Ax = 0 = 0x$ has only the trivial solution, but 0 is not an eigenvalue of $A$. If $0$ is an eigenvalue, then there exists $v \neq 0$ where $Av = 0v = 0$, which contradicts the fact that $Ax = 0$ has only the trivial solution. Therefore, all eigenvalues of $A$ are non-zero.
+
+        Assume that $\lambda$ is an eigenvalue that is $< 0$. Then there exists $v$ such that $Av = \lambda v$, then we have
+        $$
+        \begin{align*}
+            v^T Av &= v^T \lambda v \\
+            &= \lambda v^T v \\
+            &= \lambda \|v\|^2
+        \end{align*}
+        $$
+        In particular, $\lambda < 0$ and $\|v\|^2 > 0$, so $v^T Av < 0$, which contradicts the fact that $A$ is positive definite. Therefore, all eigenvalues of $A$ are $> 0$.
+    </ProofContent>
+</Proof>
+We have a useful theorem:
+<Theorem>
+    <TheoremContent>
+        If $A \in \mathbb R^{n \times n}$ is positive definite (P.D.), and $X \in \mathbb R^{n \times k}$ with $\text{rank}(A) = k \leq n$ (It has full rank), then $B = X^T AX$ is also P.D..
+    </TheoremContent>
+</Theorem>
+Why is this useful? We can create positive definite matrices using existing positive definite matrices. 
+<Proof>
+    <ProofContent>
+        Consider $z \in \mathbb R^k$. We want to show that $z^T Bz > 0$ for all $z \neq 0$. We have
+        $$
+        z^T Bz = z^T(X^T AX)z = (Xz)^T A (Xz)
+        $$
+        Let $x = Xz \in \mathbb R^n$. If $x \neq 0$, then $x^T Ax > 0$ since $A$ is P.D..
+
+        If $x = 0$, then $Xz = 0$, which only happens if $z = 0$ since $X$ has full rank, so $z^T Bz > 0$ for all $z \neq 0$, and thus $B$ is P.D..
+    </ProofContent>
+</Proof>
+<Definition>
+    <DefinitionName>Principal Submatrix</DefinitionName>
+    <DefinitionContent>
+        A principal submatrix is a smaller matrix produced by deleting a set of rows and the corresponding columns (we remove the same row and column).
+
+        For example, 
+        $$
+        A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}
+        $$ 
+        has principal submatrix
+        $$
+        \begin{bmatrix} 1 & 2 \\ 4 & 5 \end{bmatrix}
+        $$
+        by removing the last row and last column.
+
+        To construct a submatrix, we can multiply $A$ by an identity matrix $I$ that has the columns that we want to keep. Notice that
+        $$
+        \begin{align*}
+            \begin{bmatrix}
+                a & b & c \\
+                d & e & f \\
+                g & h & i
+            \end{bmatrix} \begin{bmatrix}
+                1 & 0 \\
+                0 & 0 \\
+                0 & 1
+            \end{bmatrix} = \begin{bmatrix}
+                a & c \\
+                d & f \\
+                g & i
+            \end{bmatrix}
+        \end{align*}
+        $$
+        So this removes the second column. If we want to remove the second row, we multiply $A$ on the left by $I^T$.
+        $$
+        \begin{align*}
+            \begin{bmatrix}
+                1 & 0 & 0\\
+                0 & 0 & 1\\
+            \end{bmatrix}\begin{bmatrix}
+                a & b & c \\
+                d & e & f \\
+                g & h & i
+            \end{bmatrix} \begin{bmatrix}
+                1 & 0 \\
+                0 & 0 \\
+                0 & 1
+            \end{bmatrix} = \begin{bmatrix}
+                a & c \\
+                g & i
+            \end{bmatrix}
+        \end{align*}
+        $$
+    </DefinitionContent>
+</Definition>
+<Corollary>
+    <CorollaryContent>
+        1. If $A$ is P.D., then all principal submatrices of $A$ are also P.D.. In particular, the diagonal entries are all positive (Note that each diagonal entry is a principal submatrix with all other rows/columns deleted).
+        2. If $A$ is P.D., then diagonal $D$ of $A = LDM^T$ has strictly positive entries.
+    </CorollaryContent>
+</Corollary>
+<Proof withName={true}>
+    <ProofName>$A$ P.D. $\implies$ all principal submatrices P.D.</ProofName>
+    <ProofContent>
+        If we multiply $A$ by an identity matrix $I$, we get
+        $$
+        A \begin{bmatrix}
+            e_1  & e_2  & \ldots  & e_n
+        \end{bmatrix} = \begin{bmatrix}
+            Ae_1  & Ae_2  & \ldots  & Ae_n
+        \end{bmatrix}
+        $$
+        where $e_i$ is the $i$th column of the identity matrix. So, if we remove $e_i$ from $I$, then the resulting matrix has column $i$ removed. On the other hand, transposing $I$ and removing $e_i$, and we get $I^T A$, which removes row $i$.
+
+        Now, note that the identity matrix with columns removed is still full rank since the columns are still linearly indepedent. So we can use the previous theorem that states that if $A$ is P.D., then $B = X^T AX$ ,where $X$ is full rank, is also P.D..
+    </ProofContent>
+</Proof>
+<Proof withName={true}>
+    <ProofName>$A$ P.D. $\implies$ diagonal entries of $D$ are positive</ProofName>
+    <ProofContent>
+        We have $A = LDM^T$. We let $X = L^{-T}$. Then
+        $$
+        \begin{align*}
+            X^T AX &= L^{-1} A L^{-T} \\
+            &= L^{-1} LDM^T L^{-T} \\
+            &= DM^T L^{-T}
+        \end{align*}
+        $$
+        We have that $X^T A X$ is P.D. (from the previous theorem), so $ DM^T L^{-T}$ is P.D. as well, so all its diagonal entries are positive.
+
+        Since $M^T$ and $L^{-T}$ are upper unit triangular, $M^T L^{-T}$ is also upper unit triangular. Thus $\text{diag}(DM^T L^{-T}) = D$. So $D$ has positive diagonal entries.
+    </ProofContent>
+</Proof>
+
 Now, under what condition can we write $A$ as $A = GG^T$? If entries of $D$ are all positive, then we can define
 $$
 D^{\frac{1}{2}} = \text{diag}(\sqrt{d_1}, \ldots, \sqrt{d_n})
@@ -639,3 +814,96 @@ $$
     &= GG^T
 \end{align*}
 $$
+
+<Theorem withName={true}>
+    <TheoremName>Cholesky Factorization</TheoremName>
+    <TheoremContent>
+        If $A$ is P.D., then there exists a unique lower triangular matrix $G$ with positive diagonal entries such that $A = GG^T$.
+
+        This is called the Cholesky factorization and $G$ is the Cholesky factor.
+    </TheoremContent>
+</Theorem>
+** Insert Cholesky factorization example here**.
+
+Here is the algorithm for Cholesky factorization:
+```python
+# k = 1, ..., n
+for k in range(1, n + 1):
+    a_kk = sqrt(a_kk)
+    # i = k + 1, ..., n
+    for i in range(k + 1, n + 1):
+        a_ik = a_ik / a_kk
+    # j = k + 1, ..., n
+    for j in range(k + 1, n + 1):
+        # i = j, ..., n
+        for i in range(j, n + 1):
+            a_ij = a_ij - a_ik * a_jk
+```
+Focusing on the innermost loop, we have one subtraction and one multiplication, so the cost is
+$$
+\sum^n_{k=1} \sum^n_{j = k + 1} \sum^n_{i=j} 2 = \frac{n^3}{3} + O(n^2)
+$$
+which is half of $LU$ factorization.
+
+### Banded Systems
+A banded matrix is a matrix where there are bands of non-zero entries at the top and bottom of the diagonal. Here are some examples
+$$
+\begin{bmatrix}
+    9 & 5 & 0 & 0 \\
+    0 & 3 & 7 & 0 \\
+    0 & 0 & 1 & 4 \\
+    0 & 0 & 0 & 2
+\end{bmatrix} \qquad \begin{bmatrix}
+    5 & 6 & 0 & 0 & 0 & 0 \\
+    7 & 7 & 1 & 0 & 0 & 0 \\
+    4 & 2 & 9 & 2 & 0 & 0 \\
+    0 & 3 & 1 & 8 & 5 & 0 \\
+    0 & 0 & 3 & 4 & 6 & 1 \\
+    0 & 0 & 0 & 2 & 3 & 7
+\end{bmatrix}
+$$
+We let $q$ be the number of bands on top of the diagonal, and $p$ be the number of bands below the diagonal. In the examples above, $q = 1, p = 0$ for the first matrix, and $q = 1, p = 2$ for the second matrix. More formally, we have the following.
+<Definition>
+    <DefinitionName>Bandwidth of Banded Matrix</DefinitionName>
+    <DefinitionContent>
+        $A$ has 
+        - upper bandwidth $q$ if $a_{ij} = 0$ for $j > i + q$
+        - lower bandwidth $p$ if $a_{ij} = 0$ for $i > j + p$
+    </DefinitionContent>
+</Definition>
+Let's think about how we can efficiently store such matrices. One such way is storing it is by storing only the bands:
+$$
+\begin{bmatrix}
+    9 & 5 & 0 & 0 \\
+    0 & 3 & 7 & 0 \\
+    0 & 0 & 1 & 4 \\
+    0 & 0 & 0 & 2
+\end{bmatrix} \rightarrow \begin{bmatrix}
+    9 & 5 \\
+    3 & 7 \\
+    1 & 4 \\
+    2 & 0
+\end{bmatrix}
+$$
+But of course, this is not the only way, and we will not go into detail about this.
+<Theorem>
+    <TheoremContent>
+        Let $A = LU$. If $A$ has upper bandwidth $q$ and lower bandwidth $p$, then $U$ has upper bandwidth $q$ and $L$ has lower bandwidth $p$.
+    </TheoremContent>
+</Theorem>
+Given these properties of banded matrices, we have the following factoring algorithm:
+```python
+# k = 1, ..., n - 1
+for k in range(1, n):
+    # i = k + 1, ..., min(k + p, n)
+    for i in range(k + 1, min(k + p, n) + 1):
+        a_ik = a_ik / a_kk
+    # i = k + 1, ..., min(k + p, n)
+    for i in range(k + 1, min(k + p, n) + 1):
+        # j = k + 1, ..., min(k + q, n)
+        for j in range(k + 1, min(k + q, n) + 1):
+            a_ij = a_ij - a_ik * a_kj
+```
+If $n >> p$ and $n >> q$ (meaning that there are not a lot of bands), then the cost is approximately $2npq$.
+
+Comparing this to $\frac{2n^3}{3}$ for the naive LU factorization, band LU can be much faster.
