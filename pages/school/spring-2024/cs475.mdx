@@ -907,3 +907,86 @@ for k in range(1, n):
 If $n >> p$ and $n >> q$ (meaning that there are not a lot of bands), then the cost is approximately $2npq$.
 
 Comparing this to $\frac{2n^3}{3}$ for the naive LU factorization, band LU can be much faster.
+
+## General Sparse Matrices and Finite Differences for PDEs
+Patterns other than simple bands are also very common.
+
+For many problems, the max number of non-zero entries in a row is constant, i.e. the total number of non-zero entries in a row is $O(n)$. Thus for storage, we want to store only the non-zero entries.
+
+Then for GE/LU, the main cost is the row subtraction:
+$$
+a_{ij} = a_{ij} - \frac{a_{ij} a_{kj}}{a_{kk}}
+$$
+Since most entries are zero in a sparse matrix, out algorithms should skip operating on them.
+
+### Sparse Matrix Storage
+We look at Compressed Row Storage or Compressed Sparse Row (CRS or CSR). This is best illustrated using an example.
+$$
+\begin{bmatrix}
+    2 & 0 & 5 & 0 \\
+    0 & 3 & 0 & 0 \\
+    0 & 6 & -3 & 0 \\
+    0 & 0 & 10 & -2
+\end{bmatrix}
+$$
+We first store the non-zero entries in a val vector:
+$$
+\text{val} = \begin{bmatrix}
+    2 & 5 & 3 & 6 & -3 & 10 & -2
+\end{bmatrix}
+$$
+Then we store the column indices of the non-zero entries in a colInd vector:
+$$
+\text{colInd} = \begin{bmatrix}
+    1 & 3 & 2 & 2 & 3 & 3 & 4
+\end{bmatrix}
+$$
+So, the entry $2$ is in the first column, $5$ is in the third column, etc.
+
+Finally, we store the row pointers in a rowPtr vector:
+$$
+\text{rowPtr} = \begin{bmatrix}
+    1 & 3 & 4 & 6
+\end{bmatrix}
+$$
+This stores the index in the val vector of where the row starts (note that we are using 1-based indexing).
+
+### LU on General Sparse Matrices - Fill-in
+Note that even if $A$ is sparse, its factorization may not be sparse. Row reduction can turn zeros into non-zeros, this is called fill-in.
+
+A classic example is the arrow matrix:
+$$
+\begin{bmatrix}
+    \times & \times & \times & \times & \times \\
+    \times & \times &  &  &  \\
+    \times &  & \times &  &  \\
+    \times &  &  & \times &  \\
+    \times &  &  &  & \times
+\end{bmatrix}
+$$
+The LU factorization of this matrix is fully dense.
+
+However, if we reorder the rows and columns by switching the first and last row, and first and last column, we get
+$$
+\begin{bmatrix}
+    \times &  &  &  & \times \\
+     & \times &  &  & \times \\
+     &  & \times &  & \times \\
+     &  &  & \times & \times \\
+    \times & \times & \times & \times & \times
+\end{bmatrix} = \begin{bmatrix}
+    1 & & & &  \\
+    & 1 & & &  \\
+    & & 1 & &  \\
+    & & & 1 &  \\
+    \times & \times & \times & \times & 1
+\end{bmatrix}\begin{bmatrix}
+    \times &  &  &  & \times \\
+     & \times &  &  & \times \\
+     &  & \times &  & \times \\
+     &  &  & \times & \times \\
+     &  &  &  & \times
+\end{bmatrix}
+$$
+### Application Problem: Heat Conduction
+Read the textbook
