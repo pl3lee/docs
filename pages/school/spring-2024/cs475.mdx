@@ -990,3 +990,122 @@ $$
 $$
 ### Application Problem: Heat Conduction
 Read the textbook
+
+## Graph Structure of Matrices and Matrix Re-ordering
+Idea: Suppose that we have $Ax = b$, where $A$ is sparse. We can reorder the rows of columns of $A$ to obtain $A'$ and $b'$ such that $A' x = b'$ gives the solution to the original problem, and $A'$ has less fill-ins in Gaussian elimination.
+
+However, in general, the problem of giving an algorithm for reordering matrix in such a way that has the least fill-ins is an NP-hard problem.
+
+First, let's show how we can represent the graph structure of a matrix. We have the matrices
+$$
+\begin{bmatrix}
+    0 & 1 & 0 & 1 \\
+    1 & 0 & 1 & 1 \\
+    0 & 1 & 0 & 1 \\
+    1 & 1 & 1 & 0
+\end{bmatrix} \quad \begin{bmatrix}
+    0 & 1 & 1 & 1 \\
+    1 & 0 & 1 & 1 \\
+    1 & 1 & 0 & 0 \\
+    1 & 1 & 0 & 0
+\end{bmatrix}
+$$
+We can label each column $1, 2, 3, 4$, and each row $1, 2, 3, 4$ starting from the left top corner. We can represent the matrix as a graph where row $i$ is a neighbour of column $j$ if the entry $a_{ij} \neq 0$. So, the graph of the matrix above is
+
+![graph](/images/school/spring-2024/cs475/5-1.png)
+
+We can see that if we reorder the first and fourth columns and rows, then we have the same graph structure. We denote the graph of $A$ $G(A)$.
+
+Remarks:
+- This is most useful when the matrix is sparse.
+- Note that we exclude drawing self-loops (i.e. when $i = j$) in the graph.
+- We consider mostly undirected symmetric graphs in this course.
+
+
+Let's consider the relationship between factorization of sparse matrices, fill-in, and the graph structure.
+- When we pivot with node $i$, we eliminate all edges incident to node $i$.
+- New edges $jk$ are added if there were edges $ij$ and $ik$. That is, new edges bewteen all node pairs connected to $i$ in the old graph (this correponds to fill-ins).
+- So ideally, we want the node in the top left entry to be a node that has the least neighbours.
+
+For example, consider the arrow matrix and we perform a row reduction:
+$$
+\begin{bmatrix}
+    \times & \times & \times & \times & \times \\
+    \times & \times & & & \\
+    \times & & \times & & \\
+    \times & & & \times & \\
+    \times & & & & \times
+\end{bmatrix} \rightarrow \begin{bmatrix}
+    \times & \times & \times & \times & \times \\
+     & \times & \times &\times & \times\\
+     & \times& \times &\times & \times\\
+    & \times& \times& \times & \times\\
+    & \times& \times& \times & \times
+\end{bmatrix}
+$$
+When we eliminate the first column using the first diagonal entry as a pivot, we remove node 1 (which originally connects to all other nodes), and creates edges between all other nodes. As we can see, we have a lot of fill-ins.
+
+- The ordering (numbering) of the nodes/variables impacts the matrix layout, but not its graph or the solution.
+- The graph structure of a symmetric matrix is clearly unchanged by just renumbering its nodes.
+- However, different matrices with the same graph can suffer vastly different levels of fill-in during factorization.
+- Our goal of matrix reordering is to renumber the graph nodes to produce a matrix that minimizes fill-in during factorization.
+
+Reordering a matrix can be written mathematically in terms of permutation matrices. A permutation matrix is the identity matrix $I$ with some rows/columns swapped.
+- Permuting the rows is equivalent to multiplying $A$ by a permutation matrix $P$ on the left: $PA$
+$$
+\begin{bmatrix}
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+    1 & 0 & 0
+\end{bmatrix} \begin{bmatrix}
+    3 & 2 & 5 \\
+    2 & 4 & 1 \\
+    5 & 1 & 3
+\end{bmatrix} = \begin{bmatrix}
+    2 & 4 & 1 \\
+    5 & 1 & 3 \\
+    3 & 2 & 5
+\end{bmatrix}
+$$
+We can see that the first row of the original matrix is the third row of the permuted matrix, second row of the original matrix is the first row of the permuted matrix, and the third row of the original matrix is the second row of the permuted matrix.
+- Similarly, permuting the columns is equivalent to multiplying $A$ by a permutation matrix $Q$ on the right: $AQ$
+$$
+\begin{bmatrix}
+    3 & 2 & 5 \\
+    2 & 4 & 1 \\
+    5 & 1 & 3
+\end{bmatrix} \begin{bmatrix}
+
+    0 & 1 & 0 \\
+    0 & 0 & 1 \\
+    1 & 0 & 0
+\end{bmatrix} = \begin{bmatrix}
+    5 & 3 & 2\\
+    1 & 2 & 4\\
+    3 & 5 & 1
+\end{bmatrix}
+$$
+- Of course, we can permute the rows and the columns simultaneously: $PAQ$.
+
+<Theorem>
+    <TheoremContent>
+        A permutation matrix is invertible.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        A permutation matrix is full rank, so it is invertible. It's inverse is just its transpose, i.e. $P P^T = I$.
+    </ProofContent>
+</Proof>
+
+Now, how do we reorder $b$ if we permute $A$ to $\tilde A = PAQ$? We have
+$$
+\begin{align*}
+    Ax &= b \\
+    A(QQ^T)x &= b \\
+    AQ (Q^Tx) &= b \\
+    PAQ (Q^T x) &= Pb \\
+    \tilde A \tilde x &= \tilde b
+\end{align*}
+$$
+so $\tilde x = Q^T x$ and $\tilde b = Pb$. Then, by solving $\tilde A \tilde x = \tilde b$, we can recover $x$ by $x = Q \tilde x$.
