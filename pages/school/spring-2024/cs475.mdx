@@ -1158,3 +1158,214 @@ This has better performance than Cuthill-Mckee in terms of number of fill-ins. T
     </TheoremContent>
 </Theorem>
 The intuition of this theorem is that the last ordering of CM is a leaf node with degree 1, so RCM puts the degree 1 node first, which results in less fill-ins.
+
+## Matrix Re-ordering Part 2
+Let's try to use the greedy strategy for reordering. A greedy strategy is an iterative strategy that makes the best choice at each step. For example, in the Knapsack problem, at each iteration, we pick whatever item that has the largest value. So, a greedy strategy for reordering would be to pick the node with least neighbours.
+
+### Markowitz Reordering
+Markowitz is a local rule that tries to approximately minimize fill-in on the current step only. In other words, it greedily minimizes fill-in for the current step.
+
+When we perform $LU$ factorization, we subtract multiples of the current row $(k + 1)$ from rows below $(k + 2, \ldots, n)$, if there is a non-zero in the column to be zeroed out.
+
+Specifically, fill-in does not occur in rows that already have a zero in the column, e.g.
+$$
+A^{(k)} = \begin{bmatrix}
+    \textcolor{red}{\times} & \times & & \times \\
+    \times & \textcolor{blue}{\times} & & \textcolor{blue}{\times} \\
+    0 & & & \\
+    \times & \textcolor{blue}{\times} & & \textcolor{blue}{\times}
+\end{bmatrix}
+$$
+where the red $\times$ is the pivot element, and the blue $\times$ are the fill-ins.
+
+The worst case fill-in at this step is 4 entries, which is 2 non-zeros in the row times the 2 non-zeros in the column.
+
+We can swap rows and columns on the fly to reduce the reducing fill-in. The idea is to determine the entry that would mninimize the (worst-case) fill, then swap it into the top left position of $A^{(k)}$. The row that produces the least fill on this current step is determined using the Markowitz product.
+
+Let $r_i^{(k)} = nnz$ (number of nonzeros) in row $i$ of $A^{(k)}$ and $c_j^{(k)} = nnz$ in column $j$ of $A^{(k)}$. The maximum possible fill using $a_{ij}^{(k)}$ as the pivot is
+$$
+(r_i^{(k)} - 1)(c_j^{(k)} - 1)
+$$
+which is called the **Markowitz product**.
+
+The Markowitz reordering algorithm swaps rows/columns to choose the pivot $a_{pq}^{(k)}$ that minimizes the Markowitz product, that is
+$$
+(p, q) = \arg\min_{k \leq i, j} (r_i^{(k)} - 1)(c_j^{(k)} - 1)
+$$
+For example, if we have
+$$
+\begin{bmatrix}
+    a & b & c & 0 \\
+    d & e & 0 & 0 \\
+    0 & f & g & 0 \\
+    0 & h & 0 & i
+\end{bmatrix}
+$$
+Then the Markowitz product for each entry is
+$$
+\begin{bmatrix}
+    2 \times 1 & 2 \times 3 & 2 \times 1 & 0 \\
+    1 \times 1 & 3 \times 1 & 0 & 0 \\
+    0 & 3 \times 1 & 1 \times 1 & 0 \\
+    0 & 3 \times 1 & 0 & 0 \times 0
+\end{bmatrix}
+$$
+And we have that the $i$ entry has the smallest Markowitz product, so we choose $i$ as the pivot.
+
+If $A$ is symmetric, then we select $a_{pp}^{(k)}$ with
+$$
+p = \arg\min_{k \leq i}(r_i^{(k)} - 1)
+$$
+since $\arg\min_{k \leq i} r_i^{(k)} = \arg\min_{k \leq j} c_j^{(k)}$. So we only need to consider the diagonal entries for symmetric matrices.
+
+By symmetrically swapping both rows and columns, $a_{pp}^{(k)}$ becomes the new pivot. This approach has the following features:
+- preserves symmetry and diagonal dominance
+- corresponds to node reordering
+
+<Definition>
+    <DefinitionName>Diagonally Dominant</DefinitionName>
+    <DefinitionContent>
+        A matrix is weakly diagonally dominant if for every row, the magnitude of the diagonal entry is larger than or equal to the sum of the magnitudes of all the other entries in that row. That is,
+        $$
+        |a_{ii}| \geq \sum_{i \neq j} |a_{ij}| \quad \forall i
+        $$
+    </DefinitionContent>
+</Definition>
+### Minimum Degree Reordering
+The symmetric case of Markowitz reordering inspires an algorithm called **minimum degree reordering**. Consider the $(r_i^{(k)} - 1)$ (the number of non-zero entries in the row) for diagonal entries of this symmetric matrix
+$$
+\begin{bmatrix}
+    \times & \times & \times & \times & \times \\
+    \times & \times & & & \\
+    \times & & \times & \times & \\
+    \times & & \times & \times & \times \\
+    \times & & & \times & \times 
+\end{bmatrix}
+$$
+We have
+- $a_{11} \mapsto 4$
+- $a_{22} \mapsto 1$
+- $a_{33} \mapsto 2$
+- $a_{44} \mapsto 3$
+- $a_{55} \mapsto 2$
+
+Notice that the value $(r_i^{(k)} - 1)$ is the degree of the node in the graph. Minimum degree ordering therefore chooses the node with (current) minimum degree as the pivot element, at each step of factorization. The corresponding graph at each step is called the **elimination graph**. Thus, we have the following minimum degree algorithm:
+1. Construct the elimination graph
+2. At each step,
+    1. Number the node with current least degree
+    2. Remove the node and its edges
+    3. Add new edges connecting all its neighbours together
+3. Relabel the graph accordingly
+
+Let's work on an example. We break ties by alphabetical order. The final graph at the bottom is the resulting reordered graph.
+
+![min degree](/images/school/spring-2024/cs475/7-1.png)
+
+<Theorem>
+    <TheoremContent>
+        Minimum degree reordering is optimal for trees, i.e. it produces no fills on trees.
+    </TheoremContent>
+</Theorem>
+So, minimum degree reordering tries to greedily minimize fill-ins at each step by eliminating the node with least degree. This often outperforms RCM.
+
+### Image De-noising
+Images often contain random noise (small errors), arising from sensors, capture methods, or lighting conditions.
+
+Often there is enough signal amidst the noise that we can try to recover a version with the noise removed/reduced.
+
+Image denoising is an **inverse problem**. That is, given some observations we want to reconstruct the source that generated them. So, given some noisy image $u^0$, of some signal $u^*$, we want to recover the clean signal $u^*$, i.e.
+$$
+u^0 = u^* + n
+$$
+where $n$ is the noise. So, we want to decompose the noisy image $u^0$ into the sum of two components: the clean signal $u^*$ and the noise $n$. It is often impossible to find $u^*$ exactly, but we can find an approximation of $u^*$.
+
+We can treat grayscale images as 2D scalar functions, so $u_{ij}$ is the pixel intensity value at row $i$ and column $j$. There are two key assumptions enabling us to solve the inverse problem:
+1. The noise is not too large, i.e. observation $u^0$ is close to signal $u^*$.
+2. Signal $u^*$ has some **structure** that we can exploit.
+
+We seek $u$ satisfying
+$$
+\min_u \alpha R(u) + \| u - u^0 \|_2^2
+$$
+where
+- $\| u - u^0 \|_2^2$  is the measure of discrepancy between the observation $u^0$ and the numerical solution $u$.
+- $R(u)$ is the **regularization model**. There are three models, Tikhonov, Laplacian, and Total Variation.
+- $\alpha > 0$ is the **regularization constant**, which controls the trade-off between **regularity** (smoothness) and **fit** (closeness to $u^0$). As $\alpha \to 0$, we have $u \approx u^0$, so this outputs the observation $u^0$. As $\alpha \to \infty$, this means $u \approx \min R(u)$, which gives a perfectly regular image.
+
+#### Tikhonov Regularization
+The Tikhonov regularization model is
+$$
+R(u) = \| u \|^2_2
+$$
+so our optimization becomes
+$$
+\min_u \alpha \| u \|^2_2 + \| u - u^0 \|_2^2
+$$
+Solving this gives the solution
+$$
+u = \frac{u^0}{\alpha + 1}
+$$
+So, we can see that as $\alpha \to 0$, we get $u \approx u^0$. As $\alpha \to \infty$, we get $u \approx 0$.
+
+#### Laplacian Regularization
+Consider a noisy image in 1D. If we graph it out, we can see that there is drastic change in slope throughout the image, compared to a smoother 1D image where the slope chanages more continuously.
+
+![1D image](/images/school/spring-2024/cs475/7-2.png)
+
+Therefore, we should try to penalize changes in slopes/derivatives, i.e. $\nabla u$, instead of pixel values $u$. The Laplacian regularization model is
+$$
+R(u) = \| \nabla u \|^2_2
+$$
+So the optimization problem becomes
+$$
+\min_u \alpha \| \nabla u \|^2_2 + \| u - u^0 \|_2^2
+$$
+We can use the finite difference approximation of teh Laplacian to get
+$$
+\frac{\alpha}{h^2} (4u_{ij} - u_{i-1, j} - u_{i+1, j} - u_{i, j-1} - u_{i, j+1}) + u_{ij} = u_{ij}^0
+$$
+This gives a matrix equation of the form $(\alpha A + I)u = u^0$. Then we can try to keep denoising it by iterating:
+$$
+(\alpha A + I) u^{k+1} = u^k, \quad k = 1,2,\ldots,K
+$$
+However, the drawback of Laplacian regularization is that it tends to smear out edges.
+
+#### Total Variation Regularization
+To avoid smearing edges, the total variation regularization is
+$$
+R(u) = \| \nabla u \|_1
+$$
+This still minimizes the slopes but with a different measure that does not punish them too much.
+
+So our optimization becomes
+$$
+\min_u \alpha \| \nabla u \|_1 + \| u - u^0 \|_2^2
+$$
+This leads to another PDE to solve:
+$$
+-\alpha \nabla \cdot \left( \frac{\nabla u}{\| \nabla u \|_2} \right) + u = u^0
+$$
+The behaviour of total variation regularization is
+1. Edge-like regions are smoothed less, and
+2. flatter regions are smoothed more.
+
+To solve systems of the form
+$$
+\alpha A(u) + u = u^0
+$$
+we can use fixed point iteration. That is, we solve
+$$
+\begin{align*}
+    \alpha A(u^k) u^{k+1} + u^{k+1} &= u^0 \\
+    \implies \alpha (A^{u^k} + I) u^{k+1} &= u^0 
+\end{align*}
+$$
+for $k = 0,1,\ldots,K$. So we pick an initial guess and compute an approximate solution by solving the system. The matrix $A(u^k)$ is then recomputed for the next iteration.
+
+Note that such an iteration does not always converge to the solution in general.
+
+One approach to determine when to stop iterating is when the approximation is not changing anymore, i.e.
+$$
+\| u^{k+1} - u^k \| < \text{tolerance}
+$$
+for some small tolerance.
