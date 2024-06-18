@@ -1600,7 +1600,7 @@ We have the following theorem that gives a sufficient condition for convergence.
             x^{*} - x^{k+1} &= (I - M^{-1}A)(x^* - x^k) \\
             \implies \| x^* - x^{k+1} \| &= \|(I - M^{-1}A)(x^* - x^k)\| \\
             &\leq \| I - M^{-1}A \| \| x^* - x^k \| \\
-            \implies \|e^{k+1} \| \leq \| I - M^{-1}A \| \| e^k \|
+            \implies \|e^{k+1} \| &\leq \| I - M^{-1}A \| \| e^k \|
         \end{align*}
         $$
         Note that the matrix norm above is the induced norm by the vector norm. Since $\| I - M^{-1}A \| < 1$, the magnitude of the error decreases at each iteration.
