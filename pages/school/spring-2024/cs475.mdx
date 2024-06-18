@@ -1359,7 +1359,7 @@ we can use fixed point iteration. That is, we solve
 $$
 \begin{align*}
     \alpha A(u^k) u^{k+1} + u^{k+1} &= u^0 \\
-    \implies \alpha (A^{u^k} + I) u^{k+1} &= u^0 
+    \implies \alpha (A(u^k) + I) u^{k+1} &= u^0 
 \end{align*}
 $$
 for $k = 0,1,\ldots,K$. So we pick an initial guess and compute an approximate solution by solving the system. The matrix $A(u^k)$ is then recomputed for the next iteration.
