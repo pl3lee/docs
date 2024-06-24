@@ -1990,3 +1990,409 @@ Let's work on some examples to see FTC in action.
         $$
     </ProofContent>
 </Proof>
+## Lecture 17 (June 7, 2024)
+### Integration (Continued)
+#### Important Example
+Here is an important example. Consider $\int_C \frac{1}{z}$, where $C$ is the unit circle, traversed in the positive direction. We note that $\frac{1}{z}$ does not have an antiderivative which applies to all of $C$.
+
+**Method 1**:
+
+Split $C$ up. Let's start at $-i$.
+
+![](/images/school/spring-2024/pmath332/17-1.png)
+
+So we have
+$$
+\int_C \frac{1}{z} dz = \int_{C_1} \frac{1}{z} dz + \int_{C_2} \frac{1}{z} dz
+$$
+On $C_1$ we may use $\text{Log}(z)$.
+$$
+\begin{align*}
+  \int_{C_1} \frac{1}{z} dz &= \text{Log}(z) \Big|_{-i}^i \\
+  &= \text{Log}(i) - \text{Log}(-i) \\
+  &= \frac{\pi}{2}i - \left(- \frac{\pi}{2}i\right) = \pi i
+\end{align*}
+$$
+On $C_2$, we may use $\log_0(z)$.
+$$
+\begin{align*}
+  \int_{C_2} \frac{1}{z} dz &= \log_0(z) \Big|_i^{-i} \\
+  &= \log_0(-i) - \log_0(i) \\
+  &= \frac{3\pi}{2} i - \frac{\pi}{2}i = \pi i
+\end{align*}
+$$
+Thus $\int_C \frac{1}{z} dz = 2\pi i$.
+
+**Method 2**
+Parameterize $C$. Use $z = e^{it}$, $t \in [0, 2\pi]$. Differentiate to get $dz = ie^{it} dt$. So
+$$
+\begin{align*}
+  \int_C \frac{1}{z} &= \int_0^{2\pi} \frac{1}{e^{it}} ie^{it} dt \\
+  &= \int_0^{2\pi} i dt = 2\pi i
+\end{align*}
+$$
+What if we change the radius? We have $z = Re^{it}$, $dz = Rie^{it} dt$, so
+$$
+\begin{align*}
+  \int_C \frac{1}{z} &= \int_0^{2\pi} \frac{1}{Re^{it}} Rie^{it} dt \\
+  &= \int_0^{2\pi} i dt = 2\pi i
+\end{align*}
+$$
+
+**Method 3**
+Use a limit argument. We start at $-1$.
+![](/images/school/spring-2024/pmath332/17-2.png)
+Then we have
+$$
+\begin{align*}
+  \int_{C_3} \frac{1}{z} dz &= \text{Log}(z) \Big|^{e^{(\pi - \epsilon)i}}_{e^{(-\pi + \epsilon)i}} \\
+  &= \text{Log}(e^{(\pi - \epsilon)i}) - \text{Log}(e^{(-\pi + \epsilon)i}) \\
+  &=[(\pi - \epsilon) - (- \pi + \epsilon)]i \\
+  &= 2 \pi i - 2 \epsilon i \\
+  &\to 2\pi i \text{ as } \epsilon \to 0
+\end{align*}
+$$
+Note that for all methods, we are avoiding the branch cut at the negative real axis, because the argument changes by $2\pi$ once we cross the branch cut.
+### Deformable Invariance Theorem
+<Definition>
+    <DefinitionName>Continuously Deformable</DefinitionName>
+    <DefinitionContent>
+        A closed contour $C_0$ is said to be **continuously deformable** to a closed contour $C_1$ in a domain $D$ if there exists a function $z(s, t)$, continous for $s \in [0, 1], t \in [0, 1]$, such that
+        1. $z(s, t)$ is a closed contour in $D$ for each $s \in [0, 1]$.
+        2. $z(0, t) = C_0$.
+        3. $z(1, t) = C_1$. 
+
+        ![](/images/school/spring-2024/pmath332/17-3.png)
+    </DefinitionContent>
+</Definition>
+<Theorem withName={true}>
+    <TheoremName>Deformation Invariance Theorem</TheoremName>
+    <TheoremContent>
+        Let $f$ be analytic in a domain $D$, contining closed contours $C_1$ and $C_2$. If $C_1$ can be continously deformed into $C_2$, then
+        $$
+        \int_{C_1} f(z) dz = \int_{C_2} f(z) dz
+        $$
+    </TheoremContent>
+</Theorem>
+<Definition>
+    <DefinitionName>Simply Connected Domain</DefinitionName>
+    <DefinitionContent>
+        A simply connected domain is a domain with the property that every loop within it can be continuously deformed to a single point.
+    </DefinitionContent>
+</Definition>
+<Theorem withName={true}>
+    <TheoremName>Cauchy's Integral Theorem</TheoremName>
+    <TheoremContent>
+        If $f$ is analytic in a simply connected domain $D$, and $C$ is a closed contour in $D$, then
+        $$
+        \int_C f(z) dz = 0
+        $$
+        since it can be continously deformed to a single point.
+    </TheoremContent>
+</Theorem>
+<Corollary>
+    <CorollaryContent>
+        We already knew that $\int_C f(z) dz = 0$ in $C$ implies that $f$ has an antiderivative.
+
+        If $f$ is analytic, then it has an antiderivative.
+    </CorollaryContent>
+</Corollary>
+We now know that $\int_C \frac{1}{z} dz = 2\pi i$ for any closed contour enclosing the origin. Also, we can shift this to get
+$$
+\int_C \frac{1}{z - z_0} dz = 2\pi i
+$$
+for any $C$ enclosing $z_0$.
+## Lecture 18 (June 10, 2024)
+### Cauchy's Intergral Theorem
+Last time, we had
+<Theorem withName={true}>
+    <TheoremName>Cauchy's Integral Theorem</TheoremName>
+    <TheoremContent>
+        If $f$ is analytic in a simply connected domain $D$, and $C$ is a closed contour in $D$, then
+        $$
+        \int_C f(z) dz = 0
+        $$
+        since it can be continously deformed to a single point.
+    </TheoremContent>
+</Theorem>
+What if $f$ is not analytic? We showed that $\int_C \frac{1}{z} dz = 2\pi i$ if $C$ is a simply positive-oriented contour enclosing the origin. We can shift this and state
+$$
+\int_C \frac{1}{ z - z_0} dz = \begin{cases}
+    0 & \text{ if $z_0$ is exterior to $C$} \\
+    2 \pi i & \text{if $z_0$ is interior to $C$}
+\end{cases}
+$$
+How about for other powers of $z - z_0$? We have
+$$
+\int_C (z - z_0)^n dz = 0, \quad n = 0,1,2,\ldots
+$$
+$$
+\int_C \frac{1}{(z - z_0)^n}dz = 0, \quad n = 2,3,4,\ldots
+$$
+by FTC, since $\frac{1}{(z - z_0)^n}$ has an antiderivative on $C$.
+
+So, we can now calculate loop integrals of any rational function. Let's do a couple examples.
+
+**Example 1**: Let $C$ be a positively oriented circle of radius 2 centered at the origin (denoted $C_{z_0}^r(+)$). Evaluate $\int_C \frac{2z}{z^2 + 2} dz$.
+
+Observe that we have two discontinuities within $C$. (At $\pm \sqrt{2}i$). We write
+$$
+\frac{2z}{z^2 + 2} = \frac{1}{z + i \sqrt 2} + \frac{1}{z - i\sqrt 2}
+$$
+
+![](/images/school/spring-2024/pmath332/17-4.png)
+
+We can deform $C$ as follows:
+
+![](/images/school/spring-2024/pmath332/17-5.png)
+
+So we have
+$$
+C = C_1 + C_2 + C_3 - C_2
+$$
+so
+$$
+\begin{align*}
+    \int_C f dz &= \int_{C_1} f dz + \int_{C_2} fdz + \int_{C_3} f dz - \int_{C_2} f dz \\
+    &= \int_{C_1} f dz + \int_{C_3} f dz
+\end{align*}
+$$
+Therefore
+$$
+\begin{align*}
+    \int_C \frac{2z}{z^2 + 2} &= \int_{C_1} \frac{1}{z + i \sqrt 2} dz + \int_{C_1} + \frac{1}{z - i \sqrt 2} dz + \int_{C_3} \frac{1}{z + i \sqrt 2} dz + \int_{C_3} \frac{1}{z - i \sqrt 2} dz \\
+    &= 0 + 2 \pi i + 2\pi i + 0 \\
+    &= 4 \pi i
+\end{align*}
+$$
+<Theorem>
+    <TheoremContent>
+        Let $C_1,C_2,\ldots,C_n$ be disjoint simple closed positively-oriented contours such that $C_j$ is interior to a single closed positively oriented contour $C$.
+
+        If $f$ is analytic on a domain containing all of these and the region between, then
+        $$
+        \int_C f(z) dz = \sum^n_{k = 1} \int_{C_k} f(z) dz
+        $$
+    </TheoremContent>
+</Theorem>
+**Example 2**: Evaluate $\int_{C_{0}^3(+)} \frac{3z^2 + 2}{z^4 + z^3 - 2z^2}dz$. We factor the denominator to get
+$$
+\begin{align*}
+    z^4 + z^3 - 2z^2 &= z^2(z^2 + z - 2) \\
+    &= z^2(z+2)(z-1)
+\end{align*}
+$$
+Using partial fractions, we get
+$$
+\begin{align*}
+    \frac{3z^2 + 2}{z^4 + z^3 - 2z^2} = \frac{-\frac{1}{z}}{z} - \frac{1}{z^2} + \frac{\frac{11}{6}}{z + 2} + \frac{\frac{5}{3}}{z - 1}
+\end{align*}
+$$
+
+![](/images/school/spring-2024/pmath332/17-6.png)
+
+Therefore
+$$
+\begin{align*}
+    \int_C f(z) dz &= - \frac{1}{2} (2\pi i) + 0 + \frac{11}{6}(2\pi i) + \frac{5}{3}(2\pi i) \\
+    &= 6 \pi i
+\end{align*}
+$$
+What about $\int_{C_0^{1.5}(+)} \frac{3z^2 + 2}{z^4 + z^3 - 2z^2}dz$? This is
+$$
+- \frac{1}{2} (2\pi i) + 0 + 0 + \frac{5}{3}(2\pi i) = \frac{2}{3} \pi i
+$$
+where we have 1 more zero term since the discontinuity $z = -2$ is outside of $C$.
+## Lecture 19 (June 12, 2024)
+### Cauchy's Intergral Formula
+<Theorem withName={true}>
+    <TheoremName>Cauchy's Intergral Formula</TheoremName>
+    <TheoremContent>
+        Let $C$ be a simple, closed, positively oriented contour. If $f$ is analytic in some simply connected domain $D$ containing $C$, and $z_0$ is any point within $C$, then 
+        $$
+        \int_C \frac{f(z)}{z - z_0} dz = 2\pi i f(z_0)
+        $$
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Deform $C$ to a positively oriented circle of radius $r$ centered at $z_0$. Call it $C_r$. Then 
+        $$
+        \begin{align*}
+            \int_C \frac{f(z)}{z - z_0} dz &= \int_{C_r} \frac{f(z)}{z - z_0} dz \\
+            &= \int_{C_r} \frac{f(z) - f(z_0) + f(z_0)}{z - z_0} dz \\
+            &= \int_{C_r} \frac{f(z) - f(z_0)}{z - z_0} dz + f(z_0) \int_{C_r} \frac{1}{z - z_0} dz
+            &= \int_{C_r} \frac{f(z) - f(z_0)}{z - z_0} dz + 2\pi i f(z_0)
+        \end{align*}
+        $$
+        For the first integral, note that on $C_r$ we have $|z - z_0| = r$. If we let $M$ be an upper bound on $|f(z) - f(z_0)|$ on $C_r$, then
+        $$
+        \left| \frac{f(z) - f(z_0)}{z - z_0} \right| = \frac{|f(z) - f(z_0)|}{r} \leq \frac{M}{r}
+        $$
+        Therefore
+        $$
+        \begin{align*}
+            \left| \int_{C_r} \frac{f(z) - f(z_0)}{z - z_0} dz \right| &\leq \frac{M}{r} \cdot 2\pi r \\
+            &= 2 \pi M
+        \end{align*}
+        $$
+        Finally, as $r \to 0$ we must have $M \to 0$ since $f$ is continuous. Therefore
+        $$
+        \lim_{r \to 0} \int_{C_r} \frac{f(z) - f(z_0)}{z - z_0} dz = 0
+        $$
+    </ProofContent>
+</Proof>
+**Example 1:** Evaluate  $\int_C \frac{e^z}{z - 1}dz$, where $C = C_0^2(+)$.
+
+We let $f(z) = e^z$. Since $f$ is entire and $z = 1$ is interior to $C$, we have
+$$
+\int_C \frac{e^z}{z - 1} dz = 2\pi e i
+$$
+
+**Example 2:** Evaluate $\int_C \frac{e^{i\pi z}}{2z^2 - 5z + 2} dz$, where $C = C_0^1(+)$.
+
+We factor the denominator to get
+$$
+2z^2 - 5z + 2 = 2\left(z - \frac{1}{2}\right)(z - 2)
+$$
+so we have poles at $z = \frac{1}{2}, 2$. Since $z = 2$ is not in $C$, we only need to consider $z = \frac{1}{2}$. We write this as
+$$
+\begin{align*}
+    \int_C \frac{e^{i\pi z}}{2(z - \frac{1}{2})(z - 2)} dz &= \int_C \frac{e^{i\pi z}}{2(z - \frac{1}{2})(z - 2)} \frac{\frac{1}{2(z - 2)}}{\frac{1}{2(z - 2)}} dz \\
+    &= \int_C \frac{\frac{e^{i\pi z}}{2(z - 2)}}{z - \frac{1}{2}} dz
+\end{align*}
+$$
+We let $f(z) = \frac{e^{i\pi z}}{2(z - 2)}$. Thus, the integral is
+$$
+2\pi i f\left(\frac{1}{2}\right) = \frac{2 \pi i e^{\frac{\pi}{2} i}}{2\left(- \frac{3}{2}\right)} = \frac{2\pi}{3}
+$$
+<Corollary>
+    <CorollaryContent>
+        1. $f(z_0) = \frac{1}{2 \pi i} \int_C \frac{f(z)}{z - z_0} dz$. This means that the value of $f$ at $z_0$ is independent upon the values of $f$ on $C$.
+        2. In fact, if $C$ is a circle, $C_{z_0}^R(+)$, then parameterizing it as
+        $$
+        z(t) = z_0 + Re^{it}, \quad t \in [0, 2\pi]
+        $$
+        gives
+        $$
+        \begin{align*}
+            f(z_0) &= \frac{1}{2\pi i} \int^{2\pi}_0 \frac{f(z_0 + Re^{it})}{Re^{it}} Rie^{it} dt \\
+            &= \frac{1}{2\pi} \int^{2\pi}_0 f(z_0 + Re^{it}) dt
+        \end{align*}
+        $$
+        So $f(z_0)$ is equal to the average value of $f$ on $C$. This is the **Mean Value Property** of complex integrals.
+
+        3. Since $z_0$ is arbitrary, we can interpret Cauchy's Integral Formula as an integral equation. We define $f$ as
+        $$
+        f(z) = \frac{1}{2\pi i} \int_C \frac{f(w)}{w - z} dw
+        $$
+        We differentiate to get
+        $$
+        \begin{align*}
+            f'(z) &= \frac{1}{2\pi i} \int_C f(w) \frac{d}{dz} \left(\frac{1}{w - z}\right) dw \\
+            &= \frac{1}{2\pi i} \int_C \frac{f(w)}{(w - z)^2} dw
+        \end{align*}
+        $$
+        And we can keep differentiating to get expressions of higher derivatives. Repeating gives Cauchy's Integral Formula for Derivatives (CIFD)
+    </CorollaryContent>
+</Corollary>
+<Definition>
+    <DefinitionName>Cauchy's Integral Formula for Derivatives (CIFD)</DefinitionName>
+    <DefinitionContent>
+        $$
+        f^{(n)}(z) = \frac{n!}{2\pi i} \int_C \frac{f(w)}{(w - z)^{n + 1}} dw
+        $$
+        for $z$ within $C$.
+
+        We can rewrite this as
+        $$
+        f^{(n)}(z_0) = \frac{n!}{2\pi i} \int_C \frac{f(z)}{(z - z_0)^{n + 1}} dz
+        $$
+        So, we can rearrange to get
+        $$
+        \int_C \frac{f(z)}{(z - z_0)^{n + 1}} dz = \frac{2\pi i}{n!} f^{(n)}(z_0)
+        $$
+    </DefinitionContent>
+</Definition>
+**Example 3:** Evaluate $\int_C \frac{z^3 + 2z + 1}{(z - 1)^3} dz$, where $C = C^2_0(+)$. CIFD with $n = 2$ says
+$$
+\int_C \frac{f(z)}{(z - z_0)^3} dz = 2\pi i \frac{f''(z_0)}{2!}
+$$
+So, we let $f(z) = z^3 + 2z + 1$, and $z_0 = 1$. Then
+$$
+f'(z) = 3z^2 + 2, \quad f''(z) = 6z
+$$
+So
+$$
+\int_C \frac{z^3 + 2z + 1}{(z - 1)^3} dz = \pi i (6z)\big|_{z = 1} = 6 \pi i
+$$
+
+**Implications of CIFD**:
+1. An analytic function is infinitely differentiable. Furthermore, if we write $f = u + iv$, then $u(x,y)$ and $v(x,y)$ are also infinitely differentiable with all partials being continuous.
+2. Morera's Theorem.
+
+<Theorem withName={true}>
+    <TheoremName>Morera's Theorem (Converse of Cauchy's Integral Theorem)</TheoremName>
+    <TheoremContent>
+        Let $f$ be a continuous function in a simply connected domain $D$. If $\int_C f(z) dz = 0$ for every contour in $D$, then $f$ is analytic.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        We have already shown that $\int_C f(z) dz = 0$ implies that $f$ has an antiderivative $F$ in $C$. Therefore $F(z)$ is analytic, so $f(z)$ is analytic as well.
+    </ProofContent>
+</Proof>
+<Lemma withName={true}>
+    <LemmaName>Cauchy's Estimates</LemmaName>
+    <LemmaContent>
+        Let $f$ be analytic on and within a circle with radius $R$ centered at $z_0$. If $|f(z)| \leq M$ for all $z$ on $C$, then
+        $$
+        |f^{(n)}(z_0)| \leq \frac{n!M}{R^n}
+        $$
+    </LemmaContent>
+</Lemma>
+<Proof>
+    <ProofContent>
+        From CIFD, we have
+        $$
+        f^{(n)}(z_0) = \frac{n!}{2\pi i} \int_C \frac{f(z)}{(z - z_0)^{n + 1}} dz
+        $$
+        On $C$, $|z - z_0| = R$, so the ML inequality gives
+        $$
+        \begin{align*}
+            |f^{(n)}(z_0)| &\leq \frac{n!}{2\pi} \frac{M}{R^{n + 1}} \cdot 2\pi R \\
+            &= \frac{n!M}{R^n}
+        \end{align*}
+        $$
+    </ProofContent>
+</Proof>
+<Theorem withName={true}>
+    <TheoremName>Liuoville's Theorem</TheoremName>
+    <TheoremContent>
+        If $f$ is entire and bounded, then $f$ is constant.
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        Suppose that $|f(z)| \leq M$ for all $z \in \mathbb C$. Consider $z_0 \in \mathbb C$, and let $C$ be a circle of radius $R$ centered at $z_0$. The first order Cauchy estimate gives
+        $$
+        |f'(z_0)| \leq \frac{M}{R}
+        $$
+        Since $R$ can be made arbitrarily large, we have $f'(z_0) = 0$. Since $z_0$ is also arbitrary, $f'(z) = 0$ for all $z \in \mathbb C$, so $f$ is constant.
+    </ProofContent>
+</Proof>
+This can be used to prove the Fundamental Theorem of Algebra:
+<Proof withName={true}>
+    <ProofName>Sketch Proof of Fundamental Theorem of Algebra</ProofName>
+    <ProofContent>
+        Let $P(z)$ be a polynomial. $P(z)$ is continuous, so if it has no zeroes, it must be bounded away from zero $|P(z)| \geq \epsilon$ for some $\epsilon > 0$. Therefore $\frac{1}{P(z)} \leq \frac{1}{\epsilon}$.
+
+        If $P(z)$ has no zeroes, then $\frac{1}{P(z)}$ is entire, so by Liouville's Theorem $\frac{1}{P(z)}$ is constant (so $P(z)$ is constant). Thus, a non-constant polynomial has a zero, which can be factored out.
+    </ProofContent>
+</Proof>
+<Theorem withName={true}>
+    <TheoremName>The Maximum Modulus Principle</TheoremName>
+    <TheoremContent>
+        Suppose $f$ is analytic in a bounded domain $D$, and continuous on the closure of $D$, $\bar D$. Then $|f|$ atatins a maximum on $\bar D$, and it occurs on the boundary.
+    </TheoremContent>
+</Theorem>
