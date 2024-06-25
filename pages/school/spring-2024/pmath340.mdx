@@ -1713,3 +1713,109 @@ $$
   &\equiv 4 \pmod{33}
 \end{align*}
 $$
+
+## Lecture 15 (June 7, 2024)
+**Questions Inspired from Crypto**
+1. Discrete Log Problem. Given $a, b \in (\Z / n \Z)^*$, solve $a \equiv b^x \pmod n$ for $x$ (the solution is $x = \log_b(a)$).
+2. How do we find large primes? Equivalently, given $n$ how do we test if $n$ is prime? If $n$ is prime, then $2^{n - 1} \equiv 1 \pmod n$ by Fermat's Little Theorem. so if $2^{n - 1} \not\equiv 1 \pmod n$, then $n$ is not prime. However, even though $2^{n - 1} \equiv 1 \pmod n$, it is still possible that $n$ is not prime.
+3. How do we compute $\phi(n)$? Recall that $\phi(n) = |(\Z/n\Z)^*|$ is the number of integers $1 \leq a \leq n$ which are coprime to $n$.
+
+Here are some key facts which we will work towards proving in the next few lectures:
+1. $\phi(p^a) = p^a - p^{a - 1}$ for prime $p$ and $a \in \Z_{\geq 1}$.
+2. $\phi(mn) = \phi(m)\phi(n)$ for coprime $m, n$.
+
+From 1, we get that $\phi(p) = p - 1$. From 2, we have $\phi(pq) = (p - 1)(q - 1)$ for primes $p, q$.
+
+<Example>
+    <ExampleContent>
+        Using above, we can calculate
+        $$
+        \begin{align*}
+            \phi(200) &= \phi(2^3 5^2) \\
+            &= \phi(2^3) \phi(5^2) \\
+            &= (2^3 - 2^2)(5^2 - 5)
+        \end{align*}
+        $$
+    </ExampleContent>
+</Example>
+In general, if $n = p_1^{a_1} \ldots p_k^{a_k}$, then 
+$$
+\phi(n) = (p_1^{a_1} - p_1^{a_1 - 1}) \ldots (p_k^{a_k} - p_k^{a_k - 1})
+$$
+<Definition>
+    <DefinitionName>Arithmetic Function</DefinitionName>
+    <DefinitionContent>
+        An arithmetic function is a function $f: \Z_{\geq 1} \to \mathbb C$.
+    </DefinitionContent>
+</Definition>
+Generally, we are interested in $f$ such that $f(n)$ says something about the arithmetic of $n$. Here are some examples of arithmetic functions
+1. $\phi(n)$
+2. $\pi(n)$, the number of primes less than or equal to $n$.
+3. $\omega(n)$, the number of prime divisors of $n$.
+4. The divisior function $\sigma_k(n) = \sum_{d \mid n} d^k$. For example, $\sigma_0(n) = \sum_{d \mid n} d^0 = \sum_{d \mid n} 1$ is the number of positive divisors.
+5. Ramanujan tau function $\tau(n)$, which is the coefficent $q^n$ of the expansion
+
+    $$
+    q \prod^\infty_{n = 1}(1 - q^n)^{24} = q(1 - q)^{24}(1 - q^2)^{24} \cdots = \tau(1)q + \tau(2)q^2 + \cdots
+    $$
+
+<Definition>
+    <DefinitionName>Multiplicative</DefinitionName>
+    <DefinitionContent>
+        An arithmetic function $f$ is multiplicative if $f(mn) = f(m)f(n)$ when $m, n$ are coprime. If $f(mn) = f(m)f(n)$ for all $m, n$, then $f$ is completely multiplicative.
+    </DefinitionContent>
+</Definition>
+As an example, let's try to determine if
+1. $\omega(n)$ is multiplicative
+2. $\sigma_k(n)$ is multiplicative or completely multiplicative
+
+For $\omega(n)$, we have $\omega(2 \cdot 3) = 2$, but $\omega(2) = \omega(3) = 1$, so $\omega(n)$ is not multiplicative.
+
+For $\sigma_k(n)$, we have the following lemma:
+<Lemma>
+    <LemmaContent>
+        Suppose $m,n$ coprime. Then $d \mid mn$ if and only if $d = d_1d_2$ where $d_1 \mid m$ and $d_2 \mid n$.
+    </LemmaContent>
+</Lemma>
+We can see that $\sigma_k(n)$ is multiplicative but not completely multiplicative. We can use prime factorization.
+
+Consider $\sigma_k(mn)$ where $m,n$ are coprime. Then
+$$
+\begin{align*}
+    \sigma_k(mn) &= \sum_{d \mid mn} d^k \\
+    &= \sum_{\substack{d_1 \mid m \\ d_2 \mid n}} (d_1d_2)^k \\
+    &= \sum_{d_1 \mid m} \sum_{d_2 \mid n} d_1^kd_2^k \\
+    &= \left(\sum_{d_1 \mid m} d_1^k\right)\left( \sum_{d_2 \mid n} d_2^k\right) \\
+    &= \sigma_k(m)\sigma_k(n)
+\end{align*}
+$$
+So $\sigma_k$ is multiplicative. But $\sigma_k$ is not completely multiplicative. We have $\sigma_1(2) = 1 + 2 = 3$ and $\sigma_1(4) = 1 + 2 + 4 = 7$. So $\sigma(2 \cdot 2) \neq \sigma(2)\sigma(2)$.
+
+<Corollary>
+    <CorollaryContent>
+        If $n = p_1^{a_1} \ldots p_k^{a_k}$, then
+        $$
+        \sigma_k(n) = \sigma_k(p_1^{a_1}) \cdots \sigma_k(p_k^{a_k})
+        $$
+        and $\sigma_k(p_i^{a_i})$ is easy to calculate.
+    </CorollaryContent>
+</Corollary>
+<Definition>
+    <DefinitionName>Summatory Function</DefinitionName>
+    <DefinitionContent>
+        If $f(n)$ is an arithmetic function, its summatory function $F(n)$ is given by $F(n) = \sum_{d \mid n} f(d)$.
+    </DefinitionContent>
+</Definition>
+For example, let $f(n) = 1$, a constant function. Then $F(n) = \sum_{d \mid n} f(d) = \sum_{d \mid n} 1 = \sigma_0(n)$.
+
+Generally, if $f(n) = n^k$, then $F(n) = \sum_{d \mid n} d^k = \sigma_k(n)$.
+<Theorem>
+    <TheoremContent>
+        Suppose $f(n)$ is an arithmetic function and $F(n)$ is its summatory function. If $f(n)$ is multiplicative, then $F(n)$ is also multiplicative.
+    </TheoremContent>
+</Theorem>
+<Theorem>
+    <TheoremContent>
+        If $f(n) = \phi(n)$, then its summatory function is $F(n) = n$.
+    </TheoremContent>
+</Theorem>
