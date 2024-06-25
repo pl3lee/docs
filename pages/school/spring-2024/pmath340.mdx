@@ -1819,3 +1819,149 @@ Generally, if $f(n) = n^k$, then $F(n) = \sum_{d \mid n} d^k = \sigma_k(n)$.
         If $f(n) = \phi(n)$, then its summatory function is $F(n) = n$.
     </TheoremContent>
 </Theorem>
+
+## Lecture 16 (June 12, 2024)
+Recall that our goal is to prove
+1. $\phi(mn) = \phi(m)\phi(n)$ provided that $\gcd(m, n) = 1$.
+2. $\phi(p^a) = p^{a} - p^{a - 1}$ for all primes $p$ and $a \in \mathbb Z \geq 0$.
+
+We proved last time that if $f(n)$ is multiplicative, then $F(n)$ is multiplicative.
+
+So, an idea to prove $\phi(n)$ is multiplicative is to find a multiplicative function $f(n)$ such that $\phi$ is its summatory function, i.e. $\phi(n) = \sum_{d \mid n} f(d)$. However, this is very difficult.
+
+Another idea: does a summatory function $F$ being multiplicative imply that $f$ is multiplicative? If this is true, then if we can compute the summatory function of $\phi(n)$ is multiplicative, then $\phi(n)$ is multiplicative. Recall from last time that
+<Theorem withName={true}>
+    <TheoremName>Summatory Function of $\phi$</TheoremName>
+    <TheoremContent>
+        $\Phi(n) = \sum_{d \mid n} \phi(d) = n$
+    </TheoremContent>
+</Theorem>
+Example:
+$$
+\begin{align*}
+    \Phi(6) &= \phi(1) + \phi(2) + \phi(3) + \phi(6) \\
+    &= 1 + 1 + 2 + 2 = 6
+\end{align*}
+$$
+<Proof withName={true}>
+    <ProofName>Summatory function of $\phi$</ProofName>
+    <ProofContent>
+        We will use a counting argument. Let $S = \{1,2,\ldots, n\}$ and let $S_d = \{k \in S: \gcd(k, n) = d\}$. Observe that each $k \in S$ belongs to exactly one $S_d$, so the set $S_d$ partitions $S$. So we have
+        $$
+        n = |S| = \sum_{d \mid n} |S_d|
+        $$
+        We will show that $|S_d| = \phi(d)$. Note that
+        $$
+        \begin{align*}
+            k \in S_d &\iff 1 \leq k \leq n \text{ and } \gcd(k, n) = d \\
+            &\iff 1 \leq k \leq n \text{ and } \gcd\left(\frac{k}{d}, \frac{n}{d}\right) = 1 \\
+            &\iff 1 \leq \frac{k}{d} \leq \frac{n}{d} \text{ and } \gcd\left(\frac{k}{d}, \frac{n}{d}\right) = 1 
+        \end{align*}
+        $$
+        So $|S_d|$ is the number of units coprime to $\frac{n}{d}$, thus $|S_d| = \phi\left(\frac{n}{d}\right)$. So we now have
+        $$
+        n = \sum_{d \mid n}  |S_d| = \sum_{d \mid n} \phi\left(\frac{n}{d}\right)
+        $$
+        But $\frac{n}{d}$ are also divisors of $n$, so
+        $$
+        n = \sum_{d \mid n} \phi\left(\frac{n}{d}\right) = \sum_{d \mid n} \phi(d)
+        $$
+    </ProofContent>
+</Proof>
+### Mobius Inversion
+Consider $f(n)$, with summatory function $F(n) = \sum_{d \mid n} f(d)$. We have the following
+$$
+\begin{equation*}
+\begin{aligned}
+F(1) &= f(1) \\
+F(2) &= f(1) + f(2) \\
+F(3) &= f(1) + f(3)
+\end{aligned}
+\qquad \qquad
+\begin{aligned}
+F(4) &= f(1) + f(2) + f(4) \\
+F(5) &= f(1) + f(5) \\
+F(6) &= f(1) + f(2) + f(3) + f(6)
+\end{aligned}
+\end{equation*}
+$$
+This is a system of 6 linear equations with 6 unknowns. Assuming that we know $F$, we have
+$$
+\begin{align*}
+    f(1) &= F(1) \\
+    f(2) &= F(2) - f(1) = F(2) - F(1) \\
+    f(3) &= F(3) - F(1) \\
+    f(4) &= F(4) - F(1) - F(2) + F(1) \\
+    &= F(4) - F(2) \\
+    f(5) &= F(5) - F(1) \\
+    f(6) &= F(6) - F(1) - F(2) + F(1) - F(3) + F(1) \\
+    &= F(6) - F(2) - F(3) + F(1)
+\end{align*}
+$$
+Observe that $f(n) = \sum_{d \mid n} \mu_d F(d)$, where $\mu_d \in \{0, \pm 1\}$.
+<Definition>
+    <DefinitionName>Mobius $\mu$ Function</DefinitionName>
+    <DefinitionContent>
+        The Mobius $\mu$ function is defined by
+        $$
+        \mu(n) = \begin{cases}
+            1 & \text{if } n = 1 \\
+            0 & \text{if } n \text{ has a repeated prime divisor} \\
+            (-1)^k & \text{if } n = p_1p_2\cdots p_k \text{ is a product of $k$ distinct primes}
+        \end{cases}
+        $$
+    </DefinitionContent>
+</Definition>
+For example, we have
+| $n$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 
+|-------|---|---|---|---|---|---|---|---|---|----|
+| $\mu(n)$ | 1 | -1 | -1 | 0 | -1 | 1 | -1 | 0 | 0 | 1 |
+
+We can show that $\mu$ is multiplicative, and the summatory function of $\mu$ is
+$$
+\sum_{d \mid n} \mu(d) = \begin{cases}
+    1 & \text{if } n = 1 \\
+    0 & \text{otherwise}
+\end{cases} = \left\lfloor \frac{1}{n} \right\rfloor
+$$
+<Theorem withName={true}>
+    <TheoremName>Mobius Inversion</TheoremName>
+    <TheoremContent>
+        Given a summatory function $F$, we can recover $f$ by
+        $$
+        f(n) = \sum_{d \mid n} \mu(d) F\left(\frac{n}{d}\right) = \sum_{d \mid n} \mu\left(\frac{n}{d}\right) F(d)
+        $$
+    </TheoremContent>
+</Theorem>
+<Proof>
+    <ProofContent>
+        We have
+        $$
+        \begin{align*}
+            \sum_{d \mid n} \mu(d) F\left(\frac{n}{d}\right) &= \sum_{d \mid n} \mu(d) \sum_{e \mid \frac{n}{d}} f(e) \\
+            &= \sum_{d \mid n} \sum_{e \mid \frac{n}{d}} \mu(d) f(e) \\
+        \end{align*}
+        $$
+        Here, we are summing over all pairs of integers $(d, e)$ such that $d \mid n$ and $e \mid \frac{n}{d}$. Observe that 
+        1. If $e \mid \frac{n}{d}$, then $e \mid n$.
+        2. If $e \mid n$, then $e \mid \frac{n}{d}$ iff $d \mid \frac{n}{e}$.
+
+        So, this is equivalent to summing over all pairs of integers $(d, e)$ such that $e \mid n$ and $d \mid \frac{n}{e}$. So we can change the order of summation to get
+        $$
+        \begin{align*}
+            \sum_{d \mid n} \sum_{e \mid \frac{n}{d}} \mu(d) f(e) = \sum_{e \mid n} \left(\sum_{d \mid \frac{n}{e}} \mu(d)\right) f(e)
+        \end{align*}
+        $$
+        Since 
+        $$
+        \sum_{d \mid \frac{n}{e}} \mu(d) = \begin{cases}
+            1 & \text{if } \frac{n}{e} = 1 \\
+            0 & \text{otherwise}
+        \end{cases}
+        $$
+        All the terms in the sum are 0 except for $e = n$, so this leaves us with $f(n)$, so
+        $$
+        f(n) = \sum_{d \mid n} \mu(d) F\left(\frac{n}{d}\right)
+        $$
+    </ProofContent>
+</Proof>
