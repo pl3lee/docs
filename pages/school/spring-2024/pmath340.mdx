@@ -1965,3 +1965,137 @@ $$
         $$
     </ProofContent>
 </Proof>
+
+## Lecture 17 (June 14, 2024)
+### Mobius Inversion (Continued)
+If we let $f(n) = \phi(n)$, then we have its summatory function $F(n) = \sum_{d \mid n} \phi(d) = n$. Applying Mobius Inversion gives
+$$
+\phi(n) = \sum_{d \mid n} \mu(d) \frac{n}{d}.
+$$
+A consequence of this is that $\phi$ is multiplicative.
+<Proof>
+    <ProofContent>
+        Suppose $m, n \in \Z_{> 0}$ are coprime. Then
+        $$
+        \begin{align*}
+            \phi(mn) &= \sum_{d \mid mn} \mu(d) \frac{mn}{d} \\
+            &= \sum_{\substack{d_1 \mid m \\ d_2 \mid n}} \mu(d_1d_2) \frac{mn}{d_1d_2} \\
+            &= \sum_{d_1 \mid m} \mu(d_1) \frac{m}{d_1} \sum_{d_2 \mid n} \mu(d_2) \frac{n}{d_2} \\
+            &= \phi(m) \phi(n)
+        \end{align*}
+        $$
+    </ProofContent>
+</Proof>
+**Remark**: The same proof shows that if $F(n) = \sum_{d \mid n} f(n)$ is multiplicative, then $f(n)$ is multiplicative. So,
+$$
+F(n) \text{ is mulitplicative} \iff f(n) \text{ is multiplicative}.
+$$
+Another consequence is
+$$
+\phi(p^a) = p^a - p^{a - 1}
+$$
+<Proof>
+    <ProofContent>
+        We have $\phi(p^a) = \sum_{d \mid p^a} \mu(d) \frac{p^a}{d}$. The divisors of $p^a$ are of the form $d = p^b, 0 \leq b \leq a$. Since $\mu(p^b) = 0$ for all $b > 1$, we are left with
+        $$
+        \begin{align*}
+            \phi(p^a) &= \mu(1) \frac{p^a}{1} + \mu(p) \frac{p^a}{p} \\
+            &= p^a - p^{a - 1}.
+        \end{align*}
+        $$
+    </ProofContent>
+</Proof>
+<Corollary>
+    <CorollaryContent>
+        If $n = \prod_{i = 1}^k p_i^{a_i}$, then
+        $$
+        \begin{align*}
+            \phi(n) = \prod \phi(p_i^{a_i}) \\
+        &= \prod (p_i^{a_i} - p_i^{a_i - 1})
+        \end{align*}
+        $$
+    </CorollaryContent>
+</Corollary>
+For example, we have
+$$
+\begin{align*}
+    \phi(400) &= \phi(2^4 \cdot 5^2) \\
+    &= \phi(2^4) \phi(5^2) \\
+    &= (2^4 - 2^3)(5^2 - 5) \\
+    &= 8 \cdot 20 
+\end{align*}
+$$
+### Discrete Log Problem
+The discrete log problem is as follows: solve for $x \in \Z_{> 0}$ given $a, b, n$:
+$$
+a^x \equiv b \pmod{n}
+$$
+This means that $x = \log_a(b)$. In general, this is a very difficult problem computationally for large $a, b, n$.
+
+Let's do some investigation by working in modulo 7.
+1. Solve $3^x \equiv 6 \pmod 7$. We have
+    $$
+    \begin{equation*}
+    \begin{aligned}
+        3^1 &\equiv 3 \pmod 7 \\
+        3^2 &\equiv 2 \pmod 7 \\
+        3^3 &\equiv 6 \pmod 7 \\
+        3^4 &\equiv 4 \pmod 7 \\
+        3^5 &\equiv 5 \pmod 7
+    \end{aligned}
+    \qquad \qquad
+    \begin{aligned}
+        3^6 &\equiv 1 \pmod 7 \\
+        3^7 &\equiv 3 \pmod 7 \\
+        3^8 &\equiv 2 \pmod 7 \\
+        3^9 &\equiv 6 \pmod 7 \\
+    \end{aligned}
+    \end{equation*}
+    $$
+    Since $3^6 \equiv 1 \pmod 7$, by Fermat's Little Theorem, we have 
+    $$
+    3^{3 + 6k} \equiv (3^3)(3^6)^k \equiv 6 \pmod 7
+    $$
+    So, once there is a solution, there are infinitely man, they are all equivalent to $3 \pmod 6$, which is $3 \pmod{\phi(7)}$.
+2. Solve $4^x \equiv 6 \pmod 7$. We have
+    $$
+    \begin{equation*}
+    \begin{aligned}
+        4^1 &\equiv 4 \pmod 7 \\
+        4^2 &\equiv 2 \pmod 7 \\
+        4^3 &\equiv 1 \pmod 7
+    \end{aligned}
+    \qquad \qquad
+    \begin{aligned}
+        4^4 &\equiv 4 \pmod 7 \\
+        4^5 &\equiv 2 \pmod 7 \\
+        4^6 &\equiv 1 \pmod 7
+    \end{aligned}
+    \end{equation*}
+    $$
+    None of them are equivalent to 6, so there is no solution.
+
+**Conclusion**: Consider $a^x \equiv b \pmod n$ (Assuming $\gcd(a, n) = 1$).
+1. If there is a solution for $x$, then there are infinitely many. They are congruent to each other mod $\phi(n)$.
+2. Sometimes there are no solutions.
+
+Notice that $3^x \equiv 1, 2, \ldots, 6 \pmod 7$, while $4^x \equiv 1, 2, 4 \pmod 7$. We can see that the orders of 3 and 4 divides $\phi(7) = 6$.
+<Definition>
+    <DefinitionName>Order of an Element, Primitive Root</DefinitionName>
+    <DefinitionContent>
+        Let $a \in (\Z/n \Z)^*$. The order of $a$ is the smallest integer $e \geq 1$ such that $a^e \equiv 1 \pmod n$. We write $\text{ord}(a)$.
+
+        If $\text{ord}(a) = \phi(n)$, we call it a primitive root (generator) modulo $n$.
+    </DefinitionContent>
+</Definition>
+<Theorem>
+    <TheoremContent>
+        Let $n \in \Z_{> 0}$. There is a primitive root modulo $n$ if and only if $n = 1, 2, 4, p^a, 2p^a$, where $p$ is an odd prime, and $a \in \Z_{> 0}$.
+    </TheoremContent>
+</Theorem>
+<Definition>
+    <DefinitionName>Unique Solution to Discrete Log Problem</DefinitionName>
+    <DefinitionContent>
+        Let $g$ be a primitive root modulo $p$. We define $\log_g(b)$ to be the unique solution to $g^x \equiv a \pmod p$.
+    </DefinitionContent>
+</Definition>
